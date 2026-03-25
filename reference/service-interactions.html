@@ -1,0 +1,518 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Service Interaction Sequences &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Local Developer Workflow" href="../local-deploy.html" />
+    <link rel="prev" title="Local Development Setup" href="local-dev-setup.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../specs/api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Service Interaction Sequences</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#journey-a-schema-curation">Journey A: Schema Curation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-upload">Step 1: Upload</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-configure-ai-suggestions-duplicate-detection">Step 2: Configure (AI Suggestions + Duplicate Detection)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3-curate-per-variable">Step 3: Curate (per variable)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-4-validation-rules">Step 4: Validation Rules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-5-publish">Step 5: Publish</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#journey-b-data-harmonization-validation">Journey B: Data Harmonization + Validation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-setup">Step 1: Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-match">Step 2: Match</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3-curate">Step 3: Curate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-4-validate">Step 4: Validate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-5-results">Step 5: Results</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#journey-b-continued-submission-review">Journey B (continued): Submission Review</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#journey-c-gold-dataset-management">Journey C: Gold Dataset Management</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#dashboard">Dashboard</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create">Create</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#detail-view-gold-dataset-id">Detail View (<code class="docutils literal notranslate"><span class="pre">?gold_dataset={id}</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#client-service-mapping">Client → Service Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-calls-claude-api-directly">What Calls Claude API Directly</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Service Interaction Sequences</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/service-interactions.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="service-interaction-sequences">
+<h1>Service Interaction Sequences<a class="headerlink" href="#service-interaction-sequences" title="Link to this heading"></a></h1>
+<p>What backend calls happen, in what order, for each user workflow. This is the implicit API contract that lives inside the Streamlit pages today. When the Harmonization API and Curation API are built, these sequences become the endpoint design spec.</p>
+<hr class="docutils" />
+<section id="journey-a-schema-curation">
+<h2>Journey A: Schema Curation<a class="headerlink" href="#journey-a-schema-curation" title="Link to this heading"></a></h2>
+<p><strong>Page:</strong> <code class="docutils literal notranslate"><span class="pre">pages/1_Schemas.py</span></code>
+<strong>Goal:</strong> Upload a raw CDE list → curate with AI assistance → publish to Registry</p>
+<section id="step-1-upload">
+<h3>Step 1: Upload<a class="headerlink" href="#step-1-upload" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>User uploads CSV/TSV/Excel file
+    │
+    ├─→ parser.parse_uploaded_file(content, filename, sheet_name?)
+    │       Returns: ParseResult (list of RawElement + column mapping)
+    │
+    ├─→ save_curation_session(project_id, session)          [local storage]
+    ├─→ save_schema_project(manifest)                        [local storage]
+    ├─→ save_source_file(project_id, df, filename)           [local storage]
+    └─→ save_parse_result(project_id, parse_result)          [local storage]
+</pre></div>
+</div>
+</section>
+<section id="step-2-configure-ai-suggestions-duplicate-detection">
+<h3>Step 2: Configure (AI Suggestions + Duplicate Detection)<a class="headerlink" href="#step-2-configure-ai-suggestions-duplicate-detection" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Page loads → runs AI + similarity in one pass
+    │
+    ├─→ DuplicateDetector(retrieval_config)
+    │       Uses: forge-retrieval-core (TF-IDF + embeddings)
+    │
+    ├─→ detector.index_elements(raw_elements)
+    ├─→ detector.get_pairwise_similarities(threshold)
+    │       Returns: dict[var, dict[var, float]]
+    │
+    ├─→ AISuggestionService(anthropic_client, curation_config)
+    ├─→ svc.generate_all_suggestions(raw_elements, batch_size=10)
+    │       Calls: Claude API (batches of 10 elements)
+    │       Returns: SuggestionsResult (per-element suggestions for name, type, constraints)
+    │
+    ├─→ save_batch_suggestions(project_id, suggestions_result)  [local storage]
+    ├─→ save_element_hashes(project_id, hashes)                  [local storage]
+    └─→ save_curation_session(project_id, session)               [local storage]
+</pre></div>
+</div>
+</section>
+<section id="step-3-curate-per-variable">
+<h3>Step 3: Curate (per variable)<a class="headerlink" href="#step-3-curate-per-variable" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>User reviews each variable, accepts/modifies/rejects
+    │
+    ├─→ session.get_filtered_variables(filter)           [in-memory]
+    ├─→ session.get_similar_variables(var, threshold)     [in-memory]
+    │
+    │   If variable has a linked value set:
+    ├─→ registry_client.get_value_set(value_set_id)      [Registry API]
+    │
+    │   If user creates a new value set:
+    ├─→ registry_client.list_value_sets(published_only=False)   [Registry API]
+    ├─→ registry_client.upload_value_set(bytes, name, meta)     [Registry API]
+    │
+    └─→ save_curation_session(project_id, session)       [local storage]
+</pre></div>
+</div>
+</section>
+<section id="step-4-validation-rules">
+<h3>Step 4: Validation Rules<a class="headerlink" href="#step-4-validation-rules" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>User builds conditional rules using templates or custom expressions
+    │
+    ├─→ (all in-memory: rules stored in session.validation_rules)
+    └─→ save_curation_session(project_id, session)       [local storage]
+</pre></div>
+</div>
+</section>
+<section id="step-5-publish">
+<h3>Step 5: Publish<a class="headerlink" href="#step-5-publish" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>User clicks Publish
+    │
+    ├─→ publish_to_registry(client, schema_name, display_name, description, elements, rules)
+    │       Internally:
+    │       ├─→ registry_client.create_schema(SchemaCreate)     [Registry API → 201]
+    │       └─→ registry_client.create_schema_elements(...)     [Registry API]
+    │
+    └─→ save_schema_project(manifest)                            [local storage]
+            Sets: published_schema_id, published_schema_name
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="journey-b-data-harmonization-validation">
+<h2>Journey B: Data Harmonization + Validation<a class="headerlink" href="#journey-b-data-harmonization-validation" title="Link to this heading"></a></h2>
+<p><strong>Page:</strong> <code class="docutils literal notranslate"><span class="pre">pages/2_Data.py</span></code>
+<strong>Goal:</strong> Map source fields to a published schema → validate data → submit for review</p>
+<section id="step-1-setup">
+<h3>Step 1: Setup<a class="headerlink" href="#step-1-setup" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>User uploads source data dictionary (and optionally a data file)
+    │
+    ├─→ (if data file uploaded) _extract_data_dict_from_data_file(df)
+    │       Auto-generates data dict from column headers
+    │
+    ├─→ save_harm_data_dict(project_id, data_dict_df)    [local storage]
+    ├─→ save_harm_data_file(project_id, bytes, name)     [local storage]
+    └─→ save_data_project(manifest)                       [local storage]
+</pre></div>
+</div>
+</section>
+<section id="step-2-match">
+<h3>Step 2: Match<a class="headerlink" href="#step-2-match" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>System runs 2-tier matching against the target schema
+    │
+    ├─→ load_harm_data_dict(project_id)                          [local storage]
+    │
+    ├─→ registry_client.get_schema_elements(schema_id)           [Registry API]
+    ├─→ elements_to_reference_df(elements)                       [in-memory transform]
+    │
+    ├─→ ComprehensiveMatcher(api_key, use_hybrid_retrieval=True)
+    ├─→ matcher.load_reference_cdes(df=reference_df)
+    │       Internally builds TF-IDF + embedding index via HybridRetriever
+    │
+    ├─→ run_matching(matcher, data_dict_df, progress_callback)
+    │       For each source field:
+    │       ├─→ Tier 1: Exact name match against CDE items + alternate names
+    │       │       If match → confidence 1.0, skip AI
+    │       └─→ Tier 2: HybridRetriever.retrieve(query) → top 15 candidates
+    │                    → Claude API evaluates candidates → best match + confidence
+    │
+    ├─→ save_harm_results(project_id, results_df)                [local storage]
+    └─→ save_data_project(manifest)                               [local storage]
+</pre></div>
+</div>
+</section>
+<section id="step-3-curate">
+<h3>Step 3: Curate<a class="headerlink" href="#step-3-curate" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>User reviews AI match suggestions, accepts/rejects/modifies
+    │
+    ├─→ load_curated_match_set(project_id)                       [local storage]
+    │       OR create_curated_match_set_from_results(results_df)
+    │       (auto-accepts exact matches on first creation)
+    │
+    │   Per-field operations:
+    ├─→ filter_curations(cms, decision_filter, max_confidence)   [in-memory]
+    ├─→ sort_curations(curations, sort_by)                        [in-memory]
+    ├─→ update_curation_decision(fc, decision, match_id?)         [in-memory]
+    │
+    │   Bulk operations:
+    ├─→ accept_all_exact_matches(cms)                             [in-memory]
+    ├─→ reset_exact_matches_to_pending(cms)                       [in-memory]
+    │
+    │   Exports:
+    ├─→ cms.to_simple_mapping_tsv()                               [in-memory → download]
+    ├─→ cms.to_summary_report()                                   [in-memory → download]
+    ├─→ cms.to_gap_report_tsv()                                   [in-memory → download]
+    │
+    ├─→ save_curated_match_set(project_id, cms)                   [local storage]
+    └─→ save_data_project(manifest)                                [local storage]
+</pre></div>
+</div>
+</section>
+<section id="step-4-validate">
+<h3>Step 4: Validate<a class="headerlink" href="#step-4-validate" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>User submits data file for validation against the schema
+    │
+    │   If data file was preloaded in Step 1:
+    ├─→ load_harm_data_file(project_id)                          [local storage]
+    ├─→ _load_mapping(project_id)                                 [from curated match set]
+    ├─→ _apply_column_mapping(file_bytes, mapping)                [in-memory rename]
+    │
+    │   Gold dataset selection:
+    ├─→ gold_client.list_gold_datasets(schema_id)                [DataForge API]
+    │   (optionally) gold_client.create_gold_dataset(...)        [DataForge API]
+    │
+    │   Submit to DataForge:
+    ├─→ dataforge_client.upload_submission(                       [DataForge API → 201]
+    │       file, project, study, submitter,
+    │       schema_id, gold_dataset_id?)
+    │
+    │   OR for corrections:
+    ├─→ dataforge_client.resubmit_submission(                    [DataForge API]
+    │       submission_id, file, filename, submitter)
+    │
+    └─→ save_data_project(manifest)                               [local storage]
+            Sets: active_submission_id, appends to submission_ids
+</pre></div>
+</div>
+</section>
+<section id="step-5-results">
+<h3>Step 5: Results<a class="headerlink" href="#step-5-results" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Display validation results
+    │
+    ├─→ dataforge_client.get_submission(submission_id)           [DataForge API]
+    ├─→ dataforge_client.get_report(submission_id, format=&quot;json&quot;) [DataForge API]
+    └─→ dataforge_client.get_report(submission_id, format=&quot;csv&quot;)  [DataForge API → download]
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="journey-b-continued-submission-review">
+<h2>Journey B (continued): Submission Review<a class="headerlink" href="#journey-b-continued-submission-review" title="Link to this heading"></a></h2>
+<p><strong>Page:</strong> <code class="docutils literal notranslate"><span class="pre">pages/2_Data.py</span></code> — Review View (<code class="docutils literal notranslate"><span class="pre">?submission={id}</span></code>)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Reviewer opens a submission
+    │
+    ├─→ dataforge_client.get_submission(submission_id)           [DataForge API]
+    ├─→ dataforge_client.get_report(submission_id, &quot;json&quot;)       [DataForge API]
+    │
+    │   Gold dataset assignment (before accepting):
+    ├─→ gold_client.list_gold_datasets(schema_id)                [DataForge API]
+    ├─→ dataforge_client.assign_gold_dataset(                    [DataForge API]
+    │       submission_id, reviewer, gold_dataset_id?)
+    │
+    │   Review actions:
+    ├─→ dataforge_client.claim_submission(id, reviewer)          [DataForge API]
+    ├─→ dataforge_client.accept_submission(id, reviewer, notes?) [DataForge API]
+    │       Internally: appends data to gold dataset with provenance
+    ├─→ dataforge_client.reject_submission(id, reviewer, notes?) [DataForge API]
+    └─→ dataforge_client.release_submission(id, reviewer)        [DataForge API]
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="journey-c-gold-dataset-management">
+<h2>Journey C: Gold Dataset Management<a class="headerlink" href="#journey-c-gold-dataset-management" title="Link to this heading"></a></h2>
+<p><strong>Page:</strong> <code class="docutils literal notranslate"><span class="pre">pages/3_Gold.py</span></code></p>
+<section id="dashboard">
+<h3>Dashboard<a class="headerlink" href="#dashboard" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├─→ gold_client.list_gold_datasets()                             [DataForge API]
+└─→ gold_client.delete_gold_dataset(dataset_id)                  [DataForge API]
+</pre></div>
+</div>
+</section>
+<section id="create">
+<h3>Create<a class="headerlink" href="#create" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├─→ registry_client.list_schemas()                               [Registry API]
+└─→ gold_client.create_gold_dataset(                             [DataForge API → 201]
+        name, schema_id, schema_name,
+        description?, identifier_scheme?, created_by)
+</pre></div>
+</div>
+</section>
+<section id="detail-view-gold-dataset-id">
+<h3>Detail View (<code class="docutils literal notranslate"><span class="pre">?gold_dataset={id}</span></code>)<a class="headerlink" href="#detail-view-gold-dataset-id" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├─→ gold_client.get_gold_dataset(dataset_id)                     [DataForge API]
+└─→ gold_client.download_gold_csv(dataset_id)                    [DataForge API]
+        Returns CSV with provenance columns:
+        _submission_id, _version, _source_row, _accepted_at, _accepted_by
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="client-service-mapping">
+<h2>Client → Service Mapping<a class="headerlink" href="#client-service-mapping" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Client method</p></th>
+<th class="head"><p>HTTP call</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">registry_client.list_schemas()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/v1/schemas/</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">registry_client.get_schema(id)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/v1/schemas/{id}</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">registry_client.get_schema_elements(id)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/v1/schemas/{id}/elements</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">registry_client.create_schema(payload)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/v1/schemas/</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">registry_client.list_value_sets()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/v1/value-sets/</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">registry_client.get_value_set(id)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/v1/value-sets/{id}</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">registry_client.upload_value_set(file,</span> <span class="pre">...)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/v1/value-sets/upload</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dataforge_client.upload_submission(...)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/v1/submissions/</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dataforge_client.get_submission(id)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/v1/submissions/{id}</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dataforge_client.resubmit_submission(...)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/v1/submissions/{id}/resubmit</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dataforge_client.get_report(id,</span> <span class="pre">fmt)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/v1/submissions/{id}/report</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dataforge_client.claim_submission(id,</span> <span class="pre">...)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/v1/submissions/{id}/claim</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dataforge_client.accept_submission(id,</span> <span class="pre">...)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/v1/submissions/{id}/accept</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dataforge_client.reject_submission(id,</span> <span class="pre">...)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/v1/submissions/{id}/reject</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">dataforge_client.release_submission(id,</span> <span class="pre">...)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/v1/submissions/{id}/release</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dataforge_client.assign_gold_dataset(...)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PATCH</span> <span class="pre">/api/v1/submissions/{id}/gold-dataset</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">gold_client.list_gold_datasets(schema_id?)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/v1/gold/</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">gold_client.create_gold_dataset(...)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/v1/gold/</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">gold_client.get_gold_dataset(id)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/v1/gold/{id}</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">gold_client.delete_gold_dataset(id)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">DELETE</span> <span class="pre">/api/v1/gold/{id}</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">gold_client.download_gold_csv(id)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/v1/gold/{id}/download</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="what-calls-claude-api-directly">
+<h2>What Calls Claude API Directly<a class="headerlink" href="#what-calls-claude-api-directly" title="Link to this heading"></a></h2>
+<p>Only two modules make LLM calls. Everything else is deterministic.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Module</p></th>
+<th class="head"><p>When</p></th>
+<th class="head"><p>What it sends</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">core/curation/suggestion_service.py</span></code></p></td>
+<td><p>Step 2 of Schema Curation</p></td>
+<td><p>Batches of 10 raw elements → gets name, type, constraint, description suggestions</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">core/harmonization/matcher.py</span></code></p></td>
+<td><p>Step 2 of Data Harmonization (Tier 2 only)</p></td>
+<td><p>Source field + 15 retrieval candidates → gets best match + confidence + rationale</p></td>
+</tr>
+</tbody>
+</table>
+<p>Both use <code class="docutils literal notranslate"><span class="pre">claude-sonnet-4-6</span></code>, temperature 0.0, with retry logic via <code class="docutils literal notranslate"><span class="pre">core/retry.py</span></code>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="local-dev-setup.html" class="btn btn-neutral float-left" title="Local Development Setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../local-deploy.html" class="btn btn-neutral float-right" title="Local Developer Workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

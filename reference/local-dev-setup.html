@@ -1,0 +1,438 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Local Development Setup &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Service Interaction Sequences" href="service-interactions.html" />
+    <link rel="prev" title="Glossary" href="glossary.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../specs/api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Local Development Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start-docker-all-services">Quick Start (Docker — all services)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#local-python-setup-for-running-tests-and-linting">Local Python Setup (for running tests and linting)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-virtualenv-from-the-repo-root">1. Create a virtualenv from the repo root</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-each-service-you-re-working-on">2. Install each service you’re working on</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-tests">3. Run tests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#linting-optional-ci-linting-currently-disabled">4. Linting (optional, CI linting currently disabled)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#environment-variables">Environment Variables</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#repo-root-env">Repo root <code class="docutils literal notranslate"><span class="pre">.env</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#registry-service">Registry Service</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataforge">DataForge</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#forge-app">forge-app</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#common-issues">Common Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#project-structure-abbreviated">Project Structure (abbreviated)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Local Development Setup</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/local-dev-setup.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="local-development-setup">
+<h1>Local Development Setup<a class="headerlink" href="#local-development-setup" title="Link to this heading"></a></h1>
+<hr class="docutils" />
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Python 3.11+</p></li>
+<li><p>Docker and Docker Compose</p></li>
+<li><p>An Anthropic API key (for AI features in forge-app)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="quick-start-docker-all-services">
+<h2>Quick Start (Docker — all services)<a class="headerlink" href="#quick-start-docker-all-services" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Clone and enter the repo</span>
+git<span class="w"> </span>clone<span class="w"> </span>&lt;repo-url&gt;<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>cde-engine
+
+<span class="c1"># Set up environment</span>
+cp<span class="w"> </span>.env.example<span class="w"> </span>.env
+<span class="c1"># Edit .env and add your ANTHROPIC_API_KEY</span>
+
+<span class="c1"># Start everything</span>
+docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>--build
+</pre></div>
+</div>
+<p>Services come up at:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Service</p></th>
+<th class="head"><p>URL</p></th>
+<th class="head"><p>What to check</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>forge-app</p></td>
+<td><p>http://localhost:8505</p></td>
+<td><p>Main UI — should show home dashboard</p></td>
+</tr>
+<tr class="row-odd"><td><p>Registry Service</p></td>
+<td><p>http://localhost:8000/health</p></td>
+<td><p>Should return <code class="docutils literal notranslate"><span class="pre">{&quot;status&quot;:</span> <span class="pre">&quot;healthy&quot;}</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>DataForge API</p></td>
+<td><p>http://localhost:8001/health</p></td>
+<td><p>Should return <code class="docutils literal notranslate"><span class="pre">{&quot;status&quot;:</span> <span class="pre">&quot;healthy&quot;}</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>PostgreSQL</p></td>
+<td><p>localhost:5432</p></td>
+<td><p>User: <code class="docutils literal notranslate"><span class="pre">forge</span></code>, password: <code class="docutils literal notranslate"><span class="pre">forge</span></code>, db: <code class="docutils literal notranslate"><span class="pre">forge</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>The legacy standalone services (<code class="docutils literal notranslate"><span class="pre">:8501</span></code>, <code class="docutils literal notranslate"><span class="pre">:8502</span></code>, <code class="docutils literal notranslate"><span class="pre">:8503</span></code>) also start but aren’t needed for development.</p>
+<p>To start only what you need:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>--build<span class="w"> </span>forge-app<span class="w"> </span>registry-service<span class="w"> </span>dataforge-api<span class="w"> </span>postgres
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="local-python-setup-for-running-tests-and-linting">
+<h2>Local Python Setup (for running tests and linting)<a class="headerlink" href="#local-python-setup-for-running-tests-and-linting" title="Link to this heading"></a></h2>
+<p>Tests run against the local Python environment, not Docker.</p>
+<section id="create-a-virtualenv-from-the-repo-root">
+<h3>1. Create a virtualenv from the repo root<a class="headerlink" href="#create-a-virtualenv-from-the-repo-root" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3.11<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+</pre></div>
+</div>
+</section>
+<section id="install-each-service-you-re-working-on">
+<h3>2. Install each service you’re working on<a class="headerlink" href="#install-each-service-you-re-working-on" title="Link to this heading"></a></h3>
+<p><strong>forge-app:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>services/forge-app/requirements.txt
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>libs/forge-retrieval-core
+</pre></div>
+</div>
+<p><strong>Registry Service:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>services/registry-service/requirements.txt
+</pre></div>
+</div>
+<p><strong>DataForge:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;services/dataforge[dev]&quot;</span>
+</pre></div>
+</div>
+<p><strong>forge-retrieval-core (standalone):</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;libs/forge-retrieval-core[dev]&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="run-tests">
+<h3>3. Run tests<a class="headerlink" href="#run-tests" title="Link to this heading"></a></h3>
+<p>Always run from the repo root using <code class="docutils literal notranslate"><span class="pre">.venv/bin/python</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># forge-app</span>
+.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>services/forge-app/tests/<span class="w"> </span>-x<span class="w"> </span>-q
+
+<span class="c1"># Registry Service (uses in-memory SQLite, not PostgreSQL)</span>
+.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>services/registry-service/tests/<span class="w"> </span>-x<span class="w"> </span>-q
+
+<span class="c1"># DataForge</span>
+.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>services/dataforge/tests/<span class="w"> </span>-x<span class="w"> </span>-q
+
+<span class="c1"># forge-retrieval-core</span>
+.venv/bin/python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>libs/forge-retrieval-core/tests/<span class="w"> </span>-x<span class="w"> </span>-q
+</pre></div>
+</div>
+</section>
+<section id="linting-optional-ci-linting-currently-disabled">
+<h3>4. Linting (optional, CI linting currently disabled)<a class="headerlink" href="#linting-optional-ci-linting-currently-disabled" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>black<span class="w"> </span>--check<span class="w"> </span>--line-length<span class="w"> </span><span class="m">100</span><span class="w"> </span>.
+flake8<span class="w"> </span>--max-line-length<span class="o">=</span><span class="m">110</span><span class="w"> </span>--extend-ignore<span class="o">=</span>E203,W503
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="environment-variables">
+<h2>Environment Variables<a class="headerlink" href="#environment-variables" title="Link to this heading"></a></h2>
+<section id="repo-root-env">
+<h3>Repo root <code class="docutils literal notranslate"><span class="pre">.env</span></code><a class="headerlink" href="#repo-root-env" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Used by</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ANTHROPIC_API_KEY</span></code></p></td>
+<td><p>Yes (for AI features)</p></td>
+<td><p>—</p></td>
+<td><p>forge-app, harmonization-engine, curation-workbench</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LOG_LEVEL</span></code></p></td>
+<td><p>No</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">INFO</span></code></p></td>
+<td><p>All services</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="registry-service">
+<h3>Registry Service<a class="headerlink" href="#registry-service" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DATABASE_URL</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">postgresql://forge:forge&#64;localhost:5432/forge</span></code></p></td>
+<td><p>Docker Compose sets this automatically</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="dataforge">
+<h3>DataForge<a class="headerlink" href="#dataforge" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DATAFORGE_STORAGE_ROOT</span></code></p></td>
+<td><p>No</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/app/data/storage</span></code></p></td>
+<td><p>Where submissions and gold datasets are stored</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DATAFORGE_REGISTRY_SERVICE_URL</span></code></p></td>
+<td><p>No</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http://localhost:8000</span></code></p></td>
+<td><p>Registry Service URL for schema loading</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="forge-app">
+<h3>forge-app<a class="headerlink" href="#forge-app" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">REGISTRY_SERVICE_URL</span></code></p></td>
+<td><p>No</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http://localhost:8000</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DATAFORGE_API_URL</span></code></p></td>
+<td><p>No</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">http://localhost:8001</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ANTHROPIC_API_KEY</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>—</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<hr class="docutils" />
+<section id="common-issues">
+<h2>Common Issues<a class="headerlink" href="#common-issues" title="Link to this heading"></a></h2>
+<p><strong><code class="docutils literal notranslate"><span class="pre">ModuleNotFoundError:</span> <span class="pre">shared.logging</span></code></strong>
+Set <code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code> to include the services directories:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span>services/shared:services/:<span class="nv">$PYTHONPATH</span>
+</pre></div>
+</div>
+<p><strong>forge-retrieval-core not found by forge-app tests</strong>
+Install it as an editable package:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>libs/forge-retrieval-core
+</pre></div>
+</div>
+<p><strong>DataForge import errors</strong>
+DataForge is a package, not a plain script directory. Install it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;services/dataforge[dev]&quot;</span>
+</pre></div>
+</div>
+<p><strong>Registry tests fail with PostgreSQL errors</strong>
+Registry tests use in-memory SQLite by default (see <code class="docutils literal notranslate"><span class="pre">services/registry-service/tests/conftest.py</span></code>). They don’t need a running PostgreSQL instance.</p>
+<p><strong>Streamlit <code class="docutils literal notranslate"><span class="pre">use_container_width</span></code> deprecation warnings</strong>
+Use <code class="docutils literal notranslate"><span class="pre">width=&quot;stretch&quot;</span></code> instead of <code class="docutils literal notranslate"><span class="pre">use_container_width=True</span></code>. This is a codebase convention.</p>
+</section>
+<hr class="docutils" />
+<section id="project-structure-abbreviated">
+<h2>Project Structure (abbreviated)<a class="headerlink" href="#project-structure-abbreviated" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>cde-engine/
+├── .env.example                  ← copy to .env, add ANTHROPIC_API_KEY
+├── docker-compose.yml            ← all services
+├── services/
+│   ├── forge-app/                ← Unified Streamlit UI (port 8505)
+│   │   ├── app.py                   Home dashboard
+│   │   ├── pages/                   1_Schemas, 2_Data, 3_Gold, 4_Settings
+│   │   ├── core/                    Business logic (curation/, harmonization/)
+│   │   ├── clients/                 HTTP clients for Registry + DataForge
+│   │   └── tests/
+│   ├── registry-service/         ← Schema API (port 8000)
+│   │   ├── app/api/                 FastAPI routes
+│   │   ├── app/models/              SQLAlchemy ORM
+│   │   ├── app/schemas/             Pydantic request/response models
+│   │   ├── alembic/                 Database migrations
+│   │   └── tests/
+│   ├── dataforge/                ← Validation API (port 8001)
+│   │   ├── src/dataforge/           Python package
+│   │   │   ├── api/routes/          FastAPI routes
+│   │   │   ├── submission/          Submission lifecycle
+│   │   │   ├── validation/          Schema validation engine
+│   │   │   ├── gold/                Gold dataset management
+│   │   │   └── audit/               Append-only audit logs
+│   │   └── tests/
+│   └── shared/                   ← Common utilities (logging)
+├── libs/
+│   └── forge-retrieval-core/     ← TF-IDF + embedding retrieval library
+└── docs/
+    ├── platform/                 ← Vision, roadmap, architecture
+    ├── specs/                    ← Service specs, decoupling plan
+    └── reference/                ← API reference, data models, this file
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="glossary.html" class="btn btn-neutral float-left" title="Glossary" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="service-interactions.html" class="btn btn-neutral float-right" title="Service Interaction Sequences" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

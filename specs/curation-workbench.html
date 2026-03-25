@@ -1,0 +1,979 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SchemaForge: Curation Workbench &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="DataForge" href="dataforge.html" />
+    <link rel="prev" title="API-First Decoupling Spec" href="api-first-decoupling.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SchemaForge: Curation Workbench</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#product-specification-v1-0">Product Specification v1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#executive-summary">Executive Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#solution">Solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#target-users">Target Users</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#primary-data-steward-research-data-manager">Primary: Data Steward / Research Data Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#secondary-schema-manager">Secondary: Schema Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tertiary-data-consumer">Tertiary: Data Consumer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#core-workflow">Core Workflow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#schema-creation-from-raw-cde-list">1. Schema Creation from Raw CDE List</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schema-as-managed-resource">2. Schema as Managed Resource</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schema-evolution-adding-new-variables">3. Schema Evolution (Adding New Variables)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#key-features">Key Features</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#f1-upload-parse">F1: Upload &amp; Parse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f2-duplicate-detection">F2: Duplicate Detection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f3-ai-assisted-curation">F3: AI-Assisted Curation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f4-schema-projects">F4: Schema Projects</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f5-schema-evolution">F5: Schema Evolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f6-export-integration">F6: Export &amp; Integration</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data-model">Data Model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#schema-project">Schema Project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#element">Element</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#constraint-format-examples">Constraint Format Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#variable-addition-request">Variable Addition Request</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#technical-architecture">Technical Architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#service-components">Service Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#technology-stack">Technology Stack</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#implementation-phases">Implementation Phases</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#phase-1-core-curation-workflow-mvp">Phase 1: Core Curation Workflow (MVP)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-2-schema-projects-permissions">Phase 2: Schema Projects &amp; Permissions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-3-schema-evolution">Phase 3: Schema Evolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-4-polish-scale">Phase 4: Polish &amp; Scale</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#success-metrics">Success Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#efficiency">Efficiency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#quality">Quality</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adoption">Adoption</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#integration-with-forge-ecosystem">Integration with Forge Ecosystem</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#with-registry-service">With Registry Service</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#with-harmonization-engine">With Harmonization Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#with-dataforge-future">With DataForge (Future)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#open-questions">Open Questions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#related-documentation">Related Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SchemaForge: Curation Workbench</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/specs/curation-workbench.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="schemaforge-curation-workbench">
+<h1>SchemaForge: Curation Workbench<a class="headerlink" href="#schemaforge-curation-workbench" title="Link to this heading"></a></h1>
+<section id="product-specification-v1-0">
+<h2>Product Specification v1.0<a class="headerlink" href="#product-specification-v1-0" title="Link to this heading"></a></h2>
+</section>
+<hr class="docutils" />
+<section id="executive-summary">
+<h2>Executive Summary<a class="headerlink" href="#executive-summary" title="Link to this heading"></a></h2>
+<p>The <strong>Curation Workbench</strong> is SchemaForge’s service for <strong>building canonical schemas from raw CDE lists</strong> through AI-assisted curation. Users upload a variable list (CSV, spreadsheet, etc.), and the system guides them through a semi-automated process to produce a clean, deduplicated, well-typed schema ready for use in harmonization.</p>
+<p>Unlike traditional schema management tools that focus on editing existing schemas, the Curation Workbench is designed around the <strong>schema creation workflow</strong>—taking messy, real-world variable lists and transforming them into production-ready canonical schemas.</p>
+</section>
+<hr class="docutils" />
+<section id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Link to this heading"></a></h2>
+<p>Researchers and data managers often have variable lists from studies, grants, or collaborative projects that need to become usable schemas. These lists are typically:</p>
+<ul class="simple">
+<li><p><strong>Inconsistent</strong>: Mixed naming conventions, abbreviations (e.g., <code class="docutils literal notranslate"><span class="pre">AOO</span></code> vs <code class="docutils literal notranslate"><span class="pre">age_of_onset</span></code>)</p></li>
+<li><p><strong>Redundant</strong>: Multiple variables representing the same concept</p></li>
+<li><p><strong>Underspecified</strong>: Missing types, constraints, or clear definitions</p></li>
+<li><p><strong>Unstructured</strong>: No formal schema definition, just spreadsheets</p></li>
+</ul>
+<p><strong>Current process is painful:</strong></p>
+<ol class="arabic simple">
+<li><p>Manual review of hundreds of variables</p></li>
+<li><p>Guessing at duplicates by eyeballing names</p></li>
+<li><p>Hand-typing data types and constraints</p></li>
+<li><p>No systematic way to catch semantic duplicates (variables with different names but same meaning)</p></li>
+<li><p>Starting over when new variables need to be added</p></li>
+</ol>
+<p><strong>Result:</strong> Schema creation takes weeks of manual effort, errors slip through, and schemas become stale as new requirements emerge.</p>
+</section>
+<hr class="docutils" />
+<section id="solution">
+<h2>Solution<a class="headerlink" href="#solution" title="Link to this heading"></a></h2>
+<p>The Curation Workbench provides an <strong>AI-assisted schema creation workflow</strong>:</p>
+<ol class="arabic simple">
+<li><p><strong>Upload</strong> — User uploads a raw CDE list (CSV with variable names, types, descriptions)</p></li>
+<li><p><strong>Analyze</strong> — System detects potential duplicates using TF-IDF + embeddings</p></li>
+<li><p><strong>Suggest</strong> — LLM proposes canonical names, types, allowed values, nullability</p></li>
+<li><p><strong>Review</strong> — User steps through each suggestion, accepting/modifying/rejecting</p></li>
+<li><p><strong>Publish</strong> — Clean schema is saved to Registry as a managed project</p></li>
+</ol>
+<p>Once created, schemas are <strong>living resources</strong> that can be updated when new variables are needed, with the same AI-assisted deduplication ensuring consistency.</p>
+</section>
+<hr class="docutils" />
+<section id="target-users">
+<h2>Target Users<a class="headerlink" href="#target-users" title="Link to this heading"></a></h2>
+<section id="primary-data-steward-research-data-manager">
+<h3>Primary: Data Steward / Research Data Manager<a class="headerlink" href="#primary-data-steward-research-data-manager" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Has a list of variables from a study or consortium</p></li>
+<li><p>Needs to turn it into a usable schema for data collection/harmonization</p></li>
+<li><p>Wants AI assistance but final approval authority</p></li>
+</ul>
+</section>
+<section id="secondary-schema-manager">
+<h3>Secondary: Schema Manager<a class="headerlink" href="#secondary-schema-manager" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Maintains schemas for an organization</p></li>
+<li><p>Adds new variables as requirements evolve</p></li>
+<li><p>Ensures schema quality and consistency</p></li>
+</ul>
+</section>
+<section id="tertiary-data-consumer">
+<h3>Tertiary: Data Consumer<a class="headerlink" href="#tertiary-data-consumer" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Uses schemas created by others for harmonization</p></li>
+<li><p>May request new variables be added to shared schemas</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="core-workflow">
+<h2>Core Workflow<a class="headerlink" href="#core-workflow" title="Link to this heading"></a></h2>
+<section id="schema-creation-from-raw-cde-list">
+<h3>1. Schema Creation from Raw CDE List<a class="headerlink" href="#schema-creation-from-raw-cde-list" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────────────────┐
+│                         CURATION WORKBENCH                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Step 1: Upload                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  📁 Drop your CDE list here (CSV, Excel, TSV)                       │    │
+│  │                                                                     │    │
+│  │  Expected columns: variable_name, type, description, allowed_values │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+│  Step 2: Duplicate Detection                                                │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  Found 142 variables. Analyzing for duplicates...                   │    │
+│  │                                                                     │    │
+│  │  ⚠ 8 potential duplicate groups detected:                           │    │
+│  │                                                                     │    │
+│  │  Group 1: age_of_onset, AOO, onset_age (94% similar)                │    │
+│  │  Group 2: diagnosis_primary, dx_primary, primary_dx (89% similar)   │    │
+│  │  ...                                                                │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+│  Step 3: AI-Assisted Review                                                 │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  Variable 1 of 142: age_of_onset                                    │    │
+│  │                                                                     │    │
+│  │  🤖 AI Suggestion:                                                  │    │
+│  │  ├── Canonical name: age_at_onset                                   │    │
+│  │  ├── Type: integer                                                  │    │
+│  │  ├── Constraints: min=0, max=120                                    │    │
+│  │  ├── Nullable: true (reason: may not be known)                      │    │
+│  │  ├── Description: &quot;Age in years at symptom onset&quot;                   │    │
+│  │  └── Merge with: AOO, onset_age (mark as aliases)                   │    │
+│  │                                                                     │    │
+│  │  [✓ Accept] [✎ Modify] [✗ Reject] [Skip for now]                    │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+│  Step 4: Publish                                                            │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  Schema: &quot;PATHND Study CDEs&quot;                                        │    │
+│  │  Elements: 127 (15 duplicates merged)                               │    │
+│  │  Quality score: 94%                                                 │    │
+│  │                                                                     │    │
+│  │  Visibility: ○ Private  ● Organization  ○ Public                    │    │
+│  │                                                                     │    │
+│  │  [Save as Draft] [Publish v1.0]                                     │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+<section id="schema-as-managed-resource">
+<h3>2. Schema as Managed Resource<a class="headerlink" href="#schema-as-managed-resource" title="Link to this heading"></a></h3>
+<p>Once created, schemas become <strong>projects</strong> with:</p>
+<ul class="simple">
+<li><p><strong>Ownership</strong>: Creator is the schema manager by default</p></li>
+<li><p><strong>Visibility levels</strong>:</p>
+<ul>
+<li><p><strong>Private</strong>: Only the creator can view/use</p></li>
+<li><p><strong>Organization</strong>: Anyone in the org can use for harmonization</p></li>
+<li><p><strong>Public</strong>: Anyone can use (read-only)</p></li>
+</ul>
+</li>
+<li><p><strong>Roles</strong>:</p>
+<ul>
+<li><p><strong>Manager</strong>: Can edit schema, approve additions, manage permissions</p></li>
+<li><p><strong>Contributor</strong>: Can request additions (requires approval)</p></li>
+<li><p><strong>Viewer</strong>: Can use schema for harmonization (read-only)</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="schema-evolution-adding-new-variables">
+<h3>3. Schema Evolution (Adding New Variables)<a class="headerlink" href="#schema-evolution-adding-new-variables" title="Link to this heading"></a></h3>
+<p>When harmonizing a new dataset reveals unmapped variables:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────────────────┐
+│                      ADD VARIABLES TO SCHEMA                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Schema: &quot;PATHND Study CDEs&quot; (v1.2)                                         │
+│  Your role: Manager                                                         │
+│                                                                             │
+│  New variables to add:                                                      │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  csf_abeta42                                                        │    │
+│  │  ├── Type: float                                                    │    │
+│  │  ├── Description: &quot;CSF Amyloid-beta 42 level (pg/mL)&quot;               │    │
+│  │  └── Nullable: true                                                 │    │
+│  │                                                                     │    │
+│  │  🔍 Similarity check against existing schema:                       │    │
+│  │  ├── csf_abeta40 (72% similar) - Different isoform, keep separate   │    │
+│  │  ├── amyloid_pet (45% similar) - Different modality                 │    │
+│  │  └── ✓ No semantic duplicates detected                              │    │
+│  │                                                                     │    │
+│  │  [Add to Schema] [Cancel]                                           │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p><strong>For non-managers (request workflow):</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────────────────┐
+│                      REQUEST VARIABLE ADDITION                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Schema: &quot;Consortium CDEs&quot; (v2.1) - Org: BRAIN-CODE                         │
+│  Your role: Contributor                                                     │
+│                                                                             │
+│  Request to add:                                                            │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  Variable: tau_pet_suvr                                             │    │
+│  │  Type: float                                                        │    │
+│  │  Description: &quot;Tau PET standardized uptake value ratio&quot;             │    │
+│  │  Justification: &quot;Needed for ADNI cohort harmonization&quot;              │    │
+│  │                                                                     │    │
+│  │  [Submit Request]                                                   │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+│  Pending requests (2):                                                      │
+│  • mri_hippocampal_volume - Submitted 2 days ago                            │
+│  • apoe_genotype - Approved, pending release                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="key-features">
+<h2>Key Features<a class="headerlink" href="#key-features" title="Link to this heading"></a></h2>
+<section id="f1-upload-parse">
+<h3>F1: Upload &amp; Parse<a class="headerlink" href="#f1-upload-parse" title="Link to this heading"></a></h3>
+<p><strong>F1.1: File Upload</strong></p>
+<ul class="simple">
+<li><p>Support CSV, TSV, Excel (.xlsx)</p></li>
+<li><p>Auto-detect column mapping (variable_name, type, description, allowed_values)</p></li>
+<li><p>Preview parsed data before proceeding</p></li>
+<li><p>Handle encoding issues gracefully</p></li>
+</ul>
+<p><strong>F1.2: Column Mapping</strong></p>
+<ul class="simple">
+<li><p>Smart detection of common column names</p></li>
+<li><p>Manual override if auto-detection fails</p></li>
+<li><p>Required: variable_name</p></li>
+<li><p>Optional: type, description, allowed_values, constraints</p></li>
+</ul>
+</section>
+<section id="f2-duplicate-detection">
+<h3>F2: Duplicate Detection<a class="headerlink" href="#f2-duplicate-detection" title="Link to this heading"></a></h3>
+<p><strong>F2.1: Similarity Analysis</strong></p>
+<ul class="simple">
+<li><p>TF-IDF + embedding-based similarity (shared with Harmonization Engine)</p></li>
+<li><p>Configurable threshold (default: 80% for flagging)</p></li>
+<li><p>Group duplicates into clusters</p></li>
+</ul>
+<p><strong>F2.2: Duplicate Groups</strong></p>
+<ul class="simple">
+<li><p>Visual grouping of similar variables</p></li>
+<li><p>Show similarity scores and reasons</p></li>
+<li><p>Allow user to confirm/dismiss as duplicates</p></li>
+</ul>
+</section>
+<section id="f3-ai-assisted-curation">
+<h3>F3: AI-Assisted Curation<a class="headerlink" href="#f3-ai-assisted-curation" title="Link to this heading"></a></h3>
+<p><strong>F3.1: LLM Suggestions</strong>
+For each variable (or duplicate group), the LLM suggests:</p>
+<ul class="simple">
+<li><p><strong>Canonical name</strong>: Clean, snake_case, descriptive</p></li>
+<li><p><strong>Data type</strong>: string, integer, float, boolean, enum, date, datetime</p></li>
+<li><p><strong>Allowed values</strong>: For enums, suggest value set</p></li>
+<li><p><strong>Constraints</strong>: min/max for numerics, pattern for strings</p></li>
+<li><p><strong>Nullability</strong>: Whether null is allowed and why</p></li>
+<li><p><strong>Description</strong>: Clear, standardized description</p></li>
+<li><p><strong>Merge recommendation</strong>: Which variables to consolidate</p></li>
+</ul>
+<p><strong>F3.2: Batch vs. Individual Review</strong></p>
+<ul class="simple">
+<li><p>Option to review one-by-one (careful curation)</p></li>
+<li><p>Option to accept all AI suggestions (fast path)</p></li>
+<li><p>Option to review only flagged items (duplicates, uncertain types)</p></li>
+</ul>
+<p><strong>F3.3: User Overrides</strong></p>
+<ul class="simple">
+<li><p>Accept suggestion as-is</p></li>
+<li><p>Modify any field before accepting</p></li>
+<li><p>Reject suggestion entirely</p></li>
+<li><p>Skip and return later</p></li>
+</ul>
+<p><strong>F3.5: Provenance Capture</strong></p>
+<ul class="simple">
+<li><p>Automatically track transformation decisions (on save changes button click)</p></li>
+<li><p>Track merge operations with source variable details</p></li>
+</ul>
+<p><strong>F3.4: Type-Specific Constraint Editor</strong>
+Provide intuitive, type-appropriate form fields for constraints instead of generic text input:</p>
+<ul class="simple">
+<li><p><strong>Integer constraints:</strong></p>
+<ul>
+<li><p>☐ Min value: <code class="docutils literal notranslate"><span class="pre">[____]</span></code></p></li>
+<li><p>☐ Max value: <code class="docutils literal notranslate"><span class="pre">[____]</span></code></p></li>
+<li><p>☐ Must be positive</p></li>
+<li><p>☐ Allow zero</p></li>
+</ul>
+</li>
+<li><p><strong>Float constraints:</strong></p>
+<ul>
+<li><p>☐ Min value: <code class="docutils literal notranslate"><span class="pre">[____]</span></code></p></li>
+<li><p>☐ Max value: <code class="docutils literal notranslate"><span class="pre">[____]</span></code></p></li>
+<li><p>☐ Decimal places: <code class="docutils literal notranslate"><span class="pre">[____]</span></code></p></li>
+<li><p>☐ Must be positive</p></li>
+</ul>
+</li>
+<li><p><strong>String constraints:</strong></p>
+<ul>
+<li><p>☐ Min length: <code class="docutils literal notranslate"><span class="pre">[____]</span></code></p></li>
+<li><p>☐ Max length: <code class="docutils literal notranslate"><span class="pre">[____]</span></code></p></li>
+<li><p>☐ Pattern (regex): <code class="docutils literal notranslate"><span class="pre">[____________________]</span></code></p></li>
+<li><p>☐ Format preset: [None ▼] [Email, Phone, URL, GUID, etc.]</p></li>
+</ul>
+</li>
+<li><p><strong>Date constraints:</strong></p>
+<ul>
+<li><p>☐ Min date: <code class="docutils literal notranslate"><span class="pre">[YYYY-MM-DD]</span></code></p></li>
+<li><p>☐ Max date: <code class="docutils literal notranslate"><span class="pre">[YYYY-MM-DD]</span></code></p></li>
+<li><p>☐ Format: [ISO 8601 ▼]</p></li>
+<li><p>☐ Cannot be in future</p></li>
+<li><p>☐ Cannot be in past</p></li>
+</ul>
+</li>
+<li><p><strong>Enum constraints:</strong></p>
+<ul>
+<li><p>☐ Case sensitive matching</p></li>
+</ul>
+</li>
+</ul>
+<p><strong>Smart Defaults:</strong>
+AI suggests pre-populated constraints based on variable name patterns:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">age*</span></code> → <code class="docutils literal notranslate"><span class="pre">{&quot;min&quot;:</span> <span class="pre">0,</span> <span class="pre">&quot;max&quot;:</span> <span class="pre">120}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">year*</span></code> → <code class="docutils literal notranslate"><span class="pre">{&quot;min&quot;:</span> <span class="pre">1900,</span> <span class="pre">&quot;max&quot;:</span> <span class="pre">2100}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">*percentage*</span></code> → <code class="docutils literal notranslate"><span class="pre">{&quot;min&quot;:</span> <span class="pre">0,</span> <span class="pre">&quot;max&quot;:</span> <span class="pre">100}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">systolic_bp</span></code> → <code class="docutils literal notranslate"><span class="pre">{&quot;min&quot;:</span> <span class="pre">50,</span> <span class="pre">&quot;max&quot;:</span> <span class="pre">250}</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">email*</span></code> → <code class="docutils literal notranslate"><span class="pre">{&quot;format&quot;:</span> <span class="pre">&quot;email&quot;,</span> <span class="pre">&quot;max_length&quot;:</span> <span class="pre">255}</span></code></p></li>
+</ul>
+<p><strong>Constraint Parsing:</strong>
+For uploaded CSVs with constraint strings like <code class="docutils literal notranslate"><span class="pre">(x&gt;=0)</span> <span class="pre">&amp;</span> <span class="pre">(x&lt;=120)</span></code>, the AI automatically:</p>
+<ol class="arabic simple">
+<li><p>Parses common constraint formats (ranges, patterns, lengths)</p></li>
+<li><p>Converts to structured JSON format</p></li>
+<li><p>Suggests as type-appropriate form values</p></li>
+<li><p>Allows user to review/modify via UI form</p></li>
+</ol>
+</section>
+<section id="f4-schema-projects">
+<h3>F4: Schema Projects<a class="headerlink" href="#f4-schema-projects" title="Link to this heading"></a></h3>
+<p><strong>F4.1: Create Project</strong></p>
+<ul class="simple">
+<li><p>Name, description, version</p></li>
+<li><p>Set visibility (private/org/public)</p></li>
+<li><p>Assign to organization (if applicable)</p></li>
+</ul>
+<p><strong>F4.2: Permissions</strong></p>
+<ul class="simple">
+<li><p>Manager: Full control</p></li>
+<li><p>Contributor: Can request additions</p></li>
+<li><p>Viewer: Read-only access</p></li>
+</ul>
+<p><strong>F4.3: Versioning</strong></p>
+<ul class="simple">
+<li><p>Semantic versioning (major.minor.patch)</p></li>
+<li><p>Version history with diffs</p></li>
+<li><p>Rollback capability</p></li>
+</ul>
+</section>
+<section id="f5-schema-evolution">
+<h3>F5: Schema Evolution<a class="headerlink" href="#f5-schema-evolution" title="Link to this heading"></a></h3>
+<p><strong>F5.1: Add Variables (Manager)</strong></p>
+<ul class="simple">
+<li><p>Direct addition with similarity check</p></li>
+<li><p>AI-assisted suggestions for new variables</p></li>
+<li><p>Batch import from new CDE list</p></li>
+</ul>
+<p><strong>F5.2: Request Variables (Contributor)</strong></p>
+<ul class="simple">
+<li><p>Submit request with justification</p></li>
+<li><p>Track request status</p></li>
+<li><p>Notification when approved/rejected</p></li>
+</ul>
+<p><strong>F5.3: Similarity Guardrails</strong></p>
+<ul class="simple">
+<li><p>Every addition checked against existing schema</p></li>
+<li><p>Flag potential duplicates before adding</p></li>
+<li><p>Require explicit override if similarity &gt; threshold</p></li>
+</ul>
+</section>
+<section id="f6-export-integration">
+<h3>F6: Export &amp; Integration<a class="headerlink" href="#f6-export-integration" title="Link to this heading"></a></h3>
+<p><strong>F6.1: Export Formats</strong></p>
+<ul class="simple">
+<li><p>JSON (full fidelity)</p></li>
+<li><p>CSV (spreadsheet compatible)</p></li>
+<li><p>YAML (human-readable)</p></li>
+<li><p>JSON Schema (for validation)</p></li>
+</ul>
+<p><strong>F6.2: Registry Integration</strong></p>
+<ul class="simple">
+<li><p>Publish directly to Registry Service</p></li>
+<li><p>Schemas available for Harmonization Engine</p></li>
+<li><p>Version management through Registry API</p></li>
+</ul>
+<p><strong>F6.3: Transformation Rule Export</strong></p>
+<ul class="simple">
+<li><p>Export variable mappings as JSON</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="data-model">
+<h2>Data Model<a class="headerlink" href="#data-model" title="Link to this heading"></a></h2>
+<section id="schema-project">
+<h3>Schema Project<a class="headerlink" href="#schema-project" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">schema_project</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;PATHND</span><span class="nv"> </span><span class="s">Study</span><span class="nv"> </span><span class="s">CDEs&quot;</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Common</span><span class="nv"> </span><span class="s">Data</span><span class="nv"> </span><span class="s">Elements</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">PATH-ND</span><span class="nv"> </span><span class="s">neuropathology</span><span class="nv"> </span><span class="s">study&quot;</span>
+<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1.2.0&quot;</span>
+<span class="w">  </span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;published&quot;</span><span class="w">  </span><span class="c1"># draft | published | deprecated</span>
+
+<span class="w">  </span><span class="c1"># Ownership</span>
+<span class="w">  </span><span class="nt">owner_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_uuid&quot;</span>
+<span class="w">  </span><span class="nt">organization_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;org_uuid&quot;</span><span class="w">  </span><span class="c1"># nullable for personal schemas</span>
+<span class="w">  </span><span class="nt">visibility</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;organization&quot;</span><span class="w">   </span><span class="c1"># private | organization | public</span>
+
+<span class="w">  </span><span class="c1"># Metadata</span>
+<span class="w">  </span><span class="nt">created_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-15T00:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">updated_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-30T00:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">published_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-20T00:00:00Z&quot;</span>
+
+<span class="w">  </span><span class="c1"># Stats</span>
+<span class="w">  </span><span class="nt">element_count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">127</span>
+
+<span class="w">  </span><span class="c1"># Source tracking</span>
+<span class="w">  </span><span class="nt">source_file</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;pathnd_cdes.csv&quot;</span>
+<span class="w">  </span><span class="nt">source_row_count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">142</span>
+<span class="w">  </span><span class="nt">duplicates_merged</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">15</span>
+</pre></div>
+</div>
+</section>
+<section id="element">
+<h3>Element<a class="headerlink" href="#element" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">element</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">schema_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+
+<span class="w">  </span><span class="c1"># Core definition</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;age_at_onset&quot;</span><span class="w">              </span><span class="c1"># Canonical name (snake_case)</span>
+<span class="w">  </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Age</span><span class="nv"> </span><span class="s">at</span><span class="nv"> </span><span class="s">Onset&quot;</span><span class="w">      </span><span class="c1"># Human-readable</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Age</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">years</span><span class="nv"> </span><span class="s">at</span><span class="nv"> </span><span class="s">first</span><span class="nv"> </span><span class="s">symptom</span><span class="nv"> </span><span class="s">onset&quot;</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;integer&quot;</span><span class="w">                   </span><span class="c1"># string | integer | float | boolean | enum | date | datetime</span>
+
+<span class="w">  </span><span class="c1"># Constraints</span>
+<span class="w">  </span><span class="nt">nullable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">null_reason</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;May</span><span class="nv"> </span><span class="s">not</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">known</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">all</span><span class="nv"> </span><span class="s">subjects&quot;</span>
+<span class="w">  </span><span class="nt">constraints</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">    </span><span class="nt">max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">120</span>
+
+<span class="w">  </span><span class="c1"># For enums</span>
+<span class="w">  </span><span class="nt">allowed_values</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">  </span><span class="nt">value_labels</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+
+<span class="w">  </span><span class="c1"># Alternative encodings (for enum types with multiple representation options)</span>
+<span class="w">  </span><span class="nt">encoding_options</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">  </span><span class="nt">selected_encoding</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+
+<span class="w">  </span><span class="c1"># Provenance</span>
+<span class="w">  </span><span class="nt">aliases</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;AOO&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;onset_age&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;age_of_onset&quot;</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># Original names merged into this</span>
+<span class="w">  </span><span class="nt">source_row</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">23</span><span class="w">                                  </span><span class="c1"># Row in original upload</span>
+<span class="w">  </span><span class="nt">ai_suggested</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">                              </span><span class="c1"># Whether AI proposed this</span>
+<span class="w">  </span><span class="nt">user_modified</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">                             </span><span class="c1"># Whether user changed AI suggestion</span>
+
+<span class="w">  </span><span class="c1"># Audit</span>
+<span class="w">  </span><span class="nt">created_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-15T00:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">created_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_uuid&quot;</span>
+</pre></div>
+</div>
+<section id="constraint-format-examples">
+<h4>Constraint Format Examples<a class="headerlink" href="#constraint-format-examples" title="Link to this heading"></a></h4>
+<p><strong>Integer/Float:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">constraints</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">  </span><span class="nt">max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">120</span>
+<span class="w">  </span><span class="nt">must_be_positive</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">  </span><span class="c1"># optional</span>
+</pre></div>
+</div>
+<p><strong>String:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">constraints</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">min_length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="w">  </span><span class="nt">max_length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">255</span>
+<span class="w">  </span><span class="nt">pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;^[A-Z]{2,3}$&quot;</span><span class="w">  </span><span class="c1"># regex pattern</span>
+<span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;email&quot;</span><span class="w">          </span><span class="c1"># preset: email | phone | url | guid</span>
+</pre></div>
+</div>
+<p><strong>Date:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">constraints</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">min_date</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1900-01-01&quot;</span>
+<span class="w">  </span><span class="nt">max_date</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2100-12-31&quot;</span>
+<span class="w">  </span><span class="nt">not_in_future</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">not_in_past</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">  </span><span class="nt">format</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ISO8601&quot;</span><span class="w">        </span><span class="c1"># YYYY-MM-DD</span>
+</pre></div>
+</div>
+<p><strong>Enum:</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">allowed_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;male&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;female&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;intersex&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;other&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;not_reported&quot;</span><span class="p p-Indicator">]</span>
+<span class="nt">value_labels</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">male</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Male&quot;</span>
+<span class="w">  </span><span class="nt">female</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Female&quot;</span>
+<span class="w">  </span><span class="nt">intersex</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Intersex&quot;</span>
+<span class="w">  </span><span class="nt">other</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Other&quot;</span>
+<span class="w">  </span><span class="nt">not_reported</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Not</span><span class="nv"> </span><span class="s">Reported&quot;</span>
+<span class="nt">constraints</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">case_sensitive</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</pre></div>
+</div>
+<p><strong>Encoding Options (for enums with multiple representations):</strong></p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;enum&quot;</span>
+<span class="nt">allowed_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;male&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;female&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;other&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;not_reported&quot;</span><span class="p p-Indicator">]</span>
+<span class="nt">encoding_options</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Lowercase</span><span class="nv"> </span><span class="s">strings</span><span class="nv"> </span><span class="s">(recommended)&quot;</span>
+<span class="w">    </span><span class="nt">data_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;enum&quot;</span>
+<span class="w">    </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;male&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;female&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;other&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;not_reported&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">is_recommended</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;NACC</span><span class="nv"> </span><span class="s">integer</span><span class="nv"> </span><span class="s">codes&quot;</span>
+<span class="w">    </span><span class="nt">data_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;integer&quot;</span>
+<span class="w">    </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">0</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">value_mappings</span><span class="p">:</span>
+<span class="w">      </span><span class="s">&quot;1&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;male&quot;</span>
+<span class="w">      </span><span class="s">&quot;2&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;female&quot;</span>
+<span class="w">      </span><span class="s">&quot;3&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;other&quot;</span>
+<span class="w">      </span><span class="s">&quot;0&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;not_reported&quot;</span>
+<span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;NACC&quot;</span>
+<span class="w">    </span><span class="nt">is_recommended</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Single</span><span class="nv"> </span><span class="s">letter</span><span class="nv"> </span><span class="s">codes&quot;</span>
+<span class="w">    </span><span class="nt">data_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;enum&quot;</span>
+<span class="w">    </span><span class="nt">values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;M&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;F&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;O&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;U&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">value_mappings</span><span class="p">:</span>
+<span class="w">      </span><span class="s">&quot;M&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;male&quot;</span>
+<span class="w">      </span><span class="s">&quot;F&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;female&quot;</span>
+<span class="w">      </span><span class="s">&quot;O&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;other&quot;</span>
+<span class="w">      </span><span class="s">&quot;U&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;not_reported&quot;</span>
+<span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;CDISC&quot;</span>
+<span class="w">    </span><span class="nt">is_recommended</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+
+<span class="nt">selected_encoding</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Lowercase</span><span class="nv"> </span><span class="s">strings</span><span class="nv"> </span><span class="s">(recommended)&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="variable-addition-request">
+<h3>Variable Addition Request<a class="headerlink" href="#variable-addition-request" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">addition_request</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">schema_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+
+<span class="w">  </span><span class="c1"># Requested variable</span>
+<span class="w">  </span><span class="nt">variable_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;tau_pet_suvr&quot;</span>
+<span class="w">  </span><span class="nt">variable_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;float&quot;</span>
+<span class="w">  </span><span class="nt">variable_description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Tau</span><span class="nv"> </span><span class="s">PET</span><span class="nv"> </span><span class="s">standardized</span><span class="nv"> </span><span class="s">uptake</span><span class="nv"> </span><span class="s">value</span><span class="nv"> </span><span class="s">ratio&quot;</span>
+
+<span class="w">  </span><span class="c1"># Request metadata</span>
+<span class="w">  </span><span class="nt">requested_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_uuid&quot;</span>
+<span class="w">  </span><span class="nt">requested_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-28T00:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">justification</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Needed</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">ADNI</span><span class="nv"> </span><span class="s">cohort</span><span class="nv"> </span><span class="s">harmonization&quot;</span>
+
+<span class="w">  </span><span class="c1"># Similarity check results</span>
+<span class="w">  </span><span class="nt">similar_elements</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span>
+<span class="w">    </span><span class="p p-Indicator">{</span><span class="nt"> element_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span><span class="p p-Indicator">,</span><span class="nt"> name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;amyloid_pet_suvr&quot;</span><span class="p p-Indicator">,</span><span class="nt"> score</span><span class="p">:</span><span class="w"> </span><span class="nv">0.65</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="p p-Indicator">]</span>
+
+<span class="w">  </span><span class="c1"># Status</span>
+<span class="w">  </span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;pending&quot;</span><span class="w">  </span><span class="c1"># pending | approved | rejected</span>
+<span class="w">  </span><span class="nt">reviewed_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_uuid&quot;</span>
+<span class="w">  </span><span class="nt">reviewed_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-29T00:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">review_notes</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Approved</span><span class="nv"> </span><span class="s">-</span><span class="nv"> </span><span class="s">distinct</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">amyloid</span><span class="nv"> </span><span class="s">PET&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="technical-architecture">
+<h2>Technical Architecture<a class="headerlink" href="#technical-architecture" title="Link to this heading"></a></h2>
+<section id="service-components">
+<h3>Service Components<a class="headerlink" href="#service-components" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────────────────┐
+│                         CURATION WORKBENCH                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐              │
+│  │   Streamlit UI  │  │   FastAPI       │  │   Background    │              │
+│  │                 │  │   Backend       │  │   Workers       │              │
+│  │ • Upload wizard │  │ • REST API      │  │ • Similarity    │              │
+│  │ • Review UI     │  │ • Auth/Authz    │  │   computation   │              │
+│  │ • Project mgmt  │  │ • Validation    │  │ • LLM calls     │              │
+│  └────────┬────────┘  └────────┬────────┘  └────────┬────────┘              │
+│           │                    │                    │                       │
+│           └────────────────────┼────────────────────┘                       │
+│                                ▼                                            │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │                        Shared Services                              │    │
+│  │                                                                     │    │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                  │    │
+│  │  │ Retrieval   │  │ LLM         │  │ Registry    │                  │    │
+│  │  │ Core        │  │ Service     │  │ Client      │                  │    │
+│  │  │             │  │             │  │             │                  │    │
+│  │  │ TF-IDF +    │  │ Claude API  │  │ Schema      │                  │    │
+│  │  │ Embeddings  │  │ for         │  │ CRUD via    │                  │    │
+│  │  │             │  │ suggestions │  │ Registry    │                  │    │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘                  │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+<section id="technology-stack">
+<h3>Technology Stack<a class="headerlink" href="#technology-stack" title="Link to this heading"></a></h3>
+<p><strong>Backend:</strong></p>
+<ul class="simple">
+<li><p>Python 3.11+</p></li>
+<li><p>FastAPI for API layer</p></li>
+<li><p>Streamlit for UI (Phase 1)</p></li>
+<li><p>PostgreSQL for persistence</p></li>
+<li><p>Redis for caching/sessions</p></li>
+</ul>
+<p><strong>AI/ML:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">forge-retrieval-core</span></code> for similarity (TF-IDF + embeddings)</p></li>
+<li><p>Claude API for LLM suggestions</p></li>
+<li><p>sentence-transformers for embeddings</p></li>
+</ul>
+<p><strong>Infrastructure:</strong></p>
+<ul class="simple">
+<li><p>Docker + Docker Compose</p></li>
+<li><p>Cloud Run for deployment</p></li>
+<li><p>GCS for file storage</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="implementation-phases">
+<h2>Implementation Phases<a class="headerlink" href="#implementation-phases" title="Link to this heading"></a></h2>
+<section id="phase-1-core-curation-workflow-mvp">
+<h3>Phase 1: Core Curation Workflow (MVP)<a class="headerlink" href="#phase-1-core-curation-workflow-mvp" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Upload → AI-assisted review → Publish</p>
+<ul class="simple">
+<li><p>[ ] File upload and parsing (CSV, TSV)</p></li>
+<li><p>[ ] Duplicate detection using retrieval core</p></li>
+<li><p>[ ] LLM-powered suggestion engine</p>
+<ul>
+<li><p>[ ] Parse constraint strings from source data</p></li>
+<li><p>[ ] Suggest structured constraints based on type</p></li>
+<li><p>[ ] Smart defaults for common field patterns (age, year, etc.)</p></li>
+</ul>
+</li>
+<li><p>[ ] Interactive review UI (Streamlit)</p>
+<ul>
+<li><p>[ ] Type-specific constraint editor forms</p></li>
+<li><p>[ ] Encoding options selector for enums</p></li>
+</ul>
+</li>
+<li><p>[ ] Save to Registry Service</p></li>
+<li><p>[ ] Basic versioning</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Users can create schemas from CSV files with AI assistance.</p>
+</section>
+<section id="phase-2-schema-projects-permissions">
+<h3>Phase 2: Schema Projects &amp; Permissions<a class="headerlink" href="#phase-2-schema-projects-permissions" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Schemas as managed resources</p>
+<ul class="simple">
+<li><p>[ ] Project model with ownership</p></li>
+<li><p>[ ] Organization assignment</p></li>
+<li><p>[ ] Visibility levels (private/org/public)</p></li>
+<li><p>[ ] Role-based permissions</p></li>
+<li><p>[ ] Project dashboard</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Schemas can be shared and managed within organizations.</p>
+</section>
+<section id="phase-3-schema-evolution">
+<h3>Phase 3: Schema Evolution<a class="headerlink" href="#phase-3-schema-evolution" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Add variables to existing schemas</p>
+<ul class="simple">
+<li><p>[ ] Direct addition (managers)</p></li>
+<li><p>[ ] Request workflow (contributors)</p></li>
+<li><p>[ ] Similarity guardrails</p></li>
+<li><p>[ ] Version management</p></li>
+<li><p>[ ] Audit trail</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Schemas can evolve safely without duplicates.</p>
+</section>
+<section id="phase-4-polish-scale">
+<h3>Phase 4: Polish &amp; Scale<a class="headerlink" href="#phase-4-polish-scale" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Production readiness</p>
+<ul class="simple">
+<li><p>[ ] Batch operations</p></li>
+<li><p>[ ] Import from multiple sources</p></li>
+<li><p>[ ] Advanced export options</p></li>
+<li><p>[ ] Performance optimization</p></li>
+<li><p>[ ] Comprehensive testing</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Production-ready schema curation platform.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="success-metrics">
+<h2>Success Metrics<a class="headerlink" href="#success-metrics" title="Link to this heading"></a></h2>
+<section id="efficiency">
+<h3>Efficiency<a class="headerlink" href="#efficiency" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Time to create schema from CSV reduced by 70%+</p></li>
+<li><p>Duplicate detection accuracy &gt; 90%</p></li>
+<li><p>LLM suggestion acceptance rate &gt; 60%</p></li>
+</ul>
+</section>
+<section id="quality">
+<h3>Quality<a class="headerlink" href="#quality" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Schemas pass quality checks on first publish</p></li>
+<li><p>Zero duplicate elements in published schemas</p></li>
+<li><p>All elements have descriptions and types</p></li>
+</ul>
+</section>
+<section id="adoption">
+<h3>Adoption<a class="headerlink" href="#adoption" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Number of schemas created per month</p></li>
+<li><p>Active schema managers</p></li>
+<li><p>Variable addition requests processed</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="integration-with-forge-ecosystem">
+<h2>Integration with Forge Ecosystem<a class="headerlink" href="#integration-with-forge-ecosystem" title="Link to this heading"></a></h2>
+<section id="with-registry-service">
+<h3>With Registry Service<a class="headerlink" href="#with-registry-service" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Schemas published to Registry for storage and versioning</p></li>
+<li><p>Registry API used for all CRUD operations</p></li>
+<li><p>Version management through Registry</p></li>
+</ul>
+</section>
+<section id="with-harmonization-engine">
+<h3>With Harmonization Engine<a class="headerlink" href="#with-harmonization-engine" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Curated schemas available as harmonization targets</p></li>
+<li><p>Unmapped variables can trigger addition requests</p></li>
+<li><p>Shared retrieval core ensures consistent matching</p></li>
+</ul>
+</section>
+<section id="with-dataforge-future">
+<h3>With DataForge (Future)<a class="headerlink" href="#with-dataforge-future" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Schemas used for data validation</p></li>
+<li><p>Validation errors may trigger schema updates</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="open-questions">
+<h2>Open Questions<a class="headerlink" href="#open-questions" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>LLM model choice:</strong> Claude vs. GPT-4 vs. local model for suggestions?</p></li>
+<li><p><strong>Batch size:</strong> How many variables to process in one LLM call?</p></li>
+<li><p><strong>Approval workflow:</strong> Email notifications? In-app only?</p></li>
+<li><p><strong>External CDE libraries:</strong> Integration with NIH CDE Repository, CDISC?</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="related-documentation">
+<h2>Related Documentation<a class="headerlink" href="#related-documentation" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../platform/forge-production-roadmap.html"><span class="std std-doc">forge-production-roadmap.md</span></a> — Platform roadmap and implementation phases</p></li>
+<li><p><span class="xref myst">unified-input-schema.md</span> — Unified input schema specification (archived)</p></li>
+<li><p><span class="xref myst">encoding-options-ui-design.md</span> — Detailed UI/UX design for encoding options (archived)</p></li>
+<li><p><a class="reference internal" href="registry-service.html"><span class="std std-doc">registry-service.md</span></a> — Registry Service specification</p></li>
+<li><p><span class="xref myst">forge-user-journey.md</span> — End-to-end user workflows (archived)</p></li>
+<li><p><a class="reference internal" href="dataforge.html"><span class="std std-doc">dataforge.md</span></a> — DataForge specification</p></li>
+</ul>
+<hr class="docutils" />
+<p><em>Document Version: 1.0</em>
+<em>Last Updated: 2025-02-04</em>
+<em>Author: Forge Team</em>
+<em>Changes: Added type-specific constraints, encoding options, and unified input schema support</em></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api-first-decoupling.html" class="btn btn-neutral float-left" title="API-First Decoupling Spec" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dataforge.html" class="btn btn-neutral float-right" title="DataForge" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

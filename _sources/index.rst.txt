@@ -1,0 +1,60 @@
+Forge Documentation
+===================
+
+This site documents Forge Python APIs and functions from the app client and core layers.
+
+For platform/product specs, see the Markdown docs under:
+
+- ``../platform``
+- ``../specs``
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Guides
+   :glob:
+
+   guides/*
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Platform
+   :glob:
+
+   platform/*
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Specifications
+   :glob:
+
+   specs/*
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Reference
+   :glob:
+
+   reference/*
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Deployment
+
+   local-deploy
+   gcloud-deploy
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Developers
+
+   forge
+
+Presentations
+-------------
+
+- :download:`Forge Architecture Deck <presentations/Forge-Architecture-Deck.pptx>`
+- :download:`Forge Overview <presentations/forge-overview.pptx>`
+- :download:`Forge Walkthrough <presentations/forge-walkthrough.pptx>`
+- :download:`Forge GP2 Walkthrough <presentations/forge-gp2-walkthrough.pptx>`
+- :download:`Forge One Pager <presentations/forge-one-pager.docx>`

@@ -1,0 +1,80 @@
+Forge API Reference
+===================
+
+Retrieval Engines
+-----------------
+
+.. automodule:: forge_retrieval_core.tfidf_engine
+    :members:
+
+.. automodule:: forge_retrieval_core.embedding_engine
+    :members:
+
+.. automodule:: forge_retrieval_core.score_combiner
+    :members:
+
+Clients
+--------------
+
+.. automodule:: clients.dataforge_client
+    :members:
+
+.. automodule:: clients.registry_client
+    :members:
+
+.. automodule:: clients.gold_client
+    :members:
+
+Components
+--------------
+
+.. automodule:: components.schema_selector
+    :members:
+
+.. automodule:: components.sidebar
+    :members:
+
+.. automodule:: components.status_badge
+    :members:
+
+.. automodule:: components.wizard
+    :members:
+
+Core Utilities
+--------------
+
+.. automodule:: core.curation.duplicate_detector
+    :members:
+
+.. automodule:: core.curation.models
+    :members:
+
+.. automodule:: core.curation.parser
+    :members:
+
+.. automodule:: core.curation.publisher
+    :members:
+
+.. automodule:: core.curation.suggestion_service
+    :members:
+
+.. automodule:: core.harmonization.curation
+    :members:
+
+.. automodule:: core.harmonization.match_engine
+    :members:
+
+.. automodule:: core.harmonization.matcher
+    :members:
+
+.. automodule:: core.harmonization.models
+    :members:
+
+.. automodule:: core.harmonization.retrieval
+    :members:
+
+.. automodule:: core.session_cache_service
+    :members:
+
+.. automodule:: core.storage
+    :members:

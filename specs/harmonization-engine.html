@@ -1,0 +1,1969 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SchemaForge: Harmonization Engine &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SchemaForge: Registry Service" href="registry-service.html" />
+    <link rel="prev" title="DataForge" href="dataforge.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataforge.html">DataForge</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SchemaForge: Harmonization Engine</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#product-specification-v0-3">Product Specification v0.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#executive-summary">Executive Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#solution">Solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#target-users">Target Users</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#primary-data-engineer">Primary: Data Engineer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#secondary-research-coordinator">Secondary: Research Coordinator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tertiary-domain-expert">Tertiary: Domain Expert</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#core-concepts">Core Concepts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#source">Source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#source-field">Source Field</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#candidate">Candidate</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mapping">Mapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#feedback-record">Feedback Record</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#element-proposal-phase-c">Element Proposal <em>(Phase C)</em></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#transform-phase-b">Transform <em>(Phase B)</em></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#features">Features</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#f1-source-ingestion">F1: Source Ingestion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f2-hybrid-retrieval">F2: Hybrid Retrieval</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f3-ai-evaluation">F3: AI Evaluation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f4-curation-interface">F4: Curation Interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f5-feedback-learning">F5: Feedback &amp; Learning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f6-mapping-management">F6: Mapping Management</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#user-interface">User Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#main-views">Main Views</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#api-design">API Design</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#restful-endpoints">RESTful Endpoints</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data-model">Data Model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#database-schema-postgresql">Database Schema (PostgreSQL)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#shared-infrastructure-retrieval-core">Shared Infrastructure: Retrieval Core</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#architecture">Architecture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#textprocessor">TextProcessor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tfidfengine">TFIDFEngine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#embeddingengine">EmbeddingEngine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scorecombiner">ScoreCombiner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hybridretriever-implementation">HybridRetriever Implementation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#registry-client">Registry Client</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#implementation-phases">Implementation Phases</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#phase-1-core-retrieval-complete">Phase 1: Core Retrieval ✅ Complete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-2-curation-mvp-complete">Phase 2: Curation MVP ✅ Complete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-3-ai-evaluation-complete">Phase 3: AI Evaluation ✅ Complete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-4-feedback-analysis-complete">Phase 4: Feedback Analysis ✅ Complete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-5-registry-integration-complete">Phase 5: Registry Integration ✅ Complete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-6-proposals-advanced-features-phase-c">Phase 6: Proposals &amp; Advanced Features (Phase C)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#success-metrics">Success Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#efficiency">Efficiency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#quality">Quality</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#learning">Learning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adoption">Adoption</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#risks-mitigations">Risks &amp; Mitigations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#integration-with-forge-ecosystem">Integration with Forge Ecosystem</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#with-registry-service">With Registry Service</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#with-curation-workbench">With Curation Workbench</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#with-dataforge">With DataForge</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#design-decisions">Design Decisions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cache-invalidation-webhooks-not-polling">1. Cache Invalidation: Webhooks (Not Polling)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#transform-patterns-built-organically-no-preloading">2. Transform Patterns: Built Organically (No Preloading)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#proposals-phase-c-with-curation-workbench">3. Proposals: Phase C (With Curation Workbench)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#shared-retrieval-core">4. Shared Retrieval Core</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#open-questions">Open Questions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#appendix-a-retrieval-algorithm-details">Appendix A: Retrieval Algorithm Details</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#tf-idf-configuration">TF-IDF Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#text-preparation">Text Preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#embedding-models-considered">Embedding Models Considered</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#appendix-b-evaluation-prompt-template">Appendix B: Evaluation Prompt Template</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SchemaForge: Harmonization Engine</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/specs/harmonization-engine.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="schemaforge-harmonization-engine">
+<h1>SchemaForge: Harmonization Engine<a class="headerlink" href="#schemaforge-harmonization-engine" title="Link to this heading"></a></h1>
+<section id="product-specification-v0-3">
+<h2>Product Specification v0.3<a class="headerlink" href="#product-specification-v0-3" title="Link to this heading"></a></h2>
+</section>
+<hr class="docutils" />
+<section id="executive-summary">
+<h2>Executive Summary<a class="headerlink" href="#executive-summary" title="Link to this heading"></a></h2>
+<p>The <strong>Harmonization Engine</strong> is SchemaForge’s service for mapping source dataset fields to canonical schema elements. It combines hybrid retrieval (TF-IDF + semantic embeddings), LLM-based evaluation, and human-in-the-loop curation to achieve high-quality schema mappings at scale.</p>
+<p>This service directly addresses the “intake” problem: when new data sources arrive, someone must map each source field to the canonical schema. Currently this is manual, inconsistent, and untracked. The Harmonization Engine automates candidate discovery, provides AI-assisted recommendations, and captures curator decisions to improve over time.</p>
+</section>
+<hr class="docutils" />
+<section id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Link to this heading"></a></h2>
+<p>Organizations harmonizing data from multiple sources face a recurring challenge: mapping source fields to canonical elements.</p>
+<p><strong>Current pain points:</strong></p>
+<ul class="simple">
+<li><p>Manual matching is tedious (100+ fields per source × multiple sources)</p></li>
+<li><p>Keyword search misses synonyms and abbreviations (e.g., “BP” → “BloodPressure”)</p></li>
+<li><p>No standardized process—quality depends on who does the mapping</p></li>
+<li><p>Mappings are lost or poorly documented</p></li>
+<li><p>Same mistakes repeated across similar sources</p></li>
+<li><p>No feedback loop to improve matching over time</p></li>
+</ul>
+<p><strong>Result:</strong> Data harmonization is a bottleneck. Each new source requires significant manual effort, and mapping quality is inconsistent.</p>
+</section>
+<hr class="docutils" />
+<section id="solution">
+<h2>Solution<a class="headerlink" href="#solution" title="Link to this heading"></a></h2>
+<p>The Harmonization Engine provides:</p>
+<ol class="arabic simple">
+<li><p><strong>Hybrid Retrieval</strong> — Combine lexical (TF-IDF) and semantic (embeddings) matching to surface relevant candidates</p></li>
+<li><p><strong>AI Evaluation</strong> — LLM-based assessment of match quality with confidence scores</p></li>
+<li><p><strong>Curation Interface</strong> — Human review and correction of AI recommendations</p></li>
+<li><p><strong>Feedback Learning</strong> — Capture curator decisions to identify improvement opportunities</p></li>
+<li><p><strong>Mapping Management</strong> — Store, version, and export finalized mappings</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────────┐
+│                    HARMONIZATION WORKFLOW                           │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   Source Dataset                                                    │
+│        │                                                            │
+│        ▼                                                            │
+│   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐           │
+│   │   INGEST    │────▶│  RETRIEVE   │────▶│  EVALUATE   │           │
+│   │             │     │             │     │             │           │
+│   │ Parse fields│     │ TF-IDF +    │     │ LLM scoring │           │
+│   │ Extract meta│     │ Embeddings  │     │ Confidence  │           │
+│   └─────────────┘     └─────────────┘     └─────────────┘           │
+│                                                  │                  │
+│                                                  ▼                  │
+│   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐           │
+│   │   EXPORT    │◀────│   CURATE    │◀────│   REVIEW    │           │
+│   │             │     │             │     │             │           │
+│   │ Mappings    │     │ Accept/Edit │     │ Ranked      │           │
+│   │ Transforms  │     │ Feedback    │     │ candidates  │           │
+│   └─────────────┘     └─────────────┘     └─────────────┘           │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="target-users">
+<h2>Target Users<a class="headerlink" href="#target-users" title="Link to this heading"></a></h2>
+<section id="primary-data-engineer">
+<h3>Primary: Data Engineer<a class="headerlink" href="#primary-data-engineer" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Responsible for integrating new data sources</p></li>
+<li><p>Needs to map source fields to canonical schema quickly</p></li>
+<li><p>Values accuracy and audit trails</p></li>
+</ul>
+</section>
+<section id="secondary-research-coordinator">
+<h3>Secondary: Research Coordinator<a class="headerlink" href="#secondary-research-coordinator" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Oversees data harmonization across studies</p></li>
+<li><p>Needs visibility into mapping decisions</p></li>
+<li><p>Reviews and approves mappings before deployment</p></li>
+</ul>
+</section>
+<section id="tertiary-domain-expert">
+<h3>Tertiary: Domain Expert<a class="headerlink" href="#tertiary-domain-expert" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Provides guidance on semantic equivalence</p></li>
+<li><p>Reviews edge cases and ambiguous mappings</p></li>
+<li><p>Not technical but understands the domain</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="core-concepts">
+<h2>Core Concepts<a class="headerlink" href="#core-concepts" title="Link to this heading"></a></h2>
+<section id="source">
+<h3>Source<a class="headerlink" href="#source" title="Link to this heading"></a></h3>
+<p>A dataset being mapped to the canonical schema.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">source</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;NACC</span><span class="nv"> </span><span class="s">UDS3&quot;</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;National</span><span class="nv"> </span><span class="s">Alzheimer&#39;s</span><span class="nv"> </span><span class="s">Coordinating</span><span class="nv"> </span><span class="s">Center</span><span class="nv"> </span><span class="s">Uniform</span><span class="nv"> </span><span class="s">Data</span><span class="nv"> </span><span class="s">Set</span><span class="nv"> </span><span class="s">v3&quot;</span>
+<span class="w">  </span><span class="nt">file_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;csv&quot;</span><span class="w">                    </span><span class="c1"># csv | xlsx | json | parquet</span>
+<span class="w">  </span><span class="nt">field_count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">847</span>
+<span class="w">  </span><span class="nt">uploaded_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-15T10:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">uploaded_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_id&quot;</span>
+<span class="w">  </span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;in_progress&quot;</span><span class="w">               </span><span class="c1"># uploaded | in_progress | reviewed | finalized</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Progress tracking</span>
+<span class="w">  </span><span class="nt">fields_total</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">847</span>
+<span class="w">  </span><span class="nt">fields_matched</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">312</span>
+<span class="w">  </span><span class="nt">fields_reviewed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">156</span>
+<span class="w">  </span><span class="nt">fields_finalized</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">89</span>
+</pre></div>
+</div>
+</section>
+<section id="source-field">
+<h3>Source Field<a class="headerlink" href="#source-field" title="Link to this heading"></a></h3>
+<p>A single field from the source dataset.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">source_field</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">source_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;NACCBRAA&quot;</span><span class="w">                     </span><span class="c1"># Original field name</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Braak</span><span class="nv"> </span><span class="s">stage</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">neurofibrillary</span><span class="nv"> </span><span class="s">degeneration&quot;</span>
+<span class="w">  </span><span class="nt">inferred_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;integer&quot;</span><span class="w">            </span><span class="c1"># Detected from data</span>
+<span class="w">  </span><span class="nt">sample_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;0&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;1&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;2&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;3&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;4&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;5&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;6&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">null_percentage</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12.5</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Matching state</span>
+<span class="w">  </span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;reviewed&quot;</span><span class="w">                  </span><span class="c1"># pending | matched | reviewed | finalized | no_match</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># AI recommendation</span>
+<span class="w">  </span><span class="nt">ai_match</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">element_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">    </span><span class="nt">element_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;path_braak_nft&quot;</span>
+<span class="w">    </span><span class="nt">confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.94</span>
+<span class="w">    </span><span class="nt">reasoning</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Direct</span><span class="nv"> </span><span class="s">semantic</span><span class="nv"> </span><span class="s">match.</span><span class="nv"> </span><span class="s">Source</span><span class="nv"> </span><span class="s">field</span><span class="nv"> </span><span class="s">NACCBRAA</span><span class="nv"> </span><span class="s">maps</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">Braak</span><span class="nv"> </span><span class="s">NFT</span><span class="nv"> </span><span class="s">staging...&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Final decision</span>
+<span class="w">  </span><span class="nt">final_match</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">element_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">    </span><span class="nt">element_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;path_braak_nft&quot;</span>
+<span class="w">    </span><span class="nt">curator_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_id&quot;</span>
+<span class="w">    </span><span class="nt">curated_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-15T14:30:00Z&quot;</span>
+<span class="w">    </span><span class="nt">notes</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Confirmed.</span><span class="nv"> </span><span class="s">Values</span><span class="nv"> </span><span class="s">align</span><span class="nv"> </span><span class="s">exactly.&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="candidate">
+<h3>Candidate<a class="headerlink" href="#candidate" title="Link to this heading"></a></h3>
+<p>A potential match for a source field.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">candidate</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">element_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">element_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;path_braak_nft&quot;</span>
+<span class="w">  </span><span class="nt">element_description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Neurofibrillary</span><span class="nv"> </span><span class="s">tangle</span><span class="nv"> </span><span class="s">staging</span><span class="nv"> </span><span class="s">per</span><span class="nv"> </span><span class="s">Braak</span><span class="nv"> </span><span class="s">criteria&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Retrieval scores</span>
+<span class="w">  </span><span class="nt">tfidf_score</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.72</span>
+<span class="w">  </span><span class="nt">embedding_score</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.89</span>
+<span class="w">  </span><span class="nt">combined_score</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.82</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># AI evaluation (if performed)</span>
+<span class="w">  </span><span class="nt">ai_confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.94</span>
+<span class="w">  </span><span class="nt">ai_reasoning</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Strong</span><span class="nv"> </span><span class="s">semantic</span><span class="nv"> </span><span class="s">alignment...&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="nt">rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</pre></div>
+</div>
+</section>
+<section id="mapping">
+<h3>Mapping<a class="headerlink" href="#mapping" title="Link to this heading"></a></h3>
+<p>The finalized relationship between source field and canonical element.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">mapping</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">source_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">source_field_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">element_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Metadata</span>
+<span class="w">  </span><span class="nt">match_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;exact&quot;</span><span class="w">                 </span><span class="c1"># exact | semantic | partial | none</span>
+<span class="w">  </span><span class="nt">confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.94</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Value transform (if needed)</span>
+<span class="w">  </span><span class="nt">transform</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;direct&quot;</span><span class="w">                    </span><span class="c1"># direct | remap | formula | conditional | lookup</span>
+<span class="w">    </span><span class="nt">remap</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">                       </span><span class="c1"># For value remapping</span>
+<span class="w">    </span><span class="nt">formula</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">                     </span><span class="c1"># For computed transforms</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Provenance</span>
+<span class="w">  </span><span class="nt">ai_suggested</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">curator_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_id&quot;</span>
+<span class="w">  </span><span class="nt">created_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-15T14:30:00Z&quot;</span>
+<span class="w">  </span><span class="nt">notes</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Exact</span><span class="nv"> </span><span class="s">match,</span><span class="nv"> </span><span class="s">no</span><span class="nv"> </span><span class="s">transform</span><span class="nv"> </span><span class="s">needed&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="feedback-record">
+<h3>Feedback Record<a class="headerlink" href="#feedback-record" title="Link to this heading"></a></h3>
+<p>Captures curator decisions for analysis.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">feedback</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">source_field_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">timestamp</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-15T14:30:00Z&quot;</span>
+<span class="w">  </span><span class="nt">curator_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_id&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># AI recommendation</span>
+<span class="w">  </span><span class="nt">ai_top_candidate</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">element_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">    </span><span class="nt">confidence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.94</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Curator action</span>
+<span class="w">  </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;accept&quot;</span><span class="w">                    </span><span class="c1"># accept | reject | select_alternative | no_match</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># If alternative selected</span>
+<span class="w">  </span><span class="nt">selected_element_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">           </span><span class="c1"># Different element if action=select_alternative</span>
+<span class="w">  </span><span class="nt">alternative_rank</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">              </span><span class="c1"># Rank of selected alternative in candidate list</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Context</span>
+<span class="w">  </span><span class="nt">candidates_shown</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">15</span>
+<span class="w">  </span><span class="nt">time_to_decision_ms</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4500</span>
+<span class="w">  </span><span class="nt">notes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+</pre></div>
+</div>
+</section>
+<section id="element-proposal-phase-c">
+<h3>Element Proposal <em>(Phase C)</em><a class="headerlink" href="#element-proposal-phase-c" title="Link to this heading"></a></h3>
+<p>A request to add a new element to the canonical schema.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">element_proposal</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">schema_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">source_field_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span><span class="w">             </span><span class="c1"># Source field that triggered proposal</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Proposed element definition</span>
+<span class="w">  </span><span class="nt">proposed_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;moca_total_score&quot;</span>
+<span class="w">  </span><span class="nt">proposed_display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MoCA</span><span class="nv"> </span><span class="s">Total</span><span class="nv"> </span><span class="s">Score&quot;</span>
+<span class="w">  </span><span class="nt">proposed_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;integer&quot;</span>
+<span class="w">  </span><span class="nt">proposed_description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Montreal</span><span class="nv"> </span><span class="s">Cognitive</span><span class="nv"> </span><span class="s">Assessment</span><span class="nv"> </span><span class="s">total</span><span class="nv"> </span><span class="s">score</span><span class="nv"> </span><span class="s">(0-30)&quot;</span>
+<span class="w">  </span><span class="nt">proposed_constraints</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">    </span><span class="nt">max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
+<span class="w">  </span><span class="nt">suggested_category</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cognitive_assessments&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Justification</span>
+<span class="w">  </span><span class="nt">justification</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MoCA</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">widely-used</span><span class="nv"> </span><span class="s">cognitive</span><span class="nv"> </span><span class="s">screening</span><span class="nv"> </span><span class="s">tool...&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Similar elements (AI-detected)</span>
+<span class="w">  </span><span class="nt">similar_elements</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">element_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mmse_total&quot;</span>
+<span class="w">      </span><span class="nt">similarity_score</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.62</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Status</span>
+<span class="w">  </span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;pending&quot;</span><span class="w">                   </span><span class="c1"># draft | pending | under_review | approved | rejected | withdrawn</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Resolution</span>
+<span class="w">  </span><span class="nt">registry_proposal_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span><span class="w">        </span><span class="c1"># ID in Registry Service</span>
+<span class="w">  </span><span class="nt">created_element_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span><span class="w">          </span><span class="c1"># If approved</span>
+<span class="w">  </span><span class="nt">rejection_reason</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Audit</span>
+<span class="w">  </span><span class="nt">created_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_id&quot;</span>
+<span class="w">  </span><span class="nt">created_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-27T15:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">resolved_at</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+</pre></div>
+</div>
+</section>
+<section id="transform-phase-b">
+<h3>Transform <em>(Phase B)</em><a class="headerlink" href="#transform-phase-b" title="Link to this heading"></a></h3>
+<p>A value transformation definition stored with mappings.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">transform</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">mapping_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="nt">transform_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;remap&quot;</span><span class="w">             </span><span class="c1"># direct | remap | formula | conditional | lookup</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># For remap transforms</span>
+<span class="w">  </span><span class="nt">definition</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">value_map</span><span class="p">:</span>
+<span class="w">      </span><span class="s">&quot;Male&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">      </span><span class="s">&quot;Female&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">      </span><span class="s">&quot;Unknown&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">    </span><span class="nt">null_mappings</span><span class="p">:</span>
+<span class="w">      </span><span class="s">&quot;Not</span><span class="nv"> </span><span class="s">Reported&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;not_reported&quot;</span>
+<span class="w">      </span><span class="s">&quot;&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="s">&quot;missing&quot;</span>
+<span class="w">    </span><span class="nt">default_action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;error&quot;</span><span class="w">           </span><span class="c1"># error | null | pass_through</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># For formula transforms</span>
+<span class="w">  </span><span class="c1"># definition:</span>
+<span class="w">  </span><span class="c1">#   expression: &quot;enrollment_year - birth_year&quot;</span>
+<span class="w">  </span><span class="c1">#   variables: [&quot;enrollment_year&quot;, &quot;birth_year&quot;]</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Testing</span>
+<span class="w">  </span><span class="nt">test_results</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">passed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">344</span>
+<span class="w">    </span><span class="nt">failed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">    </span><span class="nt">warnings</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Pattern reference (if using reusable pattern)</span>
+<span class="w">  </span><span class="nt">pattern_id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="nt">created_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-27T10:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">created_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_id&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
+<section id="f1-source-ingestion">
+<h3>F1: Source Ingestion<a class="headerlink" href="#f1-source-ingestion" title="Link to this heading"></a></h3>
+<p><strong>F1.1: Upload Source</strong></p>
+<ul class="simple">
+<li><p>Support CSV, Excel, JSON, Parquet formats</p></li>
+<li><p>Auto-detect field types from data samples</p></li>
+<li><p>Extract field descriptions from headers or metadata</p></li>
+<li><p>Handle large files (100k+ rows) efficiently</p></li>
+</ul>
+<p><strong>F1.2: Field Extraction</strong></p>
+<ul class="simple">
+<li><p>Parse field names and normalize</p></li>
+<li><p>Infer data types from values</p></li>
+<li><p>Calculate statistics (null %, unique values, sample values)</p></li>
+<li><p>Detect potential composite fields</p></li>
+</ul>
+<p><strong>F1.3: Source Metadata</strong></p>
+<ul class="simple">
+<li><p>Name and describe the source</p></li>
+<li><p>Tag with domain/category</p></li>
+<li><p>Link to documentation</p></li>
+<li><p>Track upload history</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="f2-hybrid-retrieval">
+<h3>F2: Hybrid Retrieval<a class="headerlink" href="#f2-hybrid-retrieval" title="Link to this heading"></a></h3>
+<p>The Harmonization Engine uses the <strong>shared Retrieval Core</strong> (see <a class="reference internal" href="#shared-infrastructure-retrieval-core"><span class="std std-ref">Shared Infrastructure</span></a>) for all similarity matching operations.</p>
+<p><strong>F2.1: Index Management</strong></p>
+<ul class="simple">
+<li><p>Build TF-IDF index on canonical schema elements using <code class="docutils literal notranslate"><span class="pre">TFIDFEngine</span></code></p></li>
+<li><p>Generate embeddings for all elements using <code class="docutils literal notranslate"><span class="pre">EmbeddingEngine</span></code></p></li>
+<li><p>Cache indices for performance</p></li>
+<li><p>Rebuild on schema updates (via webhook)</p></li>
+</ul>
+<p><strong>F2.2: TF-IDF Matching</strong></p>
+<ul class="simple">
+<li><p>Tokenize and normalize field names + descriptions via <code class="docutils literal notranslate"><span class="pre">TextProcessor</span></code></p></li>
+<li><p>N-gram matching (unigrams + bigrams)</p></li>
+<li><p>Stop word removal</p></li>
+<li><p>Return cosine similarity scores</p></li>
+</ul>
+<p><strong>F2.3: Semantic Matching</strong></p>
+<ul class="simple">
+<li><p>Encode source field as embedding</p></li>
+<li><p>Cosine similarity against element embeddings</p></li>
+<li><p>Handle synonyms and abbreviations</p></li>
+<li><p>Support domain-specific models (configurable)</p></li>
+</ul>
+<p><strong>F2.4: Score Combination</strong></p>
+<ul class="simple">
+<li><p>Configurable weights via <code class="docutils literal notranslate"><span class="pre">ScoreCombiner</span></code> (default: 40% TF-IDF, 60% embedding)</p></li>
+<li><p>Optional: Reciprocal Rank Fusion mode</p></li>
+<li><p>Return top-k candidates (default: 15)</p></li>
+<li><p>Include component scores for analysis</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Configuration options</span>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RetrievalConfig</span><span class="p">:</span>
+    <span class="n">embedding_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all-MiniLM-L6-v2&quot;</span>
+    <span class="n">tfidf_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.4</span>
+    <span class="n">embedding_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.6</span>
+    <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">use_rrf</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">include_component_scores</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="f3-ai-evaluation">
+<h3>F3: AI Evaluation<a class="headerlink" href="#f3-ai-evaluation" title="Link to this heading"></a></h3>
+<p><strong>F3.1: Candidate Assessment</strong></p>
+<ul class="simple">
+<li><p>LLM evaluates each candidate for semantic match</p></li>
+<li><p>Considers: name similarity, description alignment, value compatibility</p></li>
+<li><p>Outputs confidence score (0-1) and reasoning</p></li>
+</ul>
+<p><strong>F3.2: Batch Processing</strong></p>
+<ul class="simple">
+<li><p>Process multiple source fields efficiently</p></li>
+<li><p>Parallel evaluation where possible</p></li>
+<li><p>Progress tracking and resumability</p></li>
+</ul>
+<p><strong>F3.3: Confidence Calibration</strong></p>
+<ul class="simple">
+<li><p>Track confidence vs. curator acceptance</p></li>
+<li><p>Identify systematic over/under-confidence</p></li>
+<li><p>Adjust thresholds based on feedback</p></li>
+</ul>
+<p><strong>F3.4: Configurable Prompts</strong></p>
+<ul class="simple">
+<li><p>Template-based prompt construction</p></li>
+<li><p>Domain-specific instructions</p></li>
+<li><p>A/B testing support for prompt variants</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="f4-curation-interface">
+<h3>F4: Curation Interface<a class="headerlink" href="#f4-curation-interface" title="Link to this heading"></a></h3>
+<p><strong>F4.1: Match Review</strong></p>
+<ul class="simple">
+<li><p>Display source field with context</p></li>
+<li><p>Show ranked candidates with scores</p></li>
+<li><p>AI recommendation highlighted</p></li>
+<li><p>Accept, reject, or select alternative</p></li>
+</ul>
+<p><strong>F4.2: Bulk Operations</strong></p>
+<ul class="simple">
+<li><p>Auto-accept high-confidence matches (threshold configurable)</p></li>
+<li><p>Review queue sorted by confidence (low first)</p></li>
+<li><p>Batch accept/reject similar patterns</p></li>
+</ul>
+<p><strong>F4.3: No-Match Handling</strong></p>
+<p>When a source field has no acceptable match among existing canonical elements, the curator has three options:</p>
+<ol class="arabic simple">
+<li><p><strong>Mark as Intentionally Unmapped</strong></p>
+<ul class="simple">
+<li><p>Field is not relevant to canonical schema</p></li>
+<li><p>Examples: internal IDs, source-specific metadata</p></li>
+<li><p>Recorded with reason code: <code class="docutils literal notranslate"><span class="pre">not_applicable</span></code>, <code class="docutils literal notranslate"><span class="pre">source_specific</span></code>, <code class="docutils literal notranslate"><span class="pre">deprecated</span></code></p></li>
+</ul>
+</li>
+<li><p><strong>Propose New Element</strong> <em>(Phase C)</em></p>
+<ul class="simple">
+<li><p>Field represents a concept missing from canonical schema</p></li>
+<li><p>Creates a proposal for schema admin review</p></li>
+<li><p>See F4.5 for full workflow</p></li>
+</ul>
+</li>
+<li><p><strong>Request Guidance</strong></p>
+<ul class="simple">
+<li><p>Curator unsure how to handle field</p></li>
+<li><p>Creates a review request with question</p></li>
+<li><p>Routed to domain expert or schema admin</p></li>
+</ul>
+</li>
+</ol>
+<p><strong>UI Flow:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────┐
+│                   NO MATCH OPTIONS                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Source Field: moca_score                                       │
+│  No candidates above 50% confidence                             │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ ○ Mark as Unmapped                                        │  │
+│  │   This field doesn&#39;t belong in the canonical schema       │  │
+│  │                                                           │  │
+│  │   Reason: [Source-specific ▼]                             │  │
+│  │   Notes:  [________________________________]              │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ ○ Propose New Element                                     │  │
+│  │   This concept should be added to the canonical schema    │  │
+│  │                                                           │  │
+│  │   [Open Proposal Form →]                                  │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ ○ Request Guidance                                        │  │
+│  │   I need help deciding how to handle this field           │  │
+│  │                                                           │  │
+│  │   Question: [________________________________]            │  │
+│  │   Assign to: [Select reviewer ▼]                          │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  [Cancel] [Submit Decision]                                     │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p><strong>F4.4: Value Mapping</strong> <em>(Phase B)</em></p>
+<p>The Value Mapping feature enables curators to define how source values map to canonical element values. This is critical when:</p>
+<ul class="simple">
+<li><p>Source uses different encoding (e.g., “Male”/”Female” vs. 0/1)</p></li>
+<li><p>Source has additional values not in canonical allowed_values</p></li>
+<li><p>Source uses sentinel values for missing data (e.g., 99, -1)</p></li>
+</ul>
+<p><strong>Transform Types:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Example</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">direct</span></code></p></td>
+<td><p>No transformation needed</p></td>
+<td><p>age → age</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">remap</span></code></p></td>
+<td><p>Value-to-value mapping</p></td>
+<td><p>“Male” → 0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">formula</span></code></p></td>
+<td><p>Computed transformation</p></td>
+<td><p>birth_year → 2025 - birth_year</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">conditional</span></code></p></td>
+<td><p>Rule-based transformation</p></td>
+<td><p>if age &lt; 18: “minor” else “adult”</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">lookup</span></code></p></td>
+<td><p>External lookup table</p></td>
+<td><p>zip_code → state</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Remap Transform UI:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────┐
+│                 VALUE TRANSFORM: REMAP                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Source Field: sex                                              │
+│  Target Element: biological_sex (enum: 0, 1, 2)                 │
+│                                                                 │
+│  Source Values          Target Values                           │
+│  ─────────────          ─────────────                           │
+│  &quot;Male&quot;            →    [0 - Male        ▼]                     │
+│  &quot;Female&quot;          →    [1 - Female      ▼]                     │
+│  &quot;Unknown&quot;         →    [2 - Unknown     ▼]                     │
+│  &quot;Not Reported&quot;    →    [null            ▼]                     │
+│  &quot;&quot;                →    [null            ▼]                     │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ Null Handling                                             │  │
+│  │                                                           │  │
+│  │ &quot;Not Reported&quot; → null  Reason: [not_reported     ▼]       │  │
+│  │ &quot;&quot;             → null  Reason: [missing          ▼]       │  │
+│  │ (empty)        → null  Reason: [not_assessed     ▼]       │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ Unmapped Source Values                                    │  │
+│  │                                                           │  │
+│  │ ⚠ Found 2 values in data not in mapping:                  │  │
+│  │   &quot;M&quot; (47 occurrences) → [Map to... ▼]                    │  │
+│  │   &quot;F&quot; (52 occurrences) → [Map to... ▼]                    │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  [Test with Sample Data] [Save Transform]                       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p><strong>Formula Transform UI:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────┐
+│                 VALUE TRANSFORM: FORMULA                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Source Field: birth_year                                       │
+│  Target Element: age_at_enrollment (integer, 0-120)             │
+│                                                                 │
+│  Formula:                                                       │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ enrollment_year - birth_year                              │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  Available Variables:                                           │
+│  • birth_year (source field)                                    │
+│  • enrollment_year (source field)                               │
+│  • enrollment_date (source field)                               │
+│  • CURRENT_YEAR (constant: 2026)                                │
+│                                                                 │
+│  Test Results:                                                  │
+│  ┌────────────┬─────────────────┬────────────┐                  │
+│  │ birth_year │ enrollment_year │ result     │                  │
+│  ├────────────┼─────────────────┼────────────┤                  │
+│  │ 1955       │ 2023            │ 68 ✓       │                  │
+│  │ 1940       │ 2020            │ 80 ✓       │                  │
+│  │ 2030       │ 2023            │ -7 ⚠       │                  │
+│  └────────────┴─────────────────┴────────────┘                  │
+│                                                                 │
+│  ⚠ 3 values produce out-of-range results                        │
+│                                                                 │
+│  [Save Transform]                                               │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p><strong>Transform Testing:</strong></p>
+<ul class="simple">
+<li><p>Preview transform results against actual source data</p></li>
+<li><p>Highlight out-of-range or invalid outputs</p></li>
+<li><p>Show before/after comparison</p></li>
+<li><p>Detect unmapped source values</p></li>
+</ul>
+<p><strong>F4.5: Propose New Element</strong> <em>(Phase C)</em></p>
+<p>When a curator identifies a source field that should become a new canonical element:</p>
+<p><strong>Proposal Form:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────┐
+│                 PROPOSE NEW ELEMENT                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Source Context                                                 │
+│  ──────────────                                                 │
+│  Source: Cohort D Clinical                                      │
+│  Field: moca_score                                              │
+│  Type: integer                                                  │
+│  Values: 28, 24, 19, 30, ...                                    │
+│                                                                 │
+│  Proposed Element                                               │
+│  ────────────────                                               │
+│  Name:         [moca_total_score_________________]              │
+│  Display Name: [MoCA Total Score_________________]              │
+│  Type:         [integer ▼]                                      │
+│  Description:                                                   │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ Montreal Cognitive Assessment total score. Range 0-30,    │  │
+│  │ higher scores indicate better cognitive function.         │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  Constraints:                                                   │
+│  Min: [0___]  Max: [30__]  Pattern: [____________]              │
+│                                                                 │
+│  Category: [cognitive_assessments ▼]                            │
+│                                                                 │
+│  Justification:                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ MoCA is a widely-used cognitive screening tool. This      │  │
+│  │ element is needed for cross-cohort cognitive analysis.    │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  Similar Existing Elements (AI-detected):                       │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ ⚠ mmse_total (62% similar) - MMSE Total Score             │  │
+│  │   [View] [Use This Instead]                               │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  [Save Draft] [Submit Proposal]                                 │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p><strong>Proposal Workflow:</strong></p>
+<ol class="arabic simple">
+<li><p>Data manager creates proposal with element definition</p></li>
+<li><p>System detects similar existing elements</p></li>
+<li><p>Proposal synced to Registry Service</p></li>
+<li><p>Schema admin reviews in Curation Workbench</p></li>
+<li><p>On approval: element created, source field auto-mapped</p></li>
+<li><p>On rejection: proposer notified with reason/alternative</p></li>
+</ol>
+<p><strong>Proposal States:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">draft</span></code> — Being edited by proposer</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pending</span></code> — Submitted, awaiting review</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">under_review</span></code> — Claimed by reviewer</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">approved</span></code> — Element created</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rejected</span></code> — Declined with reason</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">withdrawn</span></code> — Cancelled by proposer</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="f5-feedback-learning">
+<h3>F5: Feedback &amp; Learning<a class="headerlink" href="#f5-feedback-learning" title="Link to this heading"></a></h3>
+<p><strong>F5.1: Decision Capture</strong></p>
+<ul class="simple">
+<li><p>Log every curator action</p></li>
+<li><p>Track time-to-decision</p></li>
+<li><p>Record candidate rankings</p></li>
+</ul>
+<p><strong>F5.2: Pattern Analysis</strong></p>
+<ul class="simple">
+<li><p>Identify common failure modes:</p>
+<ul>
+<li><p>Granularity mismatch (broader/narrower)</p></li>
+<li><p>Synonym confusion</p></li>
+<li><p>Domain errors</p></li>
+<li><p>Value encoding differences</p></li>
+</ul>
+</li>
+<li><p>Generate reports by source, curator, time period</p></li>
+</ul>
+<p><strong>F5.3: Improvement Metrics</strong></p>
+<ul class="simple">
+<li><p>Precision&#64;k for retrieval</p></li>
+<li><p>AI acceptance rate</p></li>
+<li><p>Curator agreement rate</p></li>
+<li><p>Time savings vs. manual</p></li>
+</ul>
+<p><strong>F5.4: Model Comparison</strong> (Future)</p>
+<ul class="simple">
+<li><p>A/B test embedding models</p></li>
+<li><p>Compare general vs. domain-specific</p></li>
+<li><p>Data-driven model selection</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="f6-mapping-management">
+<h3>F6: Mapping Management<a class="headerlink" href="#f6-mapping-management" title="Link to this heading"></a></h3>
+<p><strong>F6.1: Save Mappings</strong></p>
+<ul class="simple">
+<li><p>Persist finalized field mappings</p></li>
+<li><p>Version mappings per source</p></li>
+<li><p>Track mapping history</p></li>
+</ul>
+<p><strong>F6.2: Export Mappings</strong></p>
+<ul class="simple">
+<li><p>JSON mapping file</p></li>
+<li><p>CSV for spreadsheet review</p></li>
+<li><p>Python/SQL transform code generation</p></li>
+<li><p>Integration with ETL tools</p></li>
+</ul>
+<p><strong>F6.3: Apply Mappings</strong></p>
+<ul class="simple">
+<li><p>Generate column rename dictionary</p></li>
+<li><p>Create value transform rules</p></li>
+<li><p>Preview transformed data sample</p></li>
+</ul>
+<p><strong>F6.4: Mapping Templates</strong></p>
+<ul class="simple">
+<li><p>Reuse mappings for similar sources</p></li>
+<li><p>Suggest mappings based on field name patterns</p></li>
+<li><p>Clone and modify existing mappings</p></li>
+</ul>
+<p><strong>F6.5: Transform Management</strong> <em>(Phase B)</em></p>
+<p><strong>Transform CRUD:</strong></p>
+<ul class="simple">
+<li><p>Create transform with mapping</p></li>
+<li><p>Update transform definition</p></li>
+<li><p>Delete transform (revert to direct)</p></li>
+<li><p>View transform history</p></li>
+</ul>
+<p><strong>Transform Testing:</strong></p>
+<ul class="simple">
+<li><p>Test against sample data before saving</p></li>
+<li><p>Show pass/fail/warning counts</p></li>
+<li><p>Highlight problematic values</p></li>
+<li><p>Validate against element constraints</p></li>
+</ul>
+<p><strong>Transform Patterns (Organic Growth):</strong></p>
+<p>Patterns are built organically from curator behavior:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">check_pattern_promotion</span><span class="p">(</span><span class="n">transform</span><span class="p">:</span> <span class="n">Transform</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PatternSuggestion</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if a transform should be suggested as a reusable pattern.</span>
+<span class="sd">    Triggered after transform is saved.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Find similar transforms across all sessions</span>
+    <span class="n">similar</span> <span class="o">=</span> <span class="k">await</span> <span class="n">find_similar_transforms</span><span class="p">(</span>
+        <span class="n">transform_type</span><span class="o">=</span><span class="n">transform</span><span class="o">.</span><span class="n">transform_type</span><span class="p">,</span>
+        <span class="n">definition</span><span class="o">=</span><span class="n">transform</span><span class="o">.</span><span class="n">definition</span><span class="p">,</span>
+        <span class="n">similarity_threshold</span><span class="o">=</span><span class="mf">0.9</span>
+    <span class="p">)</span>
+    
+    <span class="c1"># If 3+ similar transforms exist, suggest pattern</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">similar</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="c1"># Check if pattern already exists</span>
+        <span class="n">existing</span> <span class="o">=</span> <span class="k">await</span> <span class="n">find_matching_pattern</span><span class="p">(</span><span class="n">transform</span><span class="o">.</span><span class="n">definition</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">existing</span><span class="p">:</span>
+            <span class="c1"># Increment usage count</span>
+            <span class="k">await</span> <span class="n">increment_pattern_usage</span><span class="p">(</span><span class="n">existing</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        
+        <span class="c1"># Suggest new pattern</span>
+        <span class="k">return</span> <span class="n">PatternSuggestion</span><span class="p">(</span>
+            <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+            <span class="n">similar_count</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">similar</span><span class="p">),</span>
+            <span class="n">suggested_name</span><span class="o">=</span><span class="n">generate_pattern_name</span><span class="p">(</span><span class="n">transform</span><span class="p">),</span>
+            <span class="n">suggested_description</span><span class="o">=</span><span class="n">generate_pattern_description</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="n">similar</span><span class="p">)</span>
+        <span class="p">)</span>
+    
+    <span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<p><strong>Pattern Promotion UI:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────┐
+│                 PATTERN SUGGESTION                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  This transform has been used 5 times across sessions.          │
+│  Would you like to save it as a reusable pattern?               │
+│                                                                 │
+│  Transform: Male/Female → 0/1                                   │
+│  Used in: Cohort A, Cohort B, Cohort C, Cohort D, Cohort E      │
+│                                                                 │
+│  Suggested Pattern Name:                                        │
+│  [sex_string_to_code_______________________]                    │
+│                                                                 │
+│  Description:                                                   │
+│  [Maps Male/Female string values to 0/1 codes___]               │
+│                                                                 │
+│  [Save as Pattern] [Not Now] [Never for This Transform]         │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="user-interface">
+<h2>User Interface<a class="headerlink" href="#user-interface" title="Link to this heading"></a></h2>
+<section id="main-views">
+<h3>Main Views<a class="headerlink" href="#main-views" title="Link to this heading"></a></h3>
+<p><strong>1. Source Dashboard</strong></p>
+<ul class="simple">
+<li><p>List of sources with progress metrics</p></li>
+<li><p>Status indicators (uploaded, in progress, finalized)</p></li>
+<li><p>Quick actions (upload, continue, export)</p></li>
+</ul>
+<p><strong>2. Field Matching Interface</strong></p>
+<ul class="simple">
+<li><p>Left panel: Source field details</p>
+<ul>
+<li><p>Field name, description, type</p></li>
+<li><p>Sample values, statistics</p></li>
+</ul>
+</li>
+<li><p>Right panel: Candidate list</p>
+<ul>
+<li><p>Ranked by combined score</p></li>
+<li><p>AI confidence badge</p></li>
+<li><p>Expand for reasoning</p></li>
+</ul>
+</li>
+<li><p>Action buttons: Accept, Reject, Skip, No Match</p></li>
+</ul>
+<p><strong>3. Batch Review</strong></p>
+<ul class="simple">
+<li><p>Table view of all fields</p></li>
+<li><p>Filter by status, confidence, curator</p></li>
+<li><p>Bulk actions toolbar</p></li>
+<li><p>Inline accept/reject</p></li>
+</ul>
+<p><strong>4. Mapping Export</strong></p>
+<ul class="simple">
+<li><p>Preview generated mappings</p></li>
+<li><p>Select export format</p></li>
+<li><p>Download or copy</p></li>
+</ul>
+<p><strong>5. Feedback Dashboard</strong></p>
+<ul class="simple">
+<li><p>Acceptance rate over time</p></li>
+<li><p>Common rejection reasons</p></li>
+<li><p>Retrieval performance metrics</p></li>
+<li><p>Curator activity</p></li>
+</ul>
+<p><strong>6. Proposal Dashboard</strong> <em>(Phase C)</em></p>
+<ul class="simple">
+<li><p>List of my proposals with status</p></li>
+<li><p>Filter by status, schema, date</p></li>
+<li><p>Quick actions: edit draft, withdraw, view resolution</p></li>
+<li><p>Notifications for status changes</p></li>
+</ul>
+<p><strong>7. Transform Editor</strong> <em>(Phase B)</em></p>
+<ul class="simple">
+<li><p>Visual transform builder</p></li>
+<li><p>Code preview (Python/SQL)</p></li>
+<li><p>Test runner with sample data</p></li>
+<li><p>Pattern library browser</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="api-design">
+<h2>API Design<a class="headerlink" href="#api-design" title="Link to this heading"></a></h2>
+<section id="restful-endpoints">
+<h3>RESTful Endpoints<a class="headerlink" href="#restful-endpoints" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Sources</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">sources</span>                    <span class="c1"># List sources</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">sources</span>                    <span class="c1"># Upload new source</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span>                <span class="c1"># Get source details</span>
+<span class="n">DELETE</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span>                <span class="c1"># Delete source</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">progress</span>       <span class="c1"># Get progress stats</span>
+
+<span class="c1"># Fields</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">fields</span>         <span class="c1"># List fields (with filters)</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">fields</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span>                 <span class="c1"># Get field details</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">fields</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">match</span>           <span class="c1"># Trigger matching for field</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">fields</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">candidates</span>      <span class="c1"># Get candidates for field</span>
+
+<span class="c1"># Curation</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">fields</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">accept</span>          <span class="c1"># Accept AI recommendation</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">fields</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">select</span>          <span class="c1"># Select alternative candidate</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">fields</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">reject</span>          <span class="c1"># Reject all / mark no match</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">fields</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">curate</span>          <span class="c1"># Custom curation decision</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">queue</span>          <span class="c1"># Get curation queue</span>
+
+<span class="c1"># Mappings</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">mappings</span>       <span class="c1"># Get all mappings for source</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">mappings</span>       <span class="c1"># Create manual mapping</span>
+<span class="n">PUT</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">mappings</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span>               <span class="c1"># Update mapping</span>
+<span class="n">DELETE</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">mappings</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span>               <span class="c1"># Delete mapping</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">sources</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">export</span>         <span class="c1"># Export mappings (format param)</span>
+
+<span class="c1"># Transforms (Phase B)</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">mappings</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">transform</span>     <span class="c1"># Get transform for mapping</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">mappings</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">transform</span>     <span class="c1"># Create/update transform</span>
+<span class="n">DELETE</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">mappings</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">transform</span>     <span class="c1"># Delete transform</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">transforms</span><span class="o">/</span><span class="n">test</span>            <span class="c1"># Test transform against data</span>
+
+<span class="c1"># Transform Patterns (Phase B)</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">patterns</span>                   <span class="c1"># List available patterns</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">patterns</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span>               <span class="c1"># Get pattern details</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">patterns</span>                   <span class="c1"># Create pattern from transform</span>
+<span class="n">PUT</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">patterns</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span>               <span class="c1"># Update pattern</span>
+<span class="n">DELETE</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">patterns</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span>               <span class="c1"># Delete pattern</span>
+
+<span class="c1"># Proposals (Phase C)</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">proposals</span>                  <span class="c1"># List my proposals</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">proposals</span>                  <span class="c1"># Create proposal</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">proposals</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span>              <span class="c1"># Get proposal details</span>
+<span class="n">PUT</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">proposals</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span>              <span class="c1"># Update draft proposal</span>
+<span class="n">DELETE</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">proposals</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span>              <span class="c1"># Withdraw proposal</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">proposals</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">submit</span>       <span class="c1"># Submit for review</span>
+
+<span class="c1"># Feedback</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">feedback</span>                   <span class="c1"># List feedback records (with filters)</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">feedback</span><span class="o">/</span><span class="n">analysis</span>          <span class="c1"># Get analysis report</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">feedback</span><span class="o">/</span><span class="n">metrics</span>           <span class="c1"># Get performance metrics</span>
+
+<span class="c1"># Configuration</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">config</span><span class="o">/</span><span class="n">retrieval</span>           <span class="c1"># Get retrieval config</span>
+<span class="n">PUT</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">config</span><span class="o">/</span><span class="n">retrieval</span>           <span class="c1"># Update retrieval config</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">config</span><span class="o">/</span><span class="n">models</span>              <span class="c1"># List available embedding models</span>
+
+<span class="c1"># Webhooks</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">webhooks</span><span class="o">/</span><span class="n">schema</span><span class="o">-</span><span class="n">changed</span>        <span class="c1"># Handle schema change from Registry</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="data-model">
+<h2>Data Model<a class="headerlink" href="#data-model" title="Link to this heading"></a></h2>
+<section id="database-schema-postgresql">
+<h3>Database Schema (PostgreSQL)<a class="headerlink" href="#database-schema-postgresql" title="Link to this heading"></a></h3>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- Sources</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">sources</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">schema_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">              </span><span class="c1">-- Target schema for mapping</span>
+<span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">description</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">file_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">file_path</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">500</span><span class="p">),</span>
+<span class="w">    </span><span class="n">field_count</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span>
+<span class="w">    </span><span class="n">uploaded_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">uploaded_by</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;uploaded&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">metadata</span><span class="w"> </span><span class="n">JSONB</span>
+<span class="p">);</span>
+
+<span class="c1">-- Source Fields</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">source_fields</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">source_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">sources</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">description</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">inferred_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+<span class="w">    </span><span class="n">sample_values</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="k">statistics</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;pending&#39;</span><span class="p">,</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c1">-- AI match</span>
+<span class="w">    </span><span class="n">ai_element_id</span><span class="w"> </span><span class="n">UUID</span><span class="p">,</span><span class="w">                   </span><span class="c1">-- References Registry element</span>
+<span class="w">    </span><span class="n">ai_confidence</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span>
+<span class="w">    </span><span class="n">ai_reasoning</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">ai_matched_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="p">,</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c1">-- Final match</span>
+<span class="w">    </span><span class="n">final_element_id</span><span class="w"> </span><span class="n">UUID</span><span class="p">,</span><span class="w">                </span><span class="c1">-- References Registry element</span>
+<span class="w">    </span><span class="n">curator_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">curated_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="p">,</span>
+<span class="w">    </span><span class="n">curator_notes</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">UNIQUE</span><span class="p">(</span><span class="n">source_id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- Candidates (cached)</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">candidates</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">source_field_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">source_fields</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">element_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">             </span><span class="c1">-- References Registry element</span>
+<span class="w">    </span><span class="n">rank</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span>
+<span class="w">    </span><span class="n">tfidf_score</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span>
+<span class="w">    </span><span class="n">embedding_score</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span>
+<span class="w">    </span><span class="n">combined_score</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span>
+<span class="w">    </span><span class="n">ai_confidence</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span>
+<span class="w">    </span><span class="n">ai_reasoning</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
+<span class="p">);</span>
+
+<span class="c1">-- Mappings</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">mappings</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">source_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">sources</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">source_field_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">source_fields</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">element_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">             </span><span class="c1">-- References Registry element</span>
+<span class="w">    </span><span class="n">match_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+<span class="w">    </span><span class="n">confidence</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span>
+<span class="w">    </span><span class="n">ai_suggested</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">curator_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">notes</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">UNIQUE</span><span class="p">(</span><span class="n">source_field_id</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- Transforms (Phase B)</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">transforms</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">mapping_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">mappings</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">transform_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">  </span><span class="c1">-- direct | remap | formula | conditional | lookup</span>
+<span class="w">    </span><span class="n">definition</span><span class="w"> </span><span class="n">JSONB</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">test_results</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">pattern_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">transform_patterns</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">updated_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">created_by</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">UNIQUE</span><span class="p">(</span><span class="n">mapping_id</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- Transform Patterns (Phase B)</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">transform_patterns</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">description</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">transform_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">definition</span><span class="w"> </span><span class="n">JSONB</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">usage_count</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">created_by</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- Element Proposals (Phase C)</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">element_proposals</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">schema_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">              </span><span class="c1">-- Target schema</span>
+<span class="w">    </span><span class="n">source_field_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">source_fields</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c1">-- Proposed element</span>
+<span class="w">    </span><span class="n">proposed_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">proposed_display_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
+<span class="w">    </span><span class="n">proposed_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">proposed_description</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">proposed_constraints</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">suggested_category</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c1">-- Context</span>
+<span class="w">    </span><span class="n">justification</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">similar_elements</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c1">-- Status</span>
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;draft&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">registry_proposal_id</span><span class="w"> </span><span class="n">UUID</span><span class="p">,</span><span class="w">            </span><span class="c1">-- ID in Registry Service</span>
+<span class="w">    </span><span class="n">created_element_id</span><span class="w"> </span><span class="n">UUID</span><span class="p">,</span><span class="w">              </span><span class="c1">-- If approved</span>
+<span class="w">    </span><span class="n">rejection_reason</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">suggested_alternative_id</span><span class="w"> </span><span class="n">UUID</span><span class="p">,</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c1">-- Audit</span>
+<span class="w">    </span><span class="n">created_by</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">updated_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">resolved_at</span><span class="w"> </span><span class="k">TIMESTAMP</span>
+<span class="p">);</span>
+
+<span class="c1">-- Feedback</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">feedback</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">source_field_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">source_fields</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="k">timestamp</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">curator_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="n">ai_element_id</span><span class="w"> </span><span class="n">UUID</span><span class="p">,</span>
+<span class="w">    </span><span class="n">ai_confidence</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="n">action</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">          </span><span class="c1">-- accept | reject | select_alternative | no_match</span>
+<span class="w">    </span><span class="n">selected_element_id</span><span class="w"> </span><span class="n">UUID</span><span class="p">,</span>
+<span class="w">    </span><span class="n">alternative_rank</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span>
+<span class="w">    </span><span class="n">candidates_shown</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span>
+<span class="w">    </span><span class="n">time_to_decision_ms</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span>
+<span class="w">    </span><span class="n">notes</span><span class="w"> </span><span class="nb">TEXT</span>
+<span class="p">);</span>
+
+<span class="c1">-- Retrieval index metadata</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">retrieval_indices</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">schema_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">embedding_model</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">element_count</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span>
+<span class="w">    </span><span class="n">index_path</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">500</span><span class="p">),</span><span class="w">              </span><span class="c1">-- Path to cached index files</span>
+<span class="w">    </span><span class="n">config</span><span class="w"> </span><span class="n">JSONB</span>
+<span class="p">);</span>
+
+<span class="c1">-- Indexes</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_sources_schema</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">sources</span><span class="p">(</span><span class="n">schema_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_source_fields_source</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">source_fields</span><span class="p">(</span><span class="n">source_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_source_fields_status</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">source_fields</span><span class="p">(</span><span class="n">status</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_candidates_field</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">candidates</span><span class="p">(</span><span class="n">source_field_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_mappings_source</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">mappings</span><span class="p">(</span><span class="n">source_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_transforms_mapping</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">transforms</span><span class="p">(</span><span class="n">mapping_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_transforms_pattern</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">transforms</span><span class="p">(</span><span class="n">pattern_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_patterns_usage</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">transform_patterns</span><span class="p">(</span><span class="n">usage_count</span><span class="w"> </span><span class="k">DESC</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_proposals_schema</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">element_proposals</span><span class="p">(</span><span class="n">schema_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_proposals_status</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">element_proposals</span><span class="p">(</span><span class="n">status</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_feedback_timestamp</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">feedback</span><span class="p">(</span><span class="k">timestamp</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_feedback_curator</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">feedback</span><span class="p">(</span><span class="n">curator_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_feedback_action</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">feedback</span><span class="p">(</span><span class="n">action</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="shared-infrastructure-retrieval-core">
+<h2>Shared Infrastructure: Retrieval Core<a class="headerlink" href="#shared-infrastructure-retrieval-core" title="Link to this heading"></a></h2>
+<p>The Harmonization Engine uses shared retrieval infrastructure that is also used by the Curation Workbench (duplicate detection) and Registry Service (proposal similarity). This ensures consistent matching behavior across all Forge services.</p>
+<section id="architecture">
+<h3>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────────────────┐
+│                         RETRIEVAL CORE MODULE                               │
+│                         (forge-retrieval-core)                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                         TextProcessor                                 │  │
+│  │                                                                       │  │
+│  │  • normalize(text) → cleaned text                                     │  │
+│  │  • tokenize(text) → tokens (handles snake_case, camelCase, etc.)      │  │
+│  │  • build_element_text(element) → combined searchable text             │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                         TFIDFEngine                                   │  │
+│  │                                                                       │  │
+│  │  • fit(texts) → builds vocabulary and IDF weights                     │  │
+│  │  • transform(texts) → sparse TF-IDF matrix                            │  │
+│  │  • similarity_matrix() → pairwise cosine similarities                 │  │
+│  │  • query(text, matrix) → similarity scores against corpus             │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                        EmbeddingEngine                                │  │
+│  │                                                                       │  │
+│  │  • encode(text) → embedding vector                                    │  │
+│  │  • encode_batch(texts) → embedding matrix                             │  │
+│  │  • similarity_matrix(embeddings) → pairwise cosine similarities       │  │
+│  │  • query(embedding, matrix) → similarity scores against corpus        │  │
+│  │                                                                       │  │
+│  │  Config:                                                              │  │
+│  │    model: str = &quot;all-MiniLM-L6-v2&quot;                                    │  │
+│  │    cache_dir: str = &quot;.cache/embeddings&quot;                               │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                        ScoreCombiner                                  │  │
+│  │                                                                       │  │
+│  │  • combine(tfidf_scores, embedding_scores, weights) → final scores    │  │
+│  │  • combine_matrices(tfidf_matrix, embedding_matrix) → combined matrix │  │
+│  │                                                                       │  │
+│  │  Config:                                                              │  │
+│  │    tfidf_weight: float = 0.4                                          │  │
+│  │    embedding_weight: float = 0.6                                      │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+<section id="textprocessor">
+<h3>TextProcessor<a class="headerlink" href="#textprocessor" title="Link to this heading"></a></h3>
+<p>Standardizes how element text is prepared for matching.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TextProcessor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Prepare element text for retrieval.&quot;&quot;&quot;</span>
+    
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">normalize</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lowercase, remove special chars, normalize whitespace.&quot;&quot;&quot;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[_\-]+&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>  <span class="c1"># snake_case → words</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;([a-z])([A-Z])&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\1 \2&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>  <span class="c1"># camelCase → words</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^a-z0-9\s]&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+    
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_element_text</span><span class="p">(</span><span class="n">element</span><span class="p">:</span> <span class="n">Element</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Combine element fields into searchable text.</span>
+<span class="sd">        </span>
+<span class="sd">        Consistent across all services using retrieval.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">element</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">element</span><span class="o">.</span><span class="n">display_name</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">element</span><span class="o">.</span><span class="n">description</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">aliases</span> <span class="ow">or</span> <span class="p">[]),</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">allowed_values</span><span class="p">:</span>
+            <span class="c1"># Include enum values for matching</span>
+            <span class="n">parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">element</span><span class="o">.</span><span class="n">allowed_values</span><span class="p">[:</span><span class="mi">20</span><span class="p">]))</span>
+        
+        <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">parts</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="tfidfengine">
+<h3>TFIDFEngine<a class="headerlink" href="#tfidfengine" title="Link to this heading"></a></h3>
+<p>Token-level lexical matching.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TFIDFEngine</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;TF-IDF based text similarity.&quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vectorizer</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span>
+            <span class="n">lowercase</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">stop_words</span><span class="o">=</span><span class="s1">&#39;english&#39;</span><span class="p">,</span>
+            <span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">max_features</span><span class="o">=</span><span class="mi">10000</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">texts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build vocabulary from texts.&quot;&quot;&quot;</span>
+        <span class="n">normalized</span> <span class="o">=</span> <span class="p">[</span><span class="n">TextProcessor</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">texts</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vectorizer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">normalized</span><span class="p">)</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get similarity scores against fitted corpus.&quot;&quot;&quot;</span>
+        <span class="n">normalized</span> <span class="o">=</span> <span class="n">TextProcessor</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="n">query_vec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vectorizer</span><span class="o">.</span><span class="n">transform</span><span class="p">([</span><span class="n">normalized</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">query_vec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">similarity_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get pairwise similarities for all fitted texts.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matrix</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="embeddingengine">
+<h3>EmbeddingEngine<a class="headerlink" href="#embeddingengine" title="Link to this heading"></a></h3>
+<p>Semantic similarity via dense embeddings.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">EmbeddingEngine</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Embedding-based semantic similarity.&quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all-MiniLM-L6-v2&quot;</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="o">=</span> <span class="n">cache_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span> <span class="o">=</span> <span class="kc">None</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">encode_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">texts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Encode texts to embeddings, with caching.&quot;&quot;&quot;</span>
+        <span class="n">cache_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_key</span><span class="p">(</span><span class="n">texts</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cache_key</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cache_key</span><span class="p">)</span>
+        
+        <span class="n">embeddings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">texts</span><span class="p">,</span> <span class="n">show_progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_dir</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">cache_key</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span> <span class="o">=</span> <span class="n">embeddings</span>
+        <span class="k">return</span> <span class="n">embeddings</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get similarity scores against encoded corpus.&quot;&quot;&quot;</span>
+        <span class="n">query_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">([</span><span class="n">text</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">query_emb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">similarity_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get pairwise similarities for all encoded texts.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="scorecombiner">
+<h3>ScoreCombiner<a class="headerlink" href="#scorecombiner" title="Link to this heading"></a></h3>
+<p>Combines lexical and semantic scores.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RetrievalConfig</span><span class="p">:</span>
+    <span class="n">tfidf_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.4</span>
+    <span class="n">embedding_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.6</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ScoreCombiner</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Combine TF-IDF and embedding scores.&quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">RetrievalConfig</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="n">RetrievalConfig</span><span class="p">()</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> 
+        <span class="n">tfidf_scores</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> 
+        <span class="n">embedding_scores</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine score arrays.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tfidf_weight</span> <span class="o">*</span> <span class="n">tfidf_scores</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">embedding_weight</span> <span class="o">*</span> <span class="n">embedding_scores</span>
+        <span class="p">)</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine_matrices</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">tfidf_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">embedding_matrix</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine pairwise similarity matrices.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">tfidf_weight</span> <span class="o">*</span> <span class="n">tfidf_matrix</span> <span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">embedding_weight</span> <span class="o">*</span> <span class="n">embedding_matrix</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="hybridretriever-implementation">
+<h3>HybridRetriever Implementation<a class="headerlink" href="#hybridretriever-implementation" title="Link to this heading"></a></h3>
+<p>The Harmonization Engine’s <code class="docutils literal notranslate"><span class="pre">HybridRetriever</span></code> uses the shared core:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">HybridRetriever</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Query-based retrieval for field matching.</span>
+<span class="sd">    </span>
+<span class="sd">    Use case: Given a source field, find top-k matching canonical elements.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">RetrievalConfig</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="n">RetrievalConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tfidf</span> <span class="o">=</span> <span class="n">TFIDFEngine</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span> <span class="o">=</span> <span class="n">EmbeddingEngine</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combiner</span> <span class="o">=</span> <span class="n">ScoreCombiner</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">index_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">elements</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Element</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build indices from canonical elements.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">elements</span> <span class="o">=</span> <span class="n">elements</span>
+        <span class="n">texts</span> <span class="o">=</span> <span class="p">[</span><span class="n">TextProcessor</span><span class="o">.</span><span class="n">build_element_text</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">tfidf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">texts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span><span class="o">.</span><span class="n">encode_batch</span><span class="p">(</span><span class="n">texts</span><span class="p">)</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">retrieve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Candidate</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find top-k matching elements for a query.&quot;&quot;&quot;</span>
+        <span class="n">query_text</span> <span class="o">=</span> <span class="n">TextProcessor</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        
+        <span class="n">tfidf_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tfidf</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query_text</span><span class="p">)</span>
+        <span class="n">embedding_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">query_text</span><span class="p">)</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">combiner</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">tfidf_scores</span><span class="p">,</span> <span class="n">embedding_scores</span><span class="p">)</span>
+        
+        <span class="c1"># Get top-k indices</span>
+        <span class="n">top_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">combined</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="n">top_k</span><span class="p">]</span>
+        
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">Candidate</span><span class="p">(</span>
+                <span class="n">element</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">elements</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="n">score</span><span class="o">=</span><span class="n">combined</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="n">tfidf_score</span><span class="o">=</span><span class="n">tfidf_scores</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="n">embedding_score</span><span class="o">=</span><span class="n">embedding_scores</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                <span class="n">rank</span><span class="o">=</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">rank</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">top_indices</span><span class="p">)</span>
+        <span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="registry-client">
+<h3>Registry Client<a class="headerlink" href="#registry-client" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">RegistryClient</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Client for Registry Service API.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="n">base_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_key</span> <span class="o">=</span> <span class="n">api_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
+    
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_schema_elements</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">schema_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">use_cache</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Element</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch all elements for a schema.&quot;&quot;&quot;</span>
+        <span class="n">cache_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;elements:</span><span class="si">{</span><span class="n">schema_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">use_cache</span> <span class="ow">and</span> <span class="n">cache_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span>
+        
+        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/api/v1/schemas/</span><span class="si">{</span><span class="n">schema_id</span><span class="si">}</span><span class="s2">/elements&quot;</span><span class="p">)</span>
+        <span class="n">elements</span> <span class="o">=</span> <span class="p">[</span><span class="n">Element</span><span class="p">(</span><span class="o">**</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">elements</span>
+        <span class="k">return</span> <span class="n">elements</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">invalidate_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Invalidate cache for schema (called by webhook).&quot;&quot;&quot;</span>
+        <span class="n">cache_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;elements:</span><span class="si">{</span><span class="n">schema_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">cache_key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="implementation-phases">
+<h2>Implementation Phases<a class="headerlink" href="#implementation-phases" title="Link to this heading"></a></h2>
+<section id="phase-1-core-retrieval-complete">
+<h3>Phase 1: Core Retrieval ✅ Complete<a class="headerlink" href="#phase-1-core-retrieval-complete" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Replace keyword search with hybrid retrieval</p>
+<ul class="simple">
+<li><p>[x] Implement HybridRetriever class</p></li>
+<li><p>[x] TF-IDF indexing and search</p></li>
+<li><p>[x] Embedding indexing and search</p></li>
+<li><p>[x] Score combination (weighted average)</p></li>
+<li><p>[x] Index caching for performance</p></li>
+<li><p>[x] Unit tests for retrieval quality</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Better candidate surfacing, synonym handling</p>
+</section>
+<section id="phase-2-curation-mvp-complete">
+<h3>Phase 2: Curation MVP ✅ Complete<a class="headerlink" href="#phase-2-curation-mvp-complete" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Basic review interface with feedback capture</p>
+<ul class="simple">
+<li><p>[x] Source upload and field extraction</p></li>
+<li><p>[x] Match triggering and candidate display</p></li>
+<li><p>[x] Accept/reject actions</p></li>
+<li><p>[x] Feedback logging</p></li>
+<li><p>[x] Simple export (JSON/CSV)</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Usable end-to-end workflow</p>
+</section>
+<section id="phase-3-ai-evaluation-complete">
+<h3>Phase 3: AI Evaluation ✅ Complete<a class="headerlink" href="#phase-3-ai-evaluation-complete" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> LLM-powered match recommendations</p>
+<ul class="simple">
+<li><p>[x] Prompt engineering for evaluation</p></li>
+<li><p>[x] Confidence score extraction</p></li>
+<li><p>[x] Reasoning display</p></li>
+<li><p>[x] Batch processing</p></li>
+<li><p>[x] Performance optimization</p></li>
+</ul>
+<p><strong>Deliverable:</strong> AI-assisted curation with confidence scores</p>
+</section>
+<section id="phase-4-feedback-analysis-complete">
+<h3>Phase 4: Feedback Analysis ✅ Complete<a class="headerlink" href="#phase-4-feedback-analysis-complete" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Learn from curator decisions</p>
+<ul class="simple">
+<li><p>[x] Feedback aggregation and reporting</p></li>
+<li><p>[x] Failure mode identification</p></li>
+<li><p>[x] Retrieval precision metrics</p></li>
+<li><p>[x] Confidence calibration analysis</p></li>
+<li><p>[x] Dashboard for insights</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Data-driven improvement pipeline</p>
+</section>
+<section id="phase-5-registry-integration-complete">
+<h3>Phase 5: Registry Integration ✅ Complete<a class="headerlink" href="#phase-5-registry-integration-complete" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Connect to Registry Service API</p>
+<ul class="simple">
+<li><p>[x] Add RegistryClient for element fetching</p></li>
+<li><p>[x] Replace CSV loading with API calls</p></li>
+<li><p>[x] Implement webhook handler for cache invalidation</p></li>
+<li><p>[x] Add schema selection to session creation</p></li>
+<li><p>[ ] Transform definition UI (F4.4)</p></li>
+<li><p>[ ] Transform testing</p></li>
+<li><p>[ ] Transform patterns (organic growth)</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Live schema integration, value transforms (partial)</p>
+</section>
+<section id="phase-6-proposals-advanced-features-phase-c">
+<h3>Phase 6: Proposals &amp; Advanced Features (Phase C)<a class="headerlink" href="#phase-6-proposals-advanced-features-phase-c" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Full proposal workflow</p>
+<ul class="simple">
+<li><p>[ ] Proposal creation UI (F4.5)</p></li>
+<li><p>[ ] Proposal sync to Registry Service</p></li>
+<li><p>[ ] Webhook handler for proposal resolution</p></li>
+<li><p>[ ] Proposal dashboard</p></li>
+<li><p>[ ] A/B testing for models/prompts</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Complete schema evolution workflow</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="success-metrics">
+<h2>Success Metrics<a class="headerlink" href="#success-metrics" title="Link to this heading"></a></h2>
+<section id="efficiency">
+<h3>Efficiency<a class="headerlink" href="#efficiency" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Matching time per field reduced by 70%+</p></li>
+<li><p>Curator throughput: 50+ fields/hour (vs. 10-15 manual)</p></li>
+</ul>
+</section>
+<section id="quality">
+<h3>Quality<a class="headerlink" href="#quality" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>AI acceptance rate &gt; 80% at high confidence</p></li>
+<li><p>Retrieval precision&#64;5 &gt; 90%</p></li>
+<li><p>Curator agreement rate &gt; 95%</p></li>
+</ul>
+</section>
+<section id="learning">
+<h3>Learning<a class="headerlink" href="#learning" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Identified failure patterns documented</p></li>
+<li><p>Model comparison completed</p></li>
+<li><p>Confidence calibration within 5%</p></li>
+</ul>
+</section>
+<section id="adoption">
+<h3>Adoption<a class="headerlink" href="#adoption" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Sources harmonized per month</p></li>
+<li><p>Fields mapped per week</p></li>
+<li><p>Active curators</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="risks-mitigations">
+<h2>Risks &amp; Mitigations<a class="headerlink" href="#risks-mitigations" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Risk</p></th>
+<th class="head"><p>Impact</p></th>
+<th class="head"><p>Mitigation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Poor retrieval quality</p></td>
+<td><p>Wrong candidates surfaced</p></td>
+<td><p>Hybrid approach, tunable weights</p></td>
+</tr>
+<tr class="row-odd"><td><p>LLM hallucination</p></td>
+<td><p>Overconfident bad matches</p></td>
+<td><p>Human review required, confidence thresholds</p></td>
+</tr>
+<tr class="row-even"><td><p>Slow performance</p></td>
+<td><p>User frustration</p></td>
+<td><p>Caching, batch processing, async queues</p></td>
+</tr>
+<tr class="row-odd"><td><p>Domain mismatch</p></td>
+<td><p>General model misses medical terms</p></td>
+<td><p>Configurable models, domain comparison</p></td>
+</tr>
+<tr class="row-even"><td><p>Feedback not captured</p></td>
+<td><p>Lost learning opportunity</p></td>
+<td><p>Required actions, structured logging</p></td>
+</tr>
+<tr class="row-odd"><td><p>Registry unavailable</p></td>
+<td><p>Can’t fetch elements</p></td>
+<td><p>Cache fallback with stale data warning</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="integration-with-forge-ecosystem">
+<h2>Integration with Forge Ecosystem<a class="headerlink" href="#integration-with-forge-ecosystem" title="Link to this heading"></a></h2>
+<section id="with-registry-service">
+<h3>With Registry Service<a class="headerlink" href="#with-registry-service" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Fetch canonical schema elements for indexing via API</p></li>
+<li><p>Subscribe to schema updates via webhook to rebuild indices</p></li>
+<li><p>Validate element IDs in mappings</p></li>
+<li><p>Submit proposals for new elements (Phase C)</p></li>
+</ul>
+</section>
+<section id="with-curation-workbench">
+<h3>With Curation Workbench<a class="headerlink" href="#with-curation-workbench" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Shared retrieval core</strong> — Same TF-IDF + embedding algorithms</p></li>
+<li><p>Proposals reviewed and resolved in Curation Workbench</p></li>
+<li><p>Feedback on unmapped fields informs schema gaps</p></li>
+<li><p>Lineage tracking for mapped elements</p></li>
+</ul>
+</section>
+<section id="with-dataforge">
+<h3>With DataForge<a class="headerlink" href="#with-dataforge" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Export mappings in executable format</p></li>
+<li><p>DataForge applies mappings to actual data</p></li>
+<li><p>Validation errors feed back to mapping quality</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="design-decisions">
+<h2>Design Decisions<a class="headerlink" href="#design-decisions" title="Link to this heading"></a></h2>
+<section id="cache-invalidation-webhooks-not-polling">
+<h3>1. Cache Invalidation: Webhooks (Not Polling)<a class="headerlink" href="#cache-invalidation-webhooks-not-polling" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Harmonization Engine exposes <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/webhooks/schema-changed</span></code></p></li>
+<li><p>Registry Service sends signed webhooks on element/schema changes</p></li>
+<li><p>Retry policy: 3 retries, exponential backoff (1s, 5s, 30s)</p></li>
+<li><p>Rationale: Immediate invalidation, no wasted polling</p></li>
+</ul>
+</section>
+<section id="transform-patterns-built-organically-no-preloading">
+<h3>2. Transform Patterns: Built Organically (No Preloading)<a class="headerlink" href="#transform-patterns-built-organically-no-preloading" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>No seed data for transform patterns</p></li>
+<li><p>System tracks transform similarity across sessions</p></li>
+<li><p>After 3+ similar transforms, suggest promoting to pattern</p></li>
+<li><p>Rationale: Learn from actual usage rather than guessing</p></li>
+</ul>
+</section>
+<section id="proposals-phase-c-with-curation-workbench">
+<h3>3. Proposals: Phase C (With Curation Workbench)<a class="headerlink" href="#proposals-phase-c-with-curation-workbench" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Deferred from Phase B to Phase C</p></li>
+<li><p>Rationale: Review workflow requires Curation Workbench UI</p></li>
+<li><p>Proposal tables specified but not implemented until UI ready</p></li>
+</ul>
+</section>
+<section id="shared-retrieval-core">
+<h3>4. Shared Retrieval Core<a class="headerlink" href="#shared-retrieval-core" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Same TF-IDF + embedding approach used by Harmonization Engine and Curation Workbench</p></li>
+<li><p>Ensures consistent matching behavior across services</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TextProcessor</span></code>, <code class="docutils literal notranslate"><span class="pre">TFIDFEngine</span></code>, <code class="docutils literal notranslate"><span class="pre">EmbeddingEngine</span></code>, <code class="docutils literal notranslate"><span class="pre">ScoreCombiner</span></code> are shared primitives</p></li>
+<li><p>Different interfaces for different use cases:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">HybridRetriever.retrieve()</span></code> for query → top-k (Harmonization)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DuplicateDetector.detect()</span></code> for set → all pairs (Curation)</p></li>
+</ul>
+</li>
+<li><p>Rationale: Consistency, proven algorithms, code reuse</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="open-questions">
+<h2>Open Questions<a class="headerlink" href="#open-questions" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Embedding model selection:</strong> Start general-purpose, but when to switch to domain-specific?</p></li>
+<li><p><strong>Confidence thresholds:</strong> What threshold for auto-accept? Should vary by domain?</p></li>
+<li><p><strong>Feedback volume:</strong> How much feedback data needed before meaningful analysis?</p></li>
+<li><p><strong>Multi-schema support:</strong> Can one source map to multiple target schemas?</p></li>
+<li><p><strong>Incremental matching:</strong> How to handle source schema updates?</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="appendix-a-retrieval-algorithm-details">
+<h2>Appendix A: Retrieval Algorithm Details<a class="headerlink" href="#appendix-a-retrieval-algorithm-details" title="Link to this heading"></a></h2>
+<section id="tf-idf-configuration">
+<h3>TF-IDF Configuration<a class="headerlink" href="#tf-idf-configuration" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">TfidfVectorizer</span><span class="p">(</span>
+    <span class="n">lowercase</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">stop_words</span><span class="o">=</span><span class="s1">&#39;english&#39;</span><span class="p">,</span>
+    <span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>      <span class="c1"># Unigrams + bigrams</span>
+    <span class="n">max_features</span><span class="o">=</span><span class="mi">10000</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="text-preparation">
+<h3>Text Preparation<a class="headerlink" href="#text-preparation" title="Link to this heading"></a></h3>
+<p>For each canonical element, concatenate:</p>
+<ul class="simple">
+<li><p>Element name (normalized)</p></li>
+<li><p>Display name</p></li>
+<li><p>Description</p></li>
+<li><p>Aliases (space-separated)</p></li>
+<li><p>Allowed values (truncated)</p></li>
+</ul>
+</section>
+<section id="embedding-models-considered">
+<h3>Embedding Models Considered<a class="headerlink" href="#embedding-models-considered" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Model</p></th>
+<th class="head"><p>Size</p></th>
+<th class="head"><p>Domain</p></th>
+<th class="head"><p>Latency</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>all-MiniLM-L6-v2</p></td>
+<td><p>80MB</p></td>
+<td><p>General</p></td>
+<td><p>Fast</p></td>
+</tr>
+<tr class="row-odd"><td><p>all-mpnet-base-v2</p></td>
+<td><p>420MB</p></td>
+<td><p>General</p></td>
+<td><p>Medium</p></td>
+</tr>
+<tr class="row-even"><td><p>S-PubMedBert-MS-MARCO</p></td>
+<td><p>420MB</p></td>
+<td><p>Medical</p></td>
+<td><p>Medium</p></td>
+</tr>
+<tr class="row-odd"><td><p>BiomedNLP-PubMedBERT</p></td>
+<td><p>420MB</p></td>
+<td><p>Medical</p></td>
+<td><p>Medium</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Strategy:</strong> Start with MiniLM, compare with feedback data.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="appendix-b-evaluation-prompt-template">
+<h2>Appendix B: Evaluation Prompt Template<a class="headerlink" href="#appendix-b-evaluation-prompt-template" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">You</span> <span class="n">are</span> <span class="n">evaluating</span> <span class="n">whether</span> <span class="n">a</span> <span class="n">source</span> <span class="n">field</span> <span class="n">matches</span> <span class="n">a</span> <span class="n">canonical</span> <span class="n">data</span> <span class="n">element</span><span class="o">.</span>
+
+<span class="n">SOURCE</span> <span class="n">FIELD</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">Name</span><span class="p">:</span> <span class="p">{</span><span class="n">source_name</span><span class="p">}</span>
+<span class="o">-</span> <span class="n">Description</span><span class="p">:</span> <span class="p">{</span><span class="n">source_description</span><span class="p">}</span>
+<span class="o">-</span> <span class="n">Sample</span> <span class="n">values</span><span class="p">:</span> <span class="p">{</span><span class="n">sample_values</span><span class="p">}</span>
+<span class="o">-</span> <span class="n">Data</span> <span class="nb">type</span><span class="p">:</span> <span class="p">{</span><span class="n">inferred_type</span><span class="p">}</span>
+
+<span class="n">CANDIDATE</span> <span class="n">ELEMENT</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">Name</span><span class="p">:</span> <span class="p">{</span><span class="n">element_name</span><span class="p">}</span>
+<span class="o">-</span> <span class="n">Description</span><span class="p">:</span> <span class="p">{</span><span class="n">element_description</span><span class="p">}</span>
+<span class="o">-</span> <span class="n">Allowed</span> <span class="n">values</span><span class="p">:</span> <span class="p">{</span><span class="n">allowed_values</span><span class="p">}</span>
+<span class="o">-</span> <span class="n">Data</span> <span class="nb">type</span><span class="p">:</span> <span class="p">{</span><span class="n">element_type</span><span class="p">}</span>
+
+<span class="n">Evaluate</span> <span class="n">the</span> <span class="n">semantic</span> <span class="n">match</span> <span class="n">between</span> <span class="n">this</span> <span class="n">source</span> <span class="n">field</span> <span class="ow">and</span> <span class="n">candidate</span> <span class="n">element</span><span class="o">.</span>
+<span class="n">Consider</span><span class="p">:</span>
+<span class="mf">1.</span> <span class="n">Name</span> <span class="n">similarity</span> <span class="p">(</span><span class="n">accounting</span> <span class="k">for</span> <span class="n">abbreviations</span> <span class="ow">and</span> <span class="n">conventions</span><span class="p">)</span>
+<span class="mf">2.</span> <span class="n">Description</span> <span class="n">alignment</span>
+<span class="mf">3.</span> <span class="n">Value</span> <span class="n">compatibility</span>
+<span class="mf">4.</span> <span class="n">Data</span> <span class="nb">type</span> <span class="n">compatibility</span>
+
+<span class="n">Respond</span> <span class="k">with</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">confidence</span><span class="p">:</span> <span class="n">A</span> <span class="n">score</span> <span class="kn">from</span><span class="w"> </span><span class="mf">0.0</span> <span class="n">to</span> <span class="mf">1.0</span>
+<span class="o">-</span> <span class="n">reasoning</span><span class="p">:</span> <span class="n">Brief</span> <span class="n">explanation</span> <span class="n">of</span> <span class="n">match</span> <span class="n">quality</span>
+<span class="o">-</span> <span class="n">concerns</span><span class="p">:</span> <span class="n">Any</span> <span class="n">issues</span> <span class="n">that</span> <span class="n">might</span> <span class="n">affect</span> <span class="n">mapping</span> <span class="n">quality</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+<p><em>Document Version: 0.3</em>
+<em>Last Updated: 2025-01-28</em>
+<em>Author: Forge Team</em>
+<em>Changes in v0.3: Added shared retrieval infrastructure section, clarified relationship with Curation Workbench duplicate detection</em></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dataforge.html" class="btn btn-neutral float-left" title="DataForge" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="registry-service.html" class="btn btn-neutral float-right" title="SchemaForge: Registry Service" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

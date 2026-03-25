@@ -1,0 +1,209 @@
+# Forge — API-First Platform Vision
+
+**Data governance infrastructure for schema conformance and harmonization**
+
+---
+
+## The Problem
+
+Organizations harmonizing multi-source data face three bottlenecks that don't go away with better AI:
+
+1. **Schema drift** — Canonical data dictionaries degrade over time. No versioning, no change tracking, no single source of truth.
+
+2. **Untracked mapping decisions** — Field mappings live in spreadsheets and tribal knowledge. No audit trail, no reuse across studies, no institutional memory.
+
+3. **No governance layer** — Once data is mapped and validated, there's no provenance trail connecting production records back to source submissions, reviewers, and decisions.
+
+AI is getting very good at *performing* harmonization. What it cannot provide: traceable, auditable, versioned decision records that satisfy institutional and regulatory requirements.
+
+---
+
+## The Insight
+
+**Matching is a commodity. Governance is the moat.**
+
+Any frontier LLM can map `patient_age` to `AGE_AT_VISIT` with high accuracy. That's table stakes. What researchers, CROs, and institutions actually need is:
+
+- A **versioned schema registry** that serves as the single source of truth
+- An **auditable record** of every mapping decision, who approved it, and why
+- **Provenance tracking** from source row to production dataset
+- **Repeatable workflows** that pass regulatory scrutiny
+- **Reusable artifacts** — mappings, schemas, validation rules — that compound over time
+
+Forge provides the governance infrastructure. AI is a pluggable capability within it, not the product itself.
+
+---
+
+## Architecture: API Core + Pluggable Clients
+
+```
+                          ┌─────────────────────────────┐
+                          │        Forge APIs           │
+                          │                             │
+                          │  Schema Registry API        │
+                          │  Harmonization API          │
+                          │  Validation API             │
+                          │  Review & Audit API         │
+                          │  Gold Dataset API           │
+                          │                             │
+                          └──────────┬──────────────────┘
+                                     │
+              ┌──────────────────────┼──────────────────────┐
+              │                      │                      │
+              ▼                      ▼                      ▼
+     ┌────────────────┐   ┌──────────────────┐   ┌────────────────┐
+     │   Forge App    │   │  Python SDK /    │   │  Integrations  │
+     │   (Web UI)     │   │  CLI             │   │                │
+     │                │   │                  │   │  REDCap plugin │
+     │  Managed UI    │   │  forge validate  │   │  Jupyter ext   │
+     │  for orgs that │   │  forge harmonize │   │  R package     │
+     │  want a full   │   │  forge publish   │   │  CI/CD hooks   │
+     │  workflow      │   │                  │   │                │
+     └────────────────┘   └──────────────────┘   └────────────────┘
+```
+
+The **APIs are the product**. Everything else is a client.
+
+---
+
+## Core APIs
+
+### Schema Registry API
+*Single source of truth for canonical schemas*
+
+| Capability | Description |
+|------------|-------------|
+| Schema CRUD | Create, version, and publish canonical schemas |
+| Element management | Add, update, deprecate individual data elements |
+| Semantic versioning | Track breaking vs. non-breaking schema changes |
+| Export | Download schemas as CSV, JSON, or data dictionary format |
+| History | Full change log with diffs between versions |
+
+**Why it matters:** Every other capability depends on a shared, versioned definition of "correct." Without a registry, schemas live in spreadsheets and diverge immediately.
+
+### Harmonization API
+*Map source fields to canonical schemas with AI assistance*
+
+| Capability | Description |
+|------------|-------------|
+| Match | Submit source fields, receive ranked candidate mappings with confidence scores |
+| Review | Accept, reject, or override AI-suggested mappings |
+| Audit | Every mapping decision is recorded with actor, timestamp, and rationale |
+| Reuse | Export mapping sets for application to new batches or similar studies |
+
+**AI is pluggable here.** The API accepts any matching backend — the current implementation uses hybrid retrieval + LLM evaluation, but could be swapped for a single frontier model call, a fine-tuned domain model, or deterministic rules. The governance layer stays the same regardless.
+
+### Validation API
+*Enforce schema conformance on real data*
+
+| Capability | Description |
+|------------|-------------|
+| Validate | Submit data against a schema; receive row-level and field-level errors |
+| Rules engine | Type checks, allowed values, numeric ranges, conditional rules, cross-field logic |
+| Batch support | Validate CSV/Excel files up to configurable size limits |
+| Schema-bound | Validation is always tied to a specific schema version |
+
+### Review & Audit API
+*Human QC workflow with full traceability*
+
+| Capability | Description |
+|------------|-------------|
+| Submission lifecycle | Upload → Validate → Review → Accept/Reject → Correct |
+| Claim/release | Reviewers claim submissions to prevent conflicts |
+| Audit log | Append-only record of every action (who, what, when) |
+| Corrections flow | Handle updates to previously accepted data with versioning |
+
+### Gold Dataset API
+*Curated, provenance-tracked production datasets*
+
+| Capability | Description |
+|------------|-------------|
+| Collection | Aggregate accepted submissions into named datasets |
+| Provenance | Every row traces back to submission, version, source row, reviewer, timestamp |
+| Deduplication | Key-column-based duplicate detection across submissions |
+| Export | Download complete datasets with or without provenance columns |
+
+---
+
+## What Makes This Defensible
+
+### 1. Governance compounds; matching doesn't
+
+Every mapping decision, schema version, and review action stored in Forge becomes institutional knowledge. Over time, the system knows: "We always map `pt_age` to `AGE_AT_VISIT`" and "Dr. Smith rejected this mapping last year because X." An ad-hoc LLM session doesn't accumulate this.
+
+### 2. Regulatory requirements aren't optional
+
+FDA submissions, NIH data sharing compliance, and institutional review boards require traceable data lineage. "We asked ChatGPT" is not an acceptable provenance record. Forge provides the structured audit trail that satisfies these requirements.
+
+### 3. The schema registry is a network effect
+
+A shared registry of community-curated schemas — versioned, validated, with mapping templates — becomes more valuable as more organizations contribute. The platform with the best schema library wins.
+
+### 4. AI gets better; governance stays necessary
+
+As AI matching improves, the *accuracy* of harmonization approaches 100% and the *need for human review* decreases. But the need for *recording that a human reviewed it* doesn't decrease — it may increase as regulators scrutinize AI-assisted pipelines.
+
+---
+
+## Deployment Tiers
+
+| Tier | Description | Target |
+|------|-------------|--------|
+| **Managed** | Hosted Forge with web UI, auth, org isolation | Research organizations, CROs |
+| **Self-hosted** | Docker Compose deployment, full control | Academic institutions with data sovereignty requirements |
+| **SDK/CLI** | Python package + CLI, bring your own storage | Data engineers, CI/CD pipelines, notebook users |
+
+---
+
+## Near-Term Roadmap
+
+### Now: Managed UI for initial organizations
+Deploy the Forge App (web UI) for 3-4 partner organizations. This validates the core workflows, builds the schema library, and generates feedback on API design.
+
+### Next: Extract and stabilize public APIs
+Formalize the internal APIs that the web UI already consumes into a documented, versioned public API surface. The web UI becomes one client among many.
+
+### Then: Python SDK + CLI
+```bash
+# Validate a CSV against a published schema
+forge validate patient-data.csv --schema cdisc-sdtm-v3.2
+
+# Harmonize a source data dictionary
+forge harmonize source-dict.csv --target my-registry/canonical-cdes
+
+# Publish a new schema version
+forge schema publish my-schema.yaml --bump minor
+```
+
+### Later: Ecosystem integrations
+- **REDCap**: Validate exports against Forge schemas without leaving REDCap
+- **Jupyter**: `from forge import Registry; schema = Registry().get("my-cdes")`
+- **R**: `forge::validate(df, schema = "cdisc-sdtm")`
+- **CI/CD**: Schema validation as a pipeline gate (fail the build if data doesn't conform)
+
+---
+
+## Positioning
+
+| | Ad-hoc LLM | Spreadsheet workflow | Forge |
+|---|---|---|---|
+| Speed | Fast | Slow | Fast |
+| Accuracy | High (improving) | Variable | High (AI-assisted) |
+| Audit trail | None | Informal | Structured, append-only |
+| Reusability | None | Copy-paste | Versioned artifacts |
+| Provenance | None | None | Row-level traceability |
+| Regulatory compliance | No | Partial | Yes |
+| Institutional memory | None | Tribal knowledge | Compounding asset |
+
+---
+
+## Summary
+
+Forge is **data governance infrastructure**, not an AI matching tool. The AI makes harmonization fast. The governance layer makes it *trustworthy, repeatable, and auditable*. As AI matching becomes commoditized, the governance layer becomes more — not less — valuable.
+
+**API-first means:** the web UI is a client, not the product. Every capability is accessible programmatically. Researchers use the UI when they want a guided workflow. Data engineers use the SDK when they want to automate. CI/CD pipelines use the CLI when they want to enforce. The APIs serve all three.
+
+---
+
+*Initial focus: Biomedical research (CDEs, clinical trials, NIH compliance)*
+*Expansion: Any domain where data must conform to shared standards — "data contracts as a service"*

@@ -1,0 +1,810 @@
+# Forge Unified App — MVP Specification
+
+> **Status:** Phase 4 Complete
+> **Last updated:** 2026-02-28 (Phase 4 complete)
+> **Depends on:** [Executive Summary](forge-executive-summary.md) · [Production Roadmap](forge-production-roadmap.md)
+
+---
+
+## 1. Overview
+
+### Problem
+
+Forge currently ships as four separate services on four different ports. An internal user testing the full data lifecycle must:
+
+1. Open the Curation Workbench (`:8502`) to create a canonical schema
+2. Query the Registry API (`:8000`) to verify the schema was published
+3. Open the Harmonization Engine (`:8501`) to map incoming data to the schema
+4. Open the DataForge UI (`:8503`) to validate, review, and accept the data
+
+This means three browser tabs, three separate session states, no shared navigation, and zero contextual handoff between steps. Users must mentally track which schema they're working with and manually re-select it in each tool.
+
+### Solution
+
+Ship a **single Streamlit multi-page application** ("Forge") that unifies all three user-facing services into one coherent workflow. The backend APIs (Registry Service, DataForge API) remain unchanged. The unified app is a new UI layer that consumes these APIs and consolidates the existing Streamlit UIs.
+
+### Goals
+
+- **Single entry point** — One URL, one sidebar, one identity for internal testers
+- **Schema-centric workflow** — Select a schema once; it flows into harmonization and validation
+- **Contextual handoffs** — Finish one step, launch the next with context pre-loaded
+- **Preserve what works** — Existing wizard flows are proven; extract and re-use, don't rewrite
+- **Test the full loop** — Internal users can exercise Create → Map → Validate → Review end-to-end
+
+### Non-Goals (MVP)
+
+- User authentication (Supabase Auth is a later phase)
+- Roles, organizations, or permissions (post-MVP)
+- React frontend migration (post-MVP, after workflows are validated)
+- Value transforms in harmonization (Phase B feature)
+- Cross-submission validation in DataForge
+- Schema evolution / variable addition requests
+- Public/external user access
+
+---
+
+## 2. Architecture
+
+### High-Level
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│                FORGE (Unified Streamlit App)                   │
+│                         Port 8505                              │
+│                                                                │
+│  ┌──────────┐  ┌──────────────┐  ┌──────────────────────────┐│
+│  │ Schemas   │  │ Harmonize    │  │ Data                     ││
+│  │ Module    │  │ Module       │  │ Module                   ││
+│  │           │  │              │  │                          ││
+│  │ • Browse  │  │ • Projects   │  │ • Submissions            ││
+│  │ • Create  │  │ • Map wizard │  │ • Upload + Validate      ││
+│  │ • Detail  │  │              │  │ • Review                 ││
+│  └──────────┘  └──────────────┘  └──────────────────────────┘│
+│                                                                │
+│  Shared: Sidebar · Identity · Schema Selector · Registry Client│
+│                                                                │
+│  ┌────────────────────────────────────────────────────────────┐│
+│  │  Backend APIs (unchanged)                                  ││
+│  │  • Registry Service (FastAPI :8000)                        ││
+│  │  • DataForge API (FastAPI :8001)                           ││
+│  │  • Anthropic Claude API (AI features)                      ││
+│  └────────────────────────────────────────────────────────────┘│
+└───────────────────────────────────────────────────────────────┘
+```
+
+### What changes vs. what stays
+
+| Component | Current state | Unified MVP |
+|-----------|--------------|-------------|
+| Registry Service API | FastAPI on `:8000` | **No change.** Consumed by unified app. |
+| DataForge API | FastAPI on `:8001` | **No change.** Consumed by unified app. |
+| Curation business logic | Inline in `curation-workbench/app/app.py` (2,170 lines) | **Extract** `core/` modules. Wire into Forge pages. |
+| Harmonization business logic | Inline in `harmonization-engine/app/app.py` (1,700 lines) | **Extract** `core/` modules. Wire into Forge pages. |
+| DataForge UI | Multi-page Streamlit in `dataforge/ui/` | **Already modular.** Adapt pages into Forge. |
+| Identity | Separate per service (or none) | **Single** sidebar component, shared across all modules. |
+| Project management | Different model per service | **Two project types** (see §3). |
+| Standalone Streamlit apps | Three separate apps on `:8501`, `:8502`, `:8503` | **Remain deployable** for backward compatibility. Unified app is additive. |
+
+### Service directory
+
+```
+services/
+├── forge-app/                    # NEW — Unified Streamlit application
+│   ├── app.py                    #   Entry point (Home / Dashboard)
+│   ├── pages/
+│   │   ├── 1_Schemas.py          #   Browse, create, view schemas
+│   │   ├── 2_Harmonize.py        #   Map data to schemas
+│   │   ├── 3_Data.py             #   Upload, validate, review data
+│   │   └── 4_Settings.py         #   Identity, preferences
+│   ├── components/               #   Shared UI components
+│   │   ├── sidebar.py            #     Navigation + identity + context
+│   │   ├── schema_selector.py    #     Reusable schema dropdown
+│   │   ├── status_badge.py       #     Status indicators
+│   │   └── wizard.py             #     Wizard step framework
+│   ├── clients/                  #   API clients
+│   │   ├── registry_client.py    #     Registry Service client
+│   │   └── dataforge_client.py   #     DataForge API client
+│   ├── core/                     #   Business logic (extracted from existing services)
+│   │   ├── curation/             #     Curation engine, suggestion service, duplicate detection
+│   │   ├── harmonization/        #     Matcher, match engine, retrieval
+│   │   └── shared/               #     Common utilities
+│   ├── schemas/                  #   Pydantic models
+│   │   ├── manifest.py           #     Project manifests (both types)
+│   │   └── models.py             #     Shared data models
+│   ├── tests/
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   └── .streamlit/
+│       └── config.toml
+├── harmonization-engine/         # UNCHANGED — standalone deployment
+├── curation-workbench/           # UNCHANGED — standalone deployment
+├── dataforge/                    # UNCHANGED — API + standalone UI
+├── registry-service/             # UNCHANGED — backend API
+└── shared/                       # UNCHANGED — common utilities
+```
+
+---
+
+## 3. Data Model: Two Project Types
+
+### Design Rationale
+
+Schemas and data have fundamentally different lifecycles:
+
+- **One schema → many data projects.** A canonical schema (e.g., "NINDS CDEs v2") is created once by a schema manager. Dozens of data managers then use that schema to map and validate their datasets.
+- **Schema curation is creative work.** It involves AI-assisted deduplication, naming standardization, constraint definition. It's a standalone workflow.
+- **Data mapping + validation is operational work.** It involves uploading files, running matchers, reviewing results. It naturally flows as one continuous process.
+
+Therefore:
+
+| Project Type | Scope | Lifecycle |
+|-------------|-------|-----------|
+| **Schema Project** | Creating/evolving a canonical schema | Upload CDE list → Curate → Publish to Registry |
+| **Data Project** | Mapping + validating data against a schema | Select schema → (optional) Harmonize → Upload to DataForge → Review |
+
+### Schema Project Manifest
+
+```python
+class SchemaProjectManifest:
+    """Tracks a schema curation effort."""
+    project_id: str                  # UUID
+    project_name: str                # Display name
+    user_id: str                     # Creator identity
+    current_step: int                # 1–4
+    created_at: datetime
+    modified_at: datetime
+
+    # Curation state
+    source_filename: str             # Original CDE list file
+    source_row_count: int
+    variable_count: int              # After initial parse
+    completed_variables: int         # Curation progress
+
+    # Outcome
+    published_schema_id: str | None  # Registry UUID after publish
+    published_schema_name: str | None
+
+    steps: dict[str, StepMetadata]   # 1_upload, 2_configure, 3_curate, 4_publish
+```
+
+### Data Project Manifest
+
+```python
+class DataProjectManifest:
+    """Tracks a data mapping + validation effort."""
+    project_id: str                  # UUID
+    project_name: str                # Display name
+    user_id: str                     # Creator identity
+    created_at: datetime
+    modified_at: datetime
+
+    # Schema reference (set once during project creation)
+    schema_id: str                   # Registry UUID
+    schema_name: str                 # Display name (cached for UI)
+    schema_version: int              # Version at time of selection
+
+    # Harmonization state (optional — user may skip)
+    harmonization_enabled: bool      # Whether user chose to harmonize
+    harmonization_step: int | None   # 1–3 (setup, match, curate)
+    harmonization_complete: bool
+    mapping_artifact_path: str | None  # Path to exported mapping JSON
+
+    # DataForge state
+    submission_ids: list[str]        # DataForge submission UUIDs
+    active_submission_id: str | None # Current submission being worked on
+
+    steps: dict[str, StepMetadata]   # Dynamic based on harmonization_enabled
+```
+
+### Schema Selector Component
+
+A shared dropdown that queries the Registry Service and returns the selected schema. Used by Data Project creation and anywhere a schema reference is needed.
+
+```python
+def schema_selector(
+    registry_client: RegistryClient,
+    label: str = "Select a canonical schema",
+    key: str = "schema_selector",
+    filter_published: bool = True,
+) -> SchemaInfo | None:
+    """
+    Renders a selectbox of available schemas from the Registry.
+    Returns SchemaInfo(id, name, display_name, version, element_count) or None.
+    """
+```
+
+Display format: `"{display_name} (v{version}, {element_count} elements)"`
+
+---
+
+## 4. Page Specifications
+
+### 4.0 Home — Dashboard (`app.py`)
+
+**Purpose:** Landing page. Orient the user, surface recent activity, provide quick actions.
+
+**Layout:**
+
+```
+┌──────────────────────────────────────────────────┐
+│  FORGE                                            │
+│  AI-powered schema management & data              │
+│  harmonization for biomedical research            │
+├──────────────────────────────────────────────────┤
+│                                                    │
+│  Quick Actions                                     │
+│  ┌──────────┐ ┌──────────────┐ ┌───────────────┐ │
+│  │ + Create  │ │ + New Data   │ │ + Upload Data │ │
+│  │   Schema  │ │   Project    │ │ (Quick)       │ │
+│  └──────────┘ └──────────────┘ └───────────────┘ │
+│                                                    │
+│  Recent Schema Projects          Recent Data       │
+│  ┌──────────────────────┐       Projects           │
+│  │ NINDS CDEs     Draft │       ┌────────────────┐│
+│  │ 450/520 curated      │       │ GP2 Study A    ││
+│  │ Modified 2h ago      │       │ Schema: NINDS  ││
+│  └──────────────────────┘       │ Status: Review ││
+│  ┌──────────────────────┐       └────────────────┘│
+│  │ ADNI Core    Published│       ┌────────────────┐│
+│  │ 320 elements         │       │ PPMI Cohort 3  ││
+│  │ Modified 1d ago      │       │ Schema: ADNI   ││
+│  └──────────────────────┘       │ Status: Mapping││
+│                                  └────────────────┘│
+└──────────────────────────────────────────────────┘
+```
+
+**Behavior:**
+- Recent projects loaded from local manifest cache
+- Quick action buttons navigate to the relevant page with `create=true` query param
+- "Upload Data (Quick)" skips harmonization — creates a Data Project with `harmonization_enabled=False`
+
+---
+
+### 4.1 Schemas Page (`pages/1_Schemas.py`)
+
+**Purpose:** Browse published schemas, create new ones via the curation wizard, view schema details.
+
+**Three views** controlled by query params:
+
+#### 4.1a Schema Browser (default)
+
+Lists all schemas from Registry (published) and local schema projects (in-progress).
+
+```
+┌──────────────────────────────────────────────────┐
+│  Schemas                          [+ New Schema] │
+├──────────────────────────────────────────────────┤
+│                                                    │
+│  Published Schemas (from Registry)                │
+│  ┌────────────────────────────────────────────┐   │
+│  │ Name          │ Version │ Elements │ Status│   │
+│  │───────────────│─────────│──────────│───────│   │
+│  │ NINDS CDEs    │ v2      │ 450      │ ✅    │   │
+│  │ ADNI Core     │ v1      │ 320      │ ✅    │   │
+│  └────────────────────────────────────────────┘   │
+│                                                    │
+│  My Schema Projects (in-progress curation)        │
+│  ┌────────────────────────────────────────────┐   │
+│  │ Name          │ Progress │ Step    │ Action│   │
+│  │───────────────│──────────│─────────│───────│   │
+│  │ PD Biomarkers │ 89/120   │ Curate  │ Open  │   │
+│  └────────────────────────────────────────────┘   │
+│                                                    │
+└──────────────────────────────────────────────────┘
+```
+
+**Actions:**
+- Click published schema → Schema Detail view
+- Click in-progress project → Resume curation wizard
+- "+ New Schema" → Start curation wizard (Step 1)
+
+#### 4.1b Curation Wizard (`?schema_project={id}`)
+
+The existing 4-step curation flow, extracted from `curation-workbench/app/app.py`:
+
+| Step | Name | Description |
+|------|------|-------------|
+| 1 | **Upload** | Parse CDE list (CSV/TSV/Excel), auto-detect columns |
+| 2 | **Configure** | Set naming conventions, description rules, similarity thresholds, AI model |
+| 3 | **Curate** | Variable-by-variable editor with AI suggestions, duplicate merging, constraint forms |
+| 4 | **Publish** | Preview schema, set metadata, publish to Registry |
+
+This is functionally identical to the current Curation Workbench wizard. The key change is that Step 4 now performs an actual Registry API publish (currently stubbed).
+
+**On publish success:**
+- Schema appears in the Published Schemas list
+- User sees a success banner with action: _"Use this schema → Create a Data Project"_
+- That action navigates to the Data page with the schema pre-selected
+
+#### 4.1c Schema Detail (`?schema={id}`)
+
+Read-only view of a published schema's elements, pulled from Registry API.
+
+```
+┌──────────────────────────────────────────────────┐
+│  ← Back to Schemas                                │
+│                                                    │
+│  NINDS Common Data Elements  v2                   │
+│  450 elements · Published 2025-01-15              │
+│                                                    │
+│  [Use for Data Project]  [Export ▾]               │
+│                                                    │
+│  Search: [____________]  Filter by collection: [▾]│
+│                                                    │
+│  ┌────────────────────────────────────────────┐   │
+│  │ Item       │ Type    │ Collection │Required│   │
+│  │────────────│─────────│────────────│────────│   │
+│  │ patient_id │ string  │ Admin      │ Yes    │   │
+│  │ age        │ numeric │ Demo       │ Yes    │   │
+│  │ sex        │ enum    │ Demo       │ Yes    │   │
+│  │ ...        │ ...     │ ...        │ ...    │   │
+│  └────────────────────────────────────────────┘   │
+│                                                    │
+└──────────────────────────────────────────────────┘
+```
+
+**Actions:**
+- "Use for Data Project" → Navigate to Data page, schema pre-selected
+- Export → JSON, CSV, TSV, YAML (via Registry export endpoint)
+
+---
+
+### 4.2 Harmonize Page (`pages/2_Harmonize.py`)
+
+**Purpose:** Map source data fields to a canonical schema's elements using AI-powered matching. This page is accessed through a Data Project that has harmonization enabled.
+
+**Two views:**
+
+#### 4.2a Data Project List (default)
+
+Lists Data Projects that have harmonization enabled, showing mapping progress.
+
+```
+┌──────────────────────────────────────────────────┐
+│  Harmonize                   [+ New Data Project]│
+├──────────────────────────────────────────────────┤
+│                                                  │
+│  Data Projects with Harmonization                │
+│  ┌────────────────────────────────────────────┐  │
+│  │ Project     │ Schema    │ Progress │ Step  │  │
+│  │─────────────│───────────│──────────│───────│  │
+│  │ GP2 Study A │ NINDS v2  │ 89/156   │ Curate│  │
+│  │ PPMI Wave 3 │ ADNI v1   │ --       │ Setup │  │
+│  └────────────────────────────────────────────┘  │
+│                                                  │
+└──────────────────────────────────────────────────┘
+```
+
+**"+ New Data Project"** creates a Data Project with `harmonization_enabled=True`. The creation dialog includes:
+1. Project name
+2. Schema selector (dropdown from Registry)
+3. → Starts the mapping wizard at Step 1
+
+#### 4.2b Mapping Wizard (`?data_project={id}`)
+
+The existing 3-step harmonization flow, extracted from `harmonization-engine/app/app.py`:
+
+| Step | Name | Description |
+|------|------|-------------|
+| 1 | **Setup** | Upload data dictionary (CSV/TSV). Schema is pre-loaded from the Data Project's `schema_id`. |
+| 2 | **Match** | Run AI-powered field matching (TF-IDF + embeddings + LLM evaluation) |
+| 3 | **Curate** | Review matches field-by-field. Accept, reject, select alternatives, mark no-match. |
+
+Key difference from standalone: **Step 1 no longer asks the user to select or upload a schema.** The schema is already set on the Data Project. The user only uploads their source data dictionary.
+
+**On curation complete:**
+- Mapping artifact saved to Data Project manifest
+- User sees action: _"Proceed to data validation →"_
+- That action navigates to the Data page with the Data Project context, pre-filling the schema and offering to apply the mapping
+
+---
+
+### 4.3 Data Page (`pages/3_Data.py`)
+
+**Purpose:** Upload data files, validate against canonical schemas, review and accept/reject submissions. This is the DataForge UI, integrated into the unified app.
+
+**Three views:**
+
+#### 4.3a Submissions Dashboard (default)
+
+Lists all submissions across Data Projects, with filtering.
+
+```
+┌──────────────────────────────────────────────────┐
+│  Data                           [+ New Submission]│
+├──────────────────────────────────────────────────┤
+│                                                    │
+│  Filter: [All statuses ▾] [All projects ▾]        │
+│                                                    │
+│  ┌────────────────────────────────────────────┐   │
+│  │ Submission  │ Project   │ Schema │ Status  │   │
+│  │─────────────│───────────│────────│─────────│   │
+│  │ GP2-001     │ GP2 Std A │ NINDS  │ ⏳ Rev  │   │
+│  │ PPMI-003    │ PPMI W3   │ ADNI   │ ❌ Corr │   │
+│  │ GP2-002     │ GP2 Std A │ NINDS  │ ✅ Acc  │   │
+│  └────────────────────────────────────────────┘   │
+│                                                    │
+└──────────────────────────────────────────────────┘
+```
+
+#### 4.3b Upload & Validate Wizard
+
+Two entry points:
+1. **From a Data Project** (harmonization completed or skipped) — schema is pre-selected
+2. **"+ New Submission"** — user selects schema from dropdown, then uploads
+
+| Step | Name | Description |
+|------|------|-------------|
+| 1 | **Setup** | Select or confirm Data Project + schema. Enter study identifier. |
+| 2 | **Upload** | Upload CSV data file. If harmonization mapping exists, offer to preview column name transforms. |
+| 3 | **Results** | Display validation report (errors, warnings, field-level issues). Actions: Submit for review, or download report and fix. |
+
+**Schema selection flow (Step 1):**
+- If arriving from a Data Project → schema pre-filled, read-only
+- If arriving from "+ New Submission" → schema selector dropdown + optional "Create Data Project" or use ad-hoc
+
+#### 4.3c Review View (`?submission={id}`)
+
+Full submission review interface (from existing DataForge Review page):
+
+- Submission metadata and version history
+- Validation report with error/warning breakdown
+- Field-level issue details
+- Reviewer actions: Claim → Review → Accept or Reject (with comments)
+- Corrections flow: Reject → submitter uploads new version → re-validate
+
+---
+
+### 4.4 Settings Page (`pages/4_Settings.py`)
+
+**Purpose:** Identity configuration. Minimal for MVP.
+
+- **Display name** — Text input, stored in `st.session_state` and persisted to local config
+- **Email** — Text input, used for project ownership attribution
+- No authentication for MVP — this is a trust-based identity for internal testing
+
+---
+
+## 5. Navigation & Shared Components
+
+### Sidebar
+
+The sidebar is persistent across all pages and provides:
+
+```
+┌─────────────────────┐
+│  🔷 FORGE            │
+│                      │
+│  ── Navigate ──      │
+│  📋 Home             │
+│  📐 Schemas          │
+│  🔄 Harmonize        │
+│  📊 Data             │
+│                      │
+│  ── You ──           │
+│  👤 Alice Smith      │
+│     alice@lab.org    │
+│                      │
+│  ── Context ──       │
+│  Schema: NINDS v2    │
+│  Project: GP2 Std A  │
+│  (shown when active) │
+│                      │
+│  ── Quick Actions ── │
+│  + New Schema        │
+│  + New Data Project  │
+│                      │
+│  ─────────────────   │
+│  ⚙ Settings          │
+└─────────────────────┘
+```
+
+**Context panel:** When a user is actively working in a Data Project, the sidebar shows the active schema and project. This provides orientation as the user moves between Harmonize and Data pages.
+
+### Contextual Handoffs
+
+The most important UX improvement over separate apps. These are implemented as action buttons that navigate with query parameters:
+
+| From | To | Context passed | Trigger |
+|------|----|---------------|---------|
+| Schema publish (Curation Step 4) | Data page (new submission) | `schema_id` | "Use this schema →" button |
+| Schema detail view | Data page (new project) | `schema_id` | "Use for Data Project" button |
+| Harmonize complete (Step 3) | Data page (upload wizard) | `data_project_id`, `schema_id`, `mapping_path` | "Proceed to validation →" button |
+| Data submission rejected | Data page (upload wizard) | `submission_id` (for resubmit) | "Upload correction" button |
+| Home quick actions | Schema / Data pages | `create=true` | Quick action buttons |
+
+### Wizard Framework
+
+All wizards share a common step indicator component:
+
+```python
+def wizard_steps(
+    steps: list[str],          # ["Upload", "Configure", "Curate", "Publish"]
+    current_step: int,         # 1-indexed
+    allow_back: bool = True,
+    on_step_click: Callable | None = None,  # For clickable completed steps
+) -> None:
+    """Renders a horizontal step indicator with progress dots."""
+```
+
+---
+
+## 6. User Journeys
+
+### Journey A: Create a Schema and Use It (Full Loop)
+
+```
+1. User opens Forge → Home
+2. Clicks "+ Create Schema" → Schemas page, curation wizard
+3. Step 1: Uploads CDE list (CSV with 520 variables)
+4. Step 2: Configures naming (snake_case), sets similarity threshold (0.80)
+5. Step 3: Curates variables one by one
+   - AI suggests canonical names, types, constraints
+   - Duplicate detection flags 47 pairs → user merges/keeps
+   - Progress: 520 → 450 canonical elements
+6. Step 4: Sets schema name "NINDS CDEs", description → Publishes to Registry
+7. Sees success → Clicks "Use this schema → Create a Data Project"
+8. → Navigates to Harmonize page, new Data Project dialog
+9. Names project "GP2 Study A", schema pre-selected as "NINDS CDEs v2"
+10. Step 1: Uploads data dictionary (156 columns)
+11. Step 2: AI matches fields → 130 high-confidence, 20 medium, 6 low
+12. Step 3: Curates uncertain matches → 142 mapped, 14 intentionally unmapped
+13. Clicks "Proceed to validation →"
+14. → Navigates to Data page, upload wizard with project context
+15. Step 1: Project and schema pre-filled
+16. Step 2: Uploads actual data CSV (347 rows)
+17. Step 3: Validation report shows 12 errors, 5 warnings
+18. Downloads report, fixes source data, re-uploads
+19. Step 3: Clean validation → Submits for review
+20. Another user claims and reviews → Accepts
+21. Data is in the system ✅
+```
+
+### Journey B: Validate Data Against an Existing Schema (Skip Harmonization)
+
+```
+1. User opens Forge → Home
+2. Clicks "+ Upload Data (Quick)"
+3. → Data page, upload wizard
+4. Step 1: Selects "NINDS CDEs v2" from schema dropdown, enters study name
+5. Step 2: Uploads CSV (columns already match canonical schema names)
+6. Step 3: Validation report → clean → Submits for review
+```
+
+This journey skips harmonization entirely. The user's data already conforms to the schema.
+
+### Journey C: Map Data to an Existing Schema (No Curation Needed)
+
+```
+1. User opens Forge → Harmonize
+2. Clicks "+ New Data Project"
+3. Selects "NINDS CDEs v2" from dropdown, names project "PPMI Wave 3"
+4. Runs the 3-step mapping wizard
+5. On completion → proceeds to Data validation
+```
+
+The schema already exists in Registry. No curation needed.
+
+---
+
+## 7. DataForge ↔ Registry Integration
+
+Currently, DataForge uses string schema names and local JSON fixtures for validation. The unified app requires DataForge to validate against schemas from the Registry.
+
+### Required Changes
+
+1. **Schema resolution in DataForge API:**
+   - Add `schema_id` field to Submission model (alongside existing `schema_name`)
+   - When `schema_id` is provided, fetch schema definition from Registry API
+   - Convert Registry `ElementResponse` objects to DataForge `FieldConfig` objects
+   - Fall back to local fixtures when `schema_id` is not provided (backward compatibility)
+
+2. **Registry → DataForge field mapping:**
+
+   | Registry `ElementResponse` | DataForge `FieldConfig` |
+   |---------------------------|------------------------|
+   | `item` | `item` |
+   | `description` | `description` |
+   | `collection` | `collection` |
+   | `item_type` (numeric/string/date/enum/binary) | `item_type` (NUMERIC/STRING/DATE/ENUM/BINARY) |
+   | `values` (pipe-delimited or range) | `values` |
+   | `alternate_names` | `alternate_names` |
+   | `priority` (Required/Optional) | `priority` (REQUIRED/OPTIONAL) |
+
+3. **Registry client in DataForge API:**
+   - Add `RegistryClient` to DataForge API (similar to the one in harmonization-engine)
+   - Inject via FastAPI `Depends()` pattern
+   - Cache schema definitions per `(schema_id, version)` to avoid repeated API calls
+
+---
+
+## 8. Technical Implementation
+
+### Streamlit Multi-Page App Structure
+
+Use Streamlit's native multi-page app pattern (`pages/` directory). Each page is a self-contained module that imports from `core/`, `clients/`, and `components/`.
+
+### State Management
+
+```python
+# Global identity (all pages)
+st.session_state["identity_name"]          # User display name
+st.session_state["identity_email"]         # User email
+
+# Curation wizard state — prefix _wizard_ (pages/1_Schemas.py)
+st.session_state["_wizard_project_id"]     # Active schema project ID
+st.session_state["_wizard_session"]        # CurationSession (persisted on step transitions)
+st.session_state["_wizard_suggestions"]    # SuggestionsResult from AISuggestionService
+st.session_state["_wizard_detector"]       # DuplicateDetector instance (not persisted)
+# per-variable keys: _wizard_applied_{var}, _wizard_merge_{var}, _wizard_type_{var}
+
+# Harmonization wizard state — prefix _harm_ (pages/2_Harmonize.py)
+st.session_state["_harm_project_id"]              # Active data project ID
+st.session_state["_harm_data_dict_df"]            # Uploaded source data dictionary DataFrame
+st.session_state["_harm_results_df"]              # Match results DataFrame
+st.session_state["_harm_curated_set"]             # CuratedMatchSet (persisted to disk)
+st.session_state["_harm_matcher_{project_id}"]    # ComprehensiveMatcher instance (per project)
+st.session_state["_harm_show_create"]             # Bool flag for project creation dialog
+```
+
+### Query Parameter Routing
+
+Each page uses `st.query_params` for deep linking and contextual navigation:
+
+```python
+# Schemas page
+?schema_project={id}    # Open curation wizard for this project
+?schema={id}            # View published schema detail
+?create=true            # Start new schema project
+
+# Harmonize page
+?data_project={id}      # Open mapping wizard for this project
+?create=true            # Start new data project
+?schema_id={id}         # Pre-select schema for new project
+
+# Data page
+?submission={id}        # View/review specific submission
+?data_project={id}      # Open upload wizard with project context
+?schema_id={id}         # Pre-select schema for new submission
+?create=true            # Start new submission
+```
+
+### Business Logic Extraction
+
+Business logic is extracted from the monolithic Streamlit apps into importable `core/` modules with no Streamlit coupling.
+
+**From `harmonization-engine/app/app.py` → `core/harmonization/` (Phase 3, complete):**
+
+| Module | What |
+|--------|------|
+| `core/harmonization/models.py` | `MatchStatus`, `CurationDecision`, `FieldMatchCuration`, `CuratedMatchSet` (with TSV/JSON export methods) |
+| `core/harmonization/matcher.py` | `ComprehensiveMatcher` — 2-tier matching (exact name → AI evaluation via Claude) |
+| `core/harmonization/retrieval.py` | `HybridRetriever` — TF-IDF + embedding candidate retrieval via forge-retrieval-core; project-scoped cache path |
+| `core/harmonization/match_engine.py` | `run_matching()` — full pipeline with progress callback; `elements_to_reference_df()` — Registry `ElementInfo` → matcher DataFrame |
+| `core/harmonization/curation.py` | Curation service functions: create set from results, update decisions, filter, sort, bulk accept/reset |
+
+Persistence is handled by `core/storage.py`: `save/load_harm_data_dict()`, `save/load_harm_results()`, `save/load_curated_match_set()`.
+
+**From `curation-workbench/app/app.py` → `core/curation/` (Phase 2, complete):**
+
+| Module | What |
+|--------|------|
+| `core/curation/parser.py` | File parsing (CSV/TSV/Excel), auto column detection |
+| `core/curation/duplicate_detector.py` | TF-IDF + embedding duplicate detection via forge-retrieval-core |
+| `core/curation/suggestion_service.py` | Claude API AI suggestion engine |
+| `core/curation/publisher.py` | Registry publish logic (actual API call, not stubbed) |
+| `core/curation/models.py` | All curation data models (RawElement, CuratedElement, CurationSession, etc.) |
+
+### Docker Compose Addition
+
+```yaml
+forge-app:
+  build:
+    context: .
+    dockerfile: services/forge-app/Dockerfile
+  ports:
+    - "8505:8505"
+  environment:
+    - REGISTRY_SERVICE_URL=http://registry-service:8000
+    - DATAFORGE_API_URL=http://dataforge-api:8001
+    - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+  depends_on:
+    - registry-service
+    - dataforge-api
+  volumes:
+    - forge-app-cache:/app/.cache
+```
+
+---
+
+## 9. Implementation Phases
+
+### Phase 1: Foundation
+
+**Goal:** App shell with navigation, shared components, and schema browsing.
+
+- [x] Create `services/forge-app/` directory structure
+- [x] Implement sidebar with navigation and identity
+- [x] Implement `RegistryClient` (adapt from harmonization-engine)
+- [x] Implement Schema Selector component
+- [x] Build Schemas page — browser view (list from Registry)
+- [x] Build Schemas page — detail view (elements table)
+- [x] Build Home page with project lists (empty state)
+- [x] Build Settings page (identity only)
+- [x] Dockerfile and docker-compose integration
+- [x] Basic test suite for clients and components
+
+### Phase 2: Schema Curation
+
+**Goal:** Full curation wizard working inside the unified app.
+
+- [x] Extract curation business logic from `curation-workbench/app/app.py` into `core/curation/`
+- [x] Build curation wizard (4 steps) in Schemas page
+- [x] Implement Registry publish in Step 4 (currently stubbed)
+- [x] Add contextual handoff: publish → "Use this schema"
+- [x] Schema project manifest persistence
+- [x] Test curation flow end-to-end
+
+### Phase 3: Harmonization
+
+**Goal:** Full mapping wizard working inside the unified app.
+
+- [x] Extract harmonization logic from `harmonization-engine/app/app.py` into `core/harmonization/`
+- [x] Build Data Project creation flow (name + schema selector)
+- [x] Build mapping wizard (3 steps) in Harmonize page
+- [x] Schema auto-loaded from Data Project (no upload/select in Step 1)
+- [x] Add contextual handoff: mapping complete → "Proceed to validation"
+- [x] Data project manifest persistence
+- [x] Test harmonization flow end-to-end
+
+### Phase 4: Data Validation
+
+**Goal:** DataForge upload/validate/review integrated into the unified app.
+
+- [x] Implement `DataForgeClient` (adapt from `dataforge/ui/client/`)
+- [x] Add `schema_id` support to DataForge API (Registry integration via `RegistrySchemaLoader`)
+- [x] Build Data page — submissions dashboard
+- [x] Build upload & validate wizard (3 steps)
+- [x] Build review view (claim, inspect, accept/reject)
+- [x] Wire contextual handoff from Harmonize → Data
+- [x] Wire corrections flow (reject → re-upload)
+- [x] Test data validation flow end-to-end
+
+### Phase 5: Polish & Integration Testing
+
+**Goal:** Full loop tested, rough edges smoothed.
+
+- [x] End-to-end integration tests (Journey A, B, C from §6)
+- [x] Home page populated with real project data
+- [x] Error handling and edge cases (API down, validation failures, empty states)
+- [x] Loading states and progress indicators
+- [x] Consistent styling across all modules
+- [ ] Internal user testing and feedback
+- [x] Documentation updates
+
+---
+
+## 10. Decisions (Resolved)
+
+1. **Mapping application during upload:** Auto-apply column renames from the harmonization mapping with a preview confirmation step. The original source-to-canonical mapping is always retained and viewable — users can inspect the mapping for any variable at any time. The mapping artifact is a first-class object in the Data Project, never discarded.
+
+2. **Schema version pinning:** Yes. Data Projects pin to the schema version at creation time. Validation results are meaningless if the schema shifts underneath them. Users can create a new Data Project to use a newer schema version, or an explicit "upgrade schema version" action can be added post-MVP.
+
+3. **Project storage:** Local filesystem cache (`.cache/forge-app/`) for MVP. Migrate to Supabase after the MVP is built and validated with internal users, aligned with the C.1-Infra persistence migration track.
+
+4. **Standalone service deprecation:** Keep deployable, mark as legacy. The standalone Streamlit apps (`:8501`, `:8502`, `:8503`) remain in the repo as fallbacks and for isolated service testing. READMEs updated to point to the unified app as the primary interface. No further UI investment in standalone apps once the unified app covers equivalent functionality.
+
+5. **Schema validation rules in Registry:** Keep as DataForge-specific config tied to `schema_id` for now. Validation rules are operational concerns (data quality), not schema definition. If multiple Data Projects duplicate the same rules for the same schema, that's the signal to promote rules into Registry.
+
+---
+
+## 11. Success Criteria
+
+| Metric | Target |
+|--------|--------|
+| Internal users can complete Journey A (full loop) | Yes, without switching apps |
+| Internal users can complete Journey B (quick upload) | Yes, in under 5 clicks |
+| Schema created in curation appears in Harmonize/Data dropdowns | Immediately after publish |
+| No regression in individual service functionality | All existing tests pass |
+| Time to complete full loop vs. separate apps | ≤ 50% of current time |
+| Zero data loss during wizard flows | Manifest persistence on every step transition |

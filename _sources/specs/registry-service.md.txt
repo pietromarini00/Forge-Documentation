@@ -1,0 +1,1310 @@
+# SchemaForge: Registry Service
+
+## Product Specification v0.2
+
+---
+
+## Executive Summary
+
+The **Registry Service** is SchemaForge's shared foundation—the single source of truth for canonical schemas, elements, and their versions. It provides the storage layer, versioning system, and API access that the Curation Workbench and Harmonization Engine depend on.
+
+Think of it as the "database + API" layer that other services build upon. It handles the fundamental operations: creating schemas, storing elements, tracking versions, and exposing everything through a consistent API.
+
+---
+
+## Problem Statement
+
+Without a central registry:
+- Each service maintains its own copy of schema data
+- Version conflicts arise when schemas are edited in multiple places
+- No single API for external systems to query schemas
+- Export formats are inconsistent across tools
+- Access control is fragmented
+
+**Result:** Data duplication, version drift, integration complexity.
+
+---
+
+## Solution
+
+The Registry Service provides:
+
+1. **Schema Storage** — Canonical schemas and elements in PostgreSQL
+2. **Versioning** — Semantic versioning with full history
+3. **API Layer** — RESTful API for all schema operations
+4. **Export Engine** — Multiple format exports (JSON, YAML, CSV, Markdown)
+5. **Event System** — Notify other services of schema changes
+6. **Access Control** — Permissions and audit logging
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      REGISTRY SERVICE                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐       │
+│   │   STORAGE   │     │ VERSIONING  │     │   EVENTS    │       │
+│   │             │     │             │     │             │       │
+│   │ PostgreSQL  │     │ Semantic    │     │ Schema      │       │
+│   │ Schemas     │     │ versions    │     │ changes     │       │
+│   │ Elements    │     │ Snapshots   │     │ Webhooks    │       │
+│   │ History     │     │ Diff/merge  │     │ Pub/sub     │       │
+│   └─────────────┘     └─────────────┘     └─────────────┘       │
+│                                                                  │
+│   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐       │
+│   │   REST API  │     │   EXPORT    │     │   ACCESS    │       │
+│   │             │     │             │     │             │       │
+│   │ CRUD ops    │     │ JSON/YAML   │     │ Roles       │       │
+│   │ Search      │     │ CSV         │     │ Permissions │       │
+│   │ Bulk ops    │     │ Markdown    │     │ Audit log   │       │
+│   │ Pagination  │     │ JSON Schema │     │ API keys    │       │
+│   └─────────────┘     └─────────────┘     └─────────────┘       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Target Users
+
+### Primary: Other Forge Services
+- Curation Workbench (read/write schemas)
+- Harmonization Engine (read schemas for matching)
+- DataForge (read schemas for validation)
+
+### Secondary: Data Engineers
+- Query schemas via API
+- Integrate with ETL pipelines
+- Export for external tools
+
+### Tertiary: External Systems
+- Data catalogs syncing schema metadata
+- Validation services checking against schema
+- Documentation generators
+
+---
+
+## Core Concepts
+
+### Schema
+A versioned container for elements.
+
+```yaml
+schema:
+  id: "uuid"
+  name: "BRAIN-CODE CDEs"
+  slug: "brain-code-cdes"              # URL-friendly identifier
+  description: "Common Data Elements for neurodegenerative disease research"
+  
+  # Version info
+  version: "2.1.0"
+  version_id: "uuid"                   # Specific version record
+  latest_version: "2.1.0"
+  
+  # Status
+  status: "active"                     # draft | active | deprecated
+  visibility: "public"                 # public | private | internal
+  
+  # Stats
+  element_count: 1626
+  
+  # Metadata
+  owner_id: "uuid"
+  organization_id: "uuid"
+  tags: ["clinical", "neurodegeneration", "research"]
+  
+  # Timestamps
+  created_at: "2024-01-15T00:00:00Z"
+  updated_at: "2025-01-15T00:00:00Z"
+  created_by: "user_id"
+  updated_by: "user_id"
+```
+
+### Element
+A field definition within a schema.
+
+```yaml
+element:
+  id: "uuid"
+  schema_id: "uuid"
+  
+  # Identity
+  name: "path_braak_nft"
+  display_name: "Braak NFT Stage"
+  
+  # Definition
+  description: "Neurofibrillary tangle staging per Braak criteria"
+  type: "enum"
+  required: false
+  
+  # Type-specific
+  allowed_values: [0, 1, 2, 3, 4, 5, 6]
+  value_labels:
+    0: "Stage 0"
+    1: "Stage I"
+    # ...
+  
+  constraints:
+    min: null
+    max: null
+    pattern: null
+  
+  # Provenance
+  sources: ["NACC", "Path-ND"]
+  aliases: ["NACCBRAA", "braak_stage"]
+  
+  # Organization
+  category: "neuropathology"
+  priority: 1
+  tags: ["staging", "tau"]
+  
+  # Audit
+  created_at: "2024-06-01T00:00:00Z"
+  updated_at: "2025-01-10T00:00:00Z"
+  created_by: "user_id"
+  updated_by: "user_id"
+```
+
+### Version
+A snapshot of a schema at a point in time.
+
+```yaml
+version:
+  id: "uuid"
+  schema_id: "uuid"
+  
+  version_number: "2.1.0"
+  version_type: "minor"                # major | minor | patch
+  
+  # Content
+  element_count: 1626
+  snapshot_path: "s3://schemas/brain-code/v2.1.0.json"
+  
+  # Change summary
+  changes:
+    added: 12
+    modified: 34
+    removed: 2
+  release_notes: "Added new biomarker elements, standardized staging fields"
+  
+  # Metadata
+  created_at: "2025-01-15T00:00:00Z"
+  created_by: "user_id"
+  
+  # Lineage
+  parent_version_id: "uuid"            # Previous version
+  
+  # Status
+  status: "released"                   # draft | released | deprecated
+```
+
+### Change Record
+An audit log entry for any modification.
+
+```yaml
+change:
+  id: "uuid"
+  timestamp: "2025-01-15T14:30:00Z"
+  
+  # Target
+  schema_id: "uuid"
+  element_id: "uuid"                   # null for schema-level changes
+  version_id: "uuid"
+  
+  # Action
+  action: "update"                     # create | update | delete | merge | split
+  target_type: "element"               # schema | element | version
+  
+  # Content
+  before: { ... }                      # State before change
+  after: { ... }                       # State after change
+  diff: { ... }                        # Computed diff
+  
+  # Context
+  user_id: "uuid"
+  reason: "Standardized naming convention"
+  source_service: "curation_workbench"
+  
+  # Reversibility
+  reversible: true
+  reverted: false
+```
+
+### Proposal *(Phase C)*
+A request to add a new element to a schema, typically created by data managers during harmonization when they encounter fields that don't match existing elements.
+
+```yaml
+proposal:
+  id: "uuid"
+  schema_id: "uuid"
+  
+  # Proposed element definition
+  proposed_name: "moca_total_score"
+  proposed_display_name: "MoCA Total Score"
+  proposed_type: "integer"
+  proposed_description: "Montreal Cognitive Assessment total score (0-30)"
+  proposed_constraints:
+    min: 0
+    max: 30
+  suggested_category: "cognitive_assessments"
+  
+  # Context from source
+  source_context:
+    source_name: "Cohort D Clinical"
+    source_field_name: "moca_score"
+    sample_values: ["28", "24", "19", "30", "22"]
+    field_description: "MoCA score from baseline visit"
+  
+  # Justification
+  justification: "MoCA is a widely-used cognitive screening tool..."
+  
+  # AI analysis (computed on creation)
+  similar_elements:
+    - element_id: "uuid"
+      name: "mmse_total"
+      similarity_score: 0.62
+      similarity_reason: "Both are cognitive assessment scores"
+  
+  # Status
+  status: "pending"                    # pending | under_review | approved | rejected | withdrawn
+  
+  # Review
+  reviewer_id: "uuid"
+  reviewed_at: "2025-01-28T09:00:00Z"
+  
+  # Resolution
+  created_element_id: "uuid"           # If approved
+  rejection_reason: "text"             # If rejected
+  suggested_alternative_id: "uuid"     # If rejected with alternative
+  
+  # Audit
+  proposed_by_user_id: "uuid"
+  proposed_by_email: "troy@research.org"
+  created_at: "2025-01-27T15:00:00Z"
+  updated_at: "2025-01-28T09:00:00Z"
+```
+
+---
+
+## Features
+
+### F1: Schema Management
+
+**F1.1: CRUD Operations**
+- Create schema with metadata
+- Read schema by ID or slug
+- Update schema metadata
+- Delete (soft delete with audit)
+
+**F1.2: Schema Listing**
+- List all schemas (paginated)
+- Filter by status, visibility, tags
+- Sort by name, updated_at, element_count
+- Full-text search across name/description
+
+**F1.3: Schema Import/Export**
+- Import from JSON, YAML, CSV
+- Export to JSON, YAML, CSV, Markdown
+- Bulk import with validation
+- Schema migration between instances
+
+---
+
+### F2: Element Management
+
+**F2.1: CRUD Operations**
+- Create element with validation
+- Read element by ID
+- Update element properties
+- Delete element (soft delete)
+
+**F2.2: Element Listing**
+- List elements for schema (paginated)
+- Filter by type, category, priority, tags
+- Sort by name, updated_at
+- Search across name, description, aliases
+
+**F2.3: Bulk Operations**
+- Bulk create from import
+- Bulk update (patch multiple)
+- Bulk delete with cascade handling
+
+**F2.4: Element Relationships**
+- Link related elements
+- Track aliases
+- Maintain source provenance
+
+---
+
+### F3: Versioning
+
+**F3.1: Create Version**
+- Semantic version numbering (major.minor.patch)
+- Auto-increment based on change type
+- Snapshot current state
+- Release notes support
+
+**F3.2: Version History**
+- List all versions for schema
+- Get specific version details
+- Compare versions (diff view)
+
+**F3.3: Version Operations**
+- Rollback to previous version
+- Branch from version (fork)
+- Deprecate old versions
+
+**F3.4: Snapshot Management**
+- Store version snapshots
+- Efficient storage (diff-based optional)
+- Quick retrieval
+
+---
+
+### F4: API Layer
+
+**F4.1: RESTful Endpoints**
+- Standard CRUD for schemas and elements
+- Pagination, filtering, sorting
+- Consistent error responses
+- OpenAPI documentation
+
+**F4.2: GraphQL** (Future)
+- Flexible queries for complex needs
+- Reduced over-fetching
+- Subscriptions for real-time updates
+
+**F4.3: API Authentication**
+- API key management
+- JWT token support
+- Rate limiting
+- Usage tracking
+
+---
+
+### F5: Export Engine
+
+**F5.1: JSON Export**
+- Full fidelity export
+- Pretty-printed or compact
+- Streaming for large schemas
+
+**F5.2: YAML Export**
+- Human-readable format
+- Comments preserved
+- Multi-document support
+
+**F5.3: CSV Export**
+- Spreadsheet-compatible
+- Configurable columns
+- Hierarchical flattening
+
+**F5.4: Markdown Documentation**
+- Auto-generated docs
+- Configurable templates
+- Category grouping
+- Table of contents
+
+**F5.5: JSON Schema**
+- Generate validation schemas
+- OpenAPI compatible
+- Custom vocabulary support
+
+---
+
+### F6: Event System
+
+**F6.1: Internal Events**
+- Schema created/updated/deleted
+- Element created/updated/deleted
+- Version released
+- Publish to message queue
+
+**F6.2: Webhooks**
+- Configure endpoints per event type
+- Retry with exponential backoff (3 retries: 1s, 5s, 30s)
+- Payload signing (HMAC-SHA256)
+- Event filtering
+
+**F6.3: Change Notifications**
+- Notify Harmonization Engine of schema updates
+- Trigger index rebuilds
+- Notify DataForge of schema changes
+- Cascade to dependent services
+
+**Webhook Payload Format:**
+```json
+{
+  "event": "element.updated",
+  "timestamp": "2025-01-28T10:30:00Z",
+  "schema_id": "uuid",
+  "data": {
+    "element_id": "uuid",
+    "element_name": "age_at_onset",
+    "change_type": "update",
+    "fields_changed": ["description", "constraints"]
+  },
+  "signature": "sha256=..."
+}
+```
+
+---
+
+### F7: Access Control
+
+**F7.1: Roles**
+- Viewer: Read-only access
+- Editor: Create/update elements
+- Admin: Full access including delete
+- Owner: Manage permissions
+
+**F7.2: Permissions**
+- Schema-level permissions
+- Organization-level defaults
+- API key scoping
+
+**F7.3: Audit Logging**
+- Log all API calls
+- Track user actions
+- Exportable audit trail
+- Compliance support
+
+---
+
+### F8: Proposal Management *(Phase C)*
+
+**Purpose:** Enable data managers to propose new canonical elements and schema admins to review and resolve proposals.
+
+**F8.1: Create Proposal**
+- Accept proposal from Harmonization Engine or API
+- Validate proposed element structure
+- Compute similar existing elements (using embedding similarity)
+- Store with `pending` status
+- Emit `proposal.created` event
+
+**F8.2: List Proposals**
+- Filter by schema, status, proposer, date range
+- Sort by created_at, status, similarity score
+- Include similar elements summary
+- Paginate results
+
+**F8.3: Review Proposal**
+- Claim proposal for review (prevents concurrent edits)
+- View full proposal details with source context
+- View similar elements with diff
+- Add comments for discussion
+
+**F8.4: Approve Proposal**
+- Validate final element definition
+- Create element in schema
+- Update proposal with `approved` status and `created_element_id`
+- Emit `proposal.resolved` event with `approved` action
+- Notify proposer
+
+**F8.5: Reject Proposal**
+- Require rejection reason
+- Optionally suggest alternative element
+- Update proposal with `rejected` status
+- Emit `proposal.resolved` event with `rejected` action
+- Notify proposer
+
+**F8.6: Withdraw Proposal**
+- Allow proposer to withdraw before resolution
+- Update proposal with `withdrawn` status
+- No notification needed
+
+**F8.7: Proposal Comments**
+- Add comments to proposals for discussion
+- Thread comments for context
+- Notify mentioned users
+
+---
+
+## API Design
+
+### RESTful Endpoints
+
+```
+# Schemas
+GET    /api/v1/schemas                      # List schemas
+POST   /api/v1/schemas                      # Create schema
+GET    /api/v1/schemas/:id                  # Get schema
+GET    /api/v1/schemas/slug/:slug           # Get schema by slug
+PUT    /api/v1/schemas/:id                  # Update schema
+DELETE /api/v1/schemas/:id                  # Delete schema
+POST   /api/v1/schemas/import               # Import schema
+
+# Elements
+GET    /api/v1/schemas/:id/elements         # List elements
+POST   /api/v1/schemas/:id/elements         # Create element
+POST   /api/v1/schemas/:id/elements/bulk    # Bulk create
+GET    /api/v1/elements/:id                 # Get element
+PUT    /api/v1/elements/:id                 # Update element
+DELETE /api/v1/elements/:id                 # Delete element
+GET    /api/v1/elements/:id/history         # Element change history
+
+# Versions
+GET    /api/v1/schemas/:id/versions         # List versions
+POST   /api/v1/schemas/:id/versions         # Create version
+GET    /api/v1/versions/:id                 # Get version
+GET    /api/v1/versions/:id/snapshot        # Get version snapshot
+GET    /api/v1/versions/compare             # Compare two versions
+POST   /api/v1/schemas/:id/rollback         # Rollback to version
+
+# Export
+GET    /api/v1/schemas/:id/export           # Export schema
+        ?format=json|yaml|csv|markdown|jsonschema
+        &version=latest|:version_number
+
+# Search
+GET    /api/v1/search/schemas               # Search schemas
+GET    /api/v1/search/elements              # Search elements across schemas
+
+# Changes
+GET    /api/v1/schemas/:id/changes          # Get change history
+GET    /api/v1/changes/:id                  # Get specific change
+
+# Webhooks
+GET    /api/v1/webhooks                     # List webhooks
+POST   /api/v1/webhooks                     # Create webhook
+PUT    /api/v1/webhooks/:id                 # Update webhook
+DELETE /api/v1/webhooks/:id                 # Delete webhook
+POST   /api/v1/webhooks/:id/test            # Test webhook
+
+# API Keys
+GET    /api/v1/api-keys                     # List API keys
+POST   /api/v1/api-keys                     # Create API key
+DELETE /api/v1/api-keys/:id                 # Revoke API key
+
+# Proposals (Phase C)
+GET    /api/v1/schemas/:id/proposals        # List proposals for schema
+POST   /api/v1/schemas/:id/proposals        # Create proposal
+GET    /api/v1/proposals/:id                # Get proposal details
+PUT    /api/v1/proposals/:id                # Update proposal (draft only)
+DELETE /api/v1/proposals/:id                # Withdraw proposal
+POST   /api/v1/proposals/:id/claim          # Claim for review
+POST   /api/v1/proposals/:id/release        # Release claim
+POST   /api/v1/proposals/:id/approve        # Approve proposal
+POST   /api/v1/proposals/:id/reject         # Reject proposal
+GET    /api/v1/proposals/:id/comments       # List comments
+POST   /api/v1/proposals/:id/comments       # Add comment
+```
+
+### Response Format
+
+```json
+{
+  "data": { ... },
+  "meta": {
+    "total": 1626,
+    "page": 1,
+    "per_page": 50,
+    "total_pages": 33
+  },
+  "links": {
+    "self": "/api/v1/schemas/abc/elements?page=1",
+    "next": "/api/v1/schemas/abc/elements?page=2",
+    "prev": null
+  }
+}
+```
+
+### Error Format
+
+```json
+{
+  "error": {
+    "code": "validation_error",
+    "message": "Element name already exists in this schema",
+    "details": {
+      "field": "name",
+      "value": "duplicate_name",
+      "constraint": "unique"
+    }
+  }
+}
+```
+
+---
+
+## Data Model
+
+### Database Schema (PostgreSQL)
+
+```sql
+-- Organizations
+CREATE TABLE organizations (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(100) UNIQUE NOT NULL,
+    settings JSONB,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Users (reference, may be external auth)
+CREATE TABLE users (
+    id UUID PRIMARY KEY,
+    organization_id UUID REFERENCES organizations(id),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255),
+    role VARCHAR(50) DEFAULT 'viewer',
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Schemas
+CREATE TABLE schemas (
+    id UUID PRIMARY KEY,
+    organization_id UUID REFERENCES organizations(id),
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(100) NOT NULL,
+    description TEXT,
+    status VARCHAR(20) DEFAULT 'draft',
+    visibility VARCHAR(20) DEFAULT 'private',
+    current_version VARCHAR(20),
+    current_version_id UUID,
+    element_count INTEGER DEFAULT 0,
+    tags TEXT[],
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    created_by UUID REFERENCES users(id),
+    updated_by UUID REFERENCES users(id),
+    deleted_at TIMESTAMP,
+    
+    UNIQUE(organization_id, slug)
+);
+
+-- Elements
+CREATE TABLE elements (
+    id UUID PRIMARY KEY,
+    schema_id UUID REFERENCES schemas(id) ON DELETE CASCADE,
+    name VARCHAR(64) NOT NULL,
+    display_name VARCHAR(255),
+    description TEXT,
+    type VARCHAR(50) NOT NULL,
+    required BOOLEAN DEFAULT FALSE,
+    allowed_values JSONB,
+    value_labels JSONB,
+    constraints JSONB,
+    sources TEXT[],
+    aliases TEXT[],
+    related_element_ids UUID[],
+    category VARCHAR(100),
+    priority INTEGER,
+    tags TEXT[],
+    metadata JSONB,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    created_by UUID REFERENCES users(id),
+    updated_by UUID REFERENCES users(id),
+    deleted_at TIMESTAMP,
+    
+    UNIQUE(schema_id, name)
+);
+
+-- Versions
+CREATE TABLE versions (
+    id UUID PRIMARY KEY,
+    schema_id UUID REFERENCES schemas(id) ON DELETE CASCADE,
+    version_number VARCHAR(20) NOT NULL,
+    version_type VARCHAR(20),
+    element_count INTEGER,
+    snapshot_path VARCHAR(500),
+    snapshot_data JSONB,              -- For smaller schemas, store inline
+    changes_summary JSONB,
+    release_notes TEXT,
+    parent_version_id UUID REFERENCES versions(id),
+    status VARCHAR(20) DEFAULT 'draft',
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by UUID REFERENCES users(id),
+    
+    UNIQUE(schema_id, version_number)
+);
+
+-- Change Log
+CREATE TABLE changes (
+    id UUID PRIMARY KEY,
+    schema_id UUID REFERENCES schemas(id),
+    element_id UUID REFERENCES elements(id),
+    version_id UUID REFERENCES versions(id),
+    timestamp TIMESTAMP DEFAULT NOW(),
+    action VARCHAR(30) NOT NULL,
+    target_type VARCHAR(30) NOT NULL,
+    before_state JSONB,
+    after_state JSONB,
+    diff JSONB,
+    user_id UUID REFERENCES users(id),
+    reason TEXT,
+    source_service VARCHAR(100),
+    reversible BOOLEAN DEFAULT TRUE,
+    reverted BOOLEAN DEFAULT FALSE,
+    reverted_at TIMESTAMP,
+    reverted_by UUID REFERENCES users(id)
+);
+
+-- Proposals (Phase C)
+CREATE TABLE proposals (
+    id UUID PRIMARY KEY,
+    schema_id UUID REFERENCES schemas(id) ON DELETE CASCADE,
+    
+    -- Proposed element
+    proposed_name VARCHAR(64) NOT NULL,
+    proposed_display_name VARCHAR(255),
+    proposed_type VARCHAR(50) NOT NULL,
+    proposed_description TEXT,
+    proposed_constraints JSONB,
+    suggested_category VARCHAR(100),
+    
+    -- Source context
+    source_context JSONB,
+    justification TEXT,
+    similar_elements JSONB,
+    
+    -- Status
+    status VARCHAR(20) DEFAULT 'pending',
+    reviewer_id UUID REFERENCES users(id),
+    claimed_at TIMESTAMP,
+    
+    -- Resolution
+    created_element_id UUID REFERENCES elements(id),
+    rejection_reason TEXT,
+    suggested_alternative_id UUID REFERENCES elements(id),
+    resolved_at TIMESTAMP,
+    
+    -- Audit
+    proposed_by_user_id UUID REFERENCES users(id),
+    proposed_by_email VARCHAR(255),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Proposal Comments (Phase C)
+CREATE TABLE proposal_comments (
+    id UUID PRIMARY KEY,
+    proposal_id UUID REFERENCES proposals(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id),
+    content TEXT NOT NULL,
+    parent_comment_id UUID REFERENCES proposal_comments(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- API Keys
+CREATE TABLE api_keys (
+    id UUID PRIMARY KEY,
+    organization_id UUID REFERENCES organizations(id),
+    user_id UUID REFERENCES users(id),
+    name VARCHAR(255) NOT NULL,
+    key_hash VARCHAR(255) NOT NULL,   -- Hashed key
+    key_prefix VARCHAR(10) NOT NULL,  -- First chars for identification
+    scopes TEXT[],
+    rate_limit INTEGER DEFAULT 1000,
+    last_used_at TIMESTAMP,
+    expires_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW(),
+    revoked_at TIMESTAMP
+);
+
+-- Webhooks
+CREATE TABLE webhooks (
+    id UUID PRIMARY KEY,
+    organization_id UUID REFERENCES organizations(id),
+    schema_id UUID REFERENCES schemas(id),  -- null = all schemas
+    url VARCHAR(500) NOT NULL,
+    secret VARCHAR(255),
+    events TEXT[],                    -- ['schema.updated', 'element.created', ...]
+    active BOOLEAN DEFAULT TRUE,
+    failure_count INTEGER DEFAULT 0,
+    last_triggered_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Webhook Deliveries (for debugging)
+CREATE TABLE webhook_deliveries (
+    id UUID PRIMARY KEY,
+    webhook_id UUID REFERENCES webhooks(id),
+    event_type VARCHAR(50),
+    payload JSONB,
+    response_status INTEGER,
+    response_body TEXT,
+    delivered_at TIMESTAMP DEFAULT NOW(),
+    duration_ms INTEGER
+);
+
+-- Indexes
+CREATE INDEX idx_schemas_org ON schemas(organization_id);
+CREATE INDEX idx_schemas_slug ON schemas(slug);
+CREATE INDEX idx_schemas_status ON schemas(status);
+CREATE INDEX idx_schemas_tags ON schemas USING GIN(tags);
+
+CREATE INDEX idx_elements_schema ON elements(schema_id);
+CREATE INDEX idx_elements_name ON elements(name);
+CREATE INDEX idx_elements_type ON elements(type);
+CREATE INDEX idx_elements_category ON elements(category);
+CREATE INDEX idx_elements_sources ON elements USING GIN(sources);
+CREATE INDEX idx_elements_aliases ON elements USING GIN(aliases);
+CREATE INDEX idx_elements_tags ON elements USING GIN(tags);
+CREATE INDEX idx_elements_fulltext ON elements 
+    USING GIN(to_tsvector('english', name || ' ' || COALESCE(description, '')));
+
+CREATE INDEX idx_versions_schema ON versions(schema_id);
+CREATE INDEX idx_versions_number ON versions(version_number);
+
+CREATE INDEX idx_changes_schema ON changes(schema_id);
+CREATE INDEX idx_changes_element ON changes(element_id);
+CREATE INDEX idx_changes_timestamp ON changes(timestamp);
+CREATE INDEX idx_changes_user ON changes(user_id);
+
+CREATE INDEX idx_proposals_schema ON proposals(schema_id);
+CREATE INDEX idx_proposals_status ON proposals(status);
+CREATE INDEX idx_proposals_proposer ON proposals(proposed_by_user_id);
+
+CREATE INDEX idx_api_keys_org ON api_keys(organization_id);
+CREATE INDEX idx_api_keys_prefix ON api_keys(key_prefix);
+```
+
+---
+
+## Technical Architecture
+
+### Service Components
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     REGISTRY SERVICE                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                      API GATEWAY                          │   │
+│  │                                                           │   │
+│  │  • Rate limiting    • Auth middleware    • Request logging│   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                              │                                   │
+│           ┌──────────────────┼──────────────────┐               │
+│           ▼                  ▼                  ▼               │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐         │
+│  │   Schema    │    │   Element   │    │   Version   │         │
+│  │   Service   │    │   Service   │    │   Service   │         │
+│  └─────────────┘    └─────────────┘    └─────────────┘         │
+│           │                  │                  │               │
+│           └──────────────────┼──────────────────┘               │
+│                              ▼                                   │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                    DATA ACCESS LAYER                      │   │
+│  │                                                           │   │
+│  │  • Repository pattern    • Query builders    • Caching    │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                              │                                   │
+│           ┌──────────────────┼──────────────────┐               │
+│           ▼                  ▼                  ▼               │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐         │
+│  │ PostgreSQL  │    │    Redis    │    │     S3      │         │
+│  │  (primary)  │    │   (cache)   │    │ (snapshots) │         │
+│  └─────────────┘    └─────────────┘    └─────────────┘         │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                    EVENT PUBLISHER                        │   │
+│  │                                                           │   │
+│  │  • Change events    • Webhooks    • Message queue         │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Caching Strategy
+
+```python
+# Cache layers
+CACHE_CONFIG = {
+    "schema_metadata": {
+        "ttl": 300,           # 5 minutes
+        "invalidate_on": ["schema.updated", "schema.deleted"]
+    },
+    "element_list": {
+        "ttl": 60,            # 1 minute
+        "invalidate_on": ["element.created", "element.updated", "element.deleted"]
+    },
+    "version_snapshot": {
+        "ttl": 3600,          # 1 hour (immutable)
+        "invalidate_on": []   # Never invalidate
+    },
+    "search_results": {
+        "ttl": 30,            # 30 seconds
+        "invalidate_on": ["element.created", "element.updated"]
+    }
+}
+```
+
+### Similar Element Detection
+
+When a proposal is created, the Registry Service computes similar existing elements to help reviewers identify potential duplicates.
+
+```python
+async def compute_similar_elements(
+    schema_id: str,
+    proposed_name: str,
+    proposed_description: str,
+    proposed_type: str,
+    top_k: int = 5
+) -> List[SimilarElement]:
+    """
+    Find elements similar to the proposed element.
+    
+    Uses combination of:
+    1. Name similarity (Levenshtein distance, normalized)
+    2. Description embedding similarity (cosine)
+    3. Type matching (exact match bonus)
+    """
+    
+    # Get all elements in schema
+    elements = await get_schema_elements(schema_id)
+    
+    similarities = []
+    
+    # Encode proposed description
+    proposed_embedding = embed(f"{proposed_name} {proposed_description}")
+    
+    for element in elements:
+        # Name similarity (0-1)
+        name_sim = 1 - (levenshtein(proposed_name, element.name) / 
+                       max(len(proposed_name), len(element.name)))
+        
+        # Description similarity (0-1)
+        element_embedding = embed(f"{element.name} {element.description}")
+        desc_sim = cosine_similarity(proposed_embedding, element_embedding)
+        
+        # Type bonus
+        type_bonus = 0.1 if proposed_type == element.type else 0
+        
+        # Combined score (weighted)
+        score = (0.3 * name_sim) + (0.6 * desc_sim) + type_bonus
+        
+        if score > 0.3:  # Threshold
+            similarities.append({
+                "element_id": element.id,
+                "name": element.name,
+                "display_name": element.display_name,
+                "similarity_score": round(score, 2),
+                "similarity_reason": generate_reason(name_sim, desc_sim, type_bonus)
+            })
+    
+    # Sort by score, return top_k
+    similarities.sort(key=lambda x: x["similarity_score"], reverse=True)
+    return similarities[:top_k]
+
+def generate_reason(name_sim: float, desc_sim: float, type_bonus: float) -> str:
+    """Generate human-readable similarity reason."""
+    reasons = []
+    if name_sim > 0.7:
+        reasons.append("Similar name")
+    if desc_sim > 0.7:
+        reasons.append("Similar description")
+    if type_bonus > 0:
+        reasons.append("Same data type")
+    return ", ".join(reasons) if reasons else "Semantic similarity"
+```
+
+---
+
+## Implementation Phases
+
+### Phase 1: Core Storage ✅ Complete
+**Goal:** Basic schema and element CRUD
+
+- [x] Database schema setup
+- [x] Schema CRUD API
+- [x] Element CRUD API
+- [x] Basic validation
+- [x] Soft delete implementation
+
+**Deliverable:** Functional storage layer
+
+### Phase 2: Versioning ✅ Complete
+**Goal:** Version management and snapshots
+
+- [x] Version creation
+- [x] Snapshot storage
+- [x] Version comparison
+- [x] Rollback functionality
+- [x] Version history API
+
+**Deliverable:** Complete version control
+
+### Phase 3: Export Engine ✅ Complete
+**Goal:** Multiple export formats
+
+- [x] JSON export
+- [x] YAML export
+- [x] CSV export
+- [x] Markdown generation
+- [x] JSON Schema generation
+
+**Deliverable:** Flexible export options
+
+### Phase 4: Events & Webhooks (Phase B)
+**Goal:** Change notification system
+
+- [ ] Event publishing
+- [ ] Webhook management
+- [ ] Retry logic with exponential backoff
+- [ ] Delivery tracking
+- [ ] Payload signing
+
+**Deliverable:** Real-time change notifications
+
+### Phase 5: Access Control (Phase B/C)
+**Goal:** Security and audit
+
+- [ ] API key management
+- [ ] Role-based permissions
+- [ ] Audit logging
+- [ ] Rate limiting
+
+**Deliverable:** Production-ready security
+
+### Phase 6: Proposal Management (Phase C)
+**Goal:** Element proposal workflow
+
+- [ ] Proposals table and API
+- [ ] Similar element detection
+- [ ] Claim/release workflow
+- [ ] Approve/reject actions
+- [ ] Comment threading
+- [ ] Proposal events for webhooks
+
+**Deliverable:** Complete proposal workflow
+
+---
+
+## Success Metrics
+
+### Reliability
+- API uptime > 99.9%
+- Data consistency: zero conflicts
+- Backup success rate: 100%
+
+### Performance
+- API p95 latency < 100ms
+- Search latency < 200ms
+- Export generation < 5s for 10k elements
+
+### Adoption
+- API calls per day
+- External integrations
+- Webhook deliveries
+
+---
+
+## Risks & Mitigations
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Data corruption | Loss of schema data | Immutable change log, backups |
+| Version conflicts | Inconsistent state | Optimistic locking, conflict detection |
+| Performance degradation | Slow API | Caching, query optimization, pagination |
+| Security breach | Data exposure | API key scoping, audit logging |
+| Integration failures | Broken webhooks | Retry logic, circuit breakers |
+
+---
+
+## Integration Contracts
+
+### For Curation Workbench
+
+```python
+# Read schema with elements
+GET /api/v1/schemas/:id?include=elements
+
+# Update element
+PUT /api/v1/elements/:id
+Content-Type: application/json
+X-Source-Service: curation_workbench
+{
+    "name": "updated_name",
+    "reason": "Standardized naming"
+}
+
+# Create version after curation session
+POST /api/v1/schemas/:id/versions
+{
+    "version_type": "minor",
+    "release_notes": "Curation session: 45 elements updated"
+}
+
+# Review proposals (Phase C)
+GET /api/v1/schemas/:id/proposals?status=pending
+POST /api/v1/proposals/:id/approve
+{
+    "element_overrides": {
+        "category": "cognitive_assessments"
+    },
+    "reviewer_notes": "Approved with category assignment"
+}
+```
+
+### For Harmonization Engine
+
+```python
+# Get elements for indexing
+GET /api/v1/schemas/:id/elements?per_page=1000&include=aliases,sources
+
+# Subscribe to schema changes
+POST /api/v1/webhooks
+{
+    "url": "https://harmonization.internal/webhooks/schema-changed",
+    "events": ["element.created", "element.updated", "element.deleted"],
+    "schema_id": "uuid"
+}
+
+# Submit proposal (Phase C)
+POST /api/v1/schemas/:id/proposals
+{
+    "proposed_name": "moca_total_score",
+    "proposed_type": "integer",
+    "proposed_description": "Montreal Cognitive Assessment total score",
+    "proposed_constraints": {"min": 0, "max": 30},
+    "source_context": {
+        "source_name": "Cohort D Clinical",
+        "source_field_name": "moca_score",
+        "sample_values": ["28", "24", "19"]
+    },
+    "justification": "MoCA is widely used...",
+    "proposed_by_email": "troy@research.org"
+}
+```
+
+### For DataForge
+
+```python
+# Get schema for validation
+GET /api/v1/schemas/:id/export?format=jsonschema
+
+# Subscribe to schema changes for validation rule updates
+POST /api/v1/webhooks
+{
+    "url": "https://dataforge.internal/webhooks/schema-updated",
+    "events": ["schema.updated", "version.released"],
+    "schema_id": "uuid"
+}
+```
+
+---
+
+## Proposal Review UI *(Phase C — Curation Workbench)*
+
+### Proposal Review Queue
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    PROPOSAL QUEUE                            │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  Schema: genetics-consortium-cdes                            │
+│  Pending: 3  |  Under Review: 1  |  This Week: 7             │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │ ○ moca_total_score                          Pending     │ │
+│  │   Proposed by: troy@research.org            2h ago      │ │
+│  │   Similar: mmse_total (62%)                             │ │
+│  │   [Review] [Quick Approve] [Quick Reject]               │ │
+│  ├─────────────────────────────────────────────────────────┤ │
+│  │ ○ gds_total                                 Pending     │ │
+│  │   Proposed by: troy@research.org            2h ago      │ │
+│  │   Similar: depression_score (58%)                       │ │
+│  │   [Review] [Quick Approve] [Quick Reject]               │ │
+│  ├─────────────────────────────────────────────────────────┤ │
+│  │ ● falls_past_year                         Under Review  │ │
+│  │   Proposed by: troy@research.org            1d ago      │ │
+│  │   Reviewer: gorb@research.org                           │ │
+│  │   Similar: fall_history (71%)                           │ │
+│  │   [View]                                                │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Proposal Detail View
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                  REVIEW PROPOSAL                             │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  Proposed Element                  Source Context            │
+│  ─────────────────                 ──────────────            │
+│  Name: moca_total_score            Source: Cohort D Clinical │
+│  Display: MoCA Total Score         Field: moca_score         │
+│  Type: integer                     Values: 28, 24, 19, 30... │
+│  Range: 0-30                                                 │
+│  Category: cognitive_assessments                             │
+│                                                              │
+│  Description:                                                │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │ Montreal Cognitive Assessment total score. Range 0-30,  │ │
+│  │ higher scores indicate better cognitive function.       │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                                                              │
+│  Justification:                                              │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │ MoCA is a widely-used cognitive screening tool. This    │ │
+│  │ element is needed for Cohort D data and has been        │ │
+│  │ requested by the research team.                         │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                                                              │
+│  Similar Existing Elements:                                  │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │ • mmse_total (62%) - MMSE Total Score                   │ │
+│  │   Different assessment instrument                       │ │
+│  │   [View Element] [Use Instead]                          │ │
+│  │                                                          │ │
+│  │ • cognitive_status (45%) - Cognitive Status             │ │
+│  │   Categorical, not continuous score                     │ │
+│  │   [View Element] [Use Instead]                          │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │ Reviewer Notes:                                         │ │
+│  │ [____________________________________________]          │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                                                              │
+│  [Approve] [Reject with Reason] [Request Changes] [Cancel]   │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Event Types
+
+### Schema Events
+- `schema.created` — New schema created
+- `schema.updated` — Schema metadata updated
+- `schema.deleted` — Schema soft-deleted
+
+### Element Events
+- `element.created` — New element added to schema
+- `element.updated` — Element properties changed
+- `element.deleted` — Element soft-deleted
+
+### Version Events
+- `version.created` — New version drafted
+- `version.released` — Version published
+
+### Proposal Events *(Phase C)*
+- `proposal.created` — New proposal submitted
+- `proposal.resolved` — Proposal approved or rejected
+
+---
+
+## Open Questions
+
+1. **Multi-tenancy:** Shared database with row-level security, or separate databases?
+2. **Snapshot storage:** Inline JSONB for small schemas, S3 for large—what's the threshold?
+3. **Version strategy:** Full snapshots or incremental diffs?
+4. **Search:** PostgreSQL full-text sufficient, or Elasticsearch needed?
+5. **Event bus:** Redis Pub/Sub sufficient, or need dedicated message queue?
+
+---
+
+*Document Version: 0.2*
+*Last Updated: 2025-01-28*
+*Author: Forge Team*

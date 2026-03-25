@@ -1,0 +1,201 @@
+# Local Development Setup
+
+---
+
+## Prerequisites
+
+- Python 3.11+
+- Docker and Docker Compose
+- An Anthropic API key (for AI features in forge-app)
+
+---
+
+## Quick Start (Docker — all services)
+
+```bash
+# Clone and enter the repo
+git clone <repo-url> && cd cde-engine
+
+# Set up environment
+cp .env.example .env
+# Edit .env and add your ANTHROPIC_API_KEY
+
+# Start everything
+docker compose up --build
+```
+
+Services come up at:
+
+| Service | URL | What to check |
+|---------|-----|---------------|
+| forge-app | http://localhost:8505 | Main UI — should show home dashboard |
+| Registry Service | http://localhost:8000/health | Should return `{"status": "healthy"}` |
+| DataForge API | http://localhost:8001/health | Should return `{"status": "healthy"}` |
+| PostgreSQL | localhost:5432 | User: `forge`, password: `forge`, db: `forge` |
+
+The legacy standalone services (`:8501`, `:8502`, `:8503`) also start but aren't needed for development.
+
+To start only what you need:
+
+```bash
+docker compose up --build forge-app registry-service dataforge-api postgres
+```
+
+---
+
+## Local Python Setup (for running tests and linting)
+
+Tests run against the local Python environment, not Docker.
+
+### 1. Create a virtualenv from the repo root
+
+```bash
+python3.11 -m venv .venv
+source .venv/bin/activate
+```
+
+### 2. Install each service you're working on
+
+**forge-app:**
+```bash
+pip install -r services/forge-app/requirements.txt
+pip install -e libs/forge-retrieval-core
+```
+
+**Registry Service:**
+```bash
+pip install -r services/registry-service/requirements.txt
+```
+
+**DataForge:**
+```bash
+pip install -e "services/dataforge[dev]"
+```
+
+**forge-retrieval-core (standalone):**
+```bash
+pip install -e "libs/forge-retrieval-core[dev]"
+```
+
+### 3. Run tests
+
+Always run from the repo root using `.venv/bin/python`:
+
+```bash
+# forge-app
+.venv/bin/python -m pytest services/forge-app/tests/ -x -q
+
+# Registry Service (uses in-memory SQLite, not PostgreSQL)
+.venv/bin/python -m pytest services/registry-service/tests/ -x -q
+
+# DataForge
+.venv/bin/python -m pytest services/dataforge/tests/ -x -q
+
+# forge-retrieval-core
+.venv/bin/python -m pytest libs/forge-retrieval-core/tests/ -x -q
+```
+
+### 4. Linting (optional, CI linting currently disabled)
+
+```bash
+black --check --line-length 100 .
+flake8 --max-line-length=110 --extend-ignore=E203,W503
+```
+
+---
+
+## Environment Variables
+
+### Repo root `.env`
+
+| Variable | Required | Default | Used by |
+|----------|----------|---------|---------|
+| `ANTHROPIC_API_KEY` | Yes (for AI features) | — | forge-app, harmonization-engine, curation-workbench |
+| `LOG_LEVEL` | No | `INFO` | All services |
+
+### Registry Service
+
+| Variable | Required | Default | Notes |
+|----------|----------|---------|-------|
+| `DATABASE_URL` | Yes | `postgresql://forge:forge@localhost:5432/forge` | Docker Compose sets this automatically |
+
+### DataForge
+
+| Variable | Required | Default | Notes |
+|----------|----------|---------|-------|
+| `DATAFORGE_STORAGE_ROOT` | No | `/app/data/storage` | Where submissions and gold datasets are stored |
+| `DATAFORGE_REGISTRY_SERVICE_URL` | No | `http://localhost:8000` | Registry Service URL for schema loading |
+
+### forge-app
+
+| Variable | Required | Default | Notes |
+|----------|----------|---------|-------|
+| `REGISTRY_SERVICE_URL` | No | `http://localhost:8000` | |
+| `DATAFORGE_API_URL` | No | `http://localhost:8001` | |
+| `ANTHROPIC_API_KEY` | Yes | — | |
+
+---
+
+## Common Issues
+
+**`ModuleNotFoundError: shared.logging`**
+Set `PYTHONPATH` to include the services directories:
+```bash
+export PYTHONPATH=services/shared:services/:$PYTHONPATH
+```
+
+**forge-retrieval-core not found by forge-app tests**
+Install it as an editable package:
+```bash
+pip install -e libs/forge-retrieval-core
+```
+
+**DataForge import errors**
+DataForge is a package, not a plain script directory. Install it:
+```bash
+pip install -e "services/dataforge[dev]"
+```
+
+**Registry tests fail with PostgreSQL errors**
+Registry tests use in-memory SQLite by default (see `services/registry-service/tests/conftest.py`). They don't need a running PostgreSQL instance.
+
+**Streamlit `use_container_width` deprecation warnings**
+Use `width="stretch"` instead of `use_container_width=True`. This is a codebase convention.
+
+---
+
+## Project Structure (abbreviated)
+
+```
+cde-engine/
+├── .env.example                  ← copy to .env, add ANTHROPIC_API_KEY
+├── docker-compose.yml            ← all services
+├── services/
+│   ├── forge-app/                ← Unified Streamlit UI (port 8505)
+│   │   ├── app.py                   Home dashboard
+│   │   ├── pages/                   1_Schemas, 2_Data, 3_Gold, 4_Settings
+│   │   ├── core/                    Business logic (curation/, harmonization/)
+│   │   ├── clients/                 HTTP clients for Registry + DataForge
+│   │   └── tests/
+│   ├── registry-service/         ← Schema API (port 8000)
+│   │   ├── app/api/                 FastAPI routes
+│   │   ├── app/models/              SQLAlchemy ORM
+│   │   ├── app/schemas/             Pydantic request/response models
+│   │   ├── alembic/                 Database migrations
+│   │   └── tests/
+│   ├── dataforge/                ← Validation API (port 8001)
+│   │   ├── src/dataforge/           Python package
+│   │   │   ├── api/routes/          FastAPI routes
+│   │   │   ├── submission/          Submission lifecycle
+│   │   │   ├── validation/          Schema validation engine
+│   │   │   ├── gold/                Gold dataset management
+│   │   │   └── audit/               Append-only audit logs
+│   │   └── tests/
+│   └── shared/                   ← Common utilities (logging)
+├── libs/
+│   └── forge-retrieval-core/     ← TF-IDF + embedding retrieval library
+└── docs/
+    ├── platform/                 ← Vision, roadmap, architecture
+    ├── specs/                    ← Service specs, decoupling plan
+    └── reference/                ← API reference, data models, this file
+```

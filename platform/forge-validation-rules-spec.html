@@ -1,0 +1,496 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validation Rules — Interactive Rule Builder Spec &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API-First Decoupling Spec" href="../specs/api-first-decoupling.html" />
+    <link rel="prev" title="Forge Unified App — MVP Specification" href="forge-unified-app-spec.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Validation Rules — Interactive Rule Builder Spec</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#background">Background</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-are-validation-rules">What Are Validation Rules?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#current-state">Current State</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#why-rules-must-come-after-curation">Why Rules Must Come After Curation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#design">Design</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#wizard-step-changes">Wizard Step Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rule-data-model">Rule Data Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#expression-syntax">Expression Syntax</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#ui-layout-step-4-validation-rules">UI Layout — Step 4: Validation Rules</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#templates">Templates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#interaction-details">Interaction Details</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#step-5-publish-updated">Step 5: Publish (Updated)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#files-to-modify">Files to Modify</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#files-already-correct-no-changes-needed">Files Already Correct (No Changes Needed)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#end-to-end-data-flow">End-to-End Data Flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verification">Verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#future-enhancements-out-of-scope">Future Enhancements (Out of Scope)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../specs/api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Validation Rules — Interactive Rule Builder Spec</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/platform/forge-validation-rules-spec.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="validation-rules-interactive-rule-builder-spec">
+<h1>Validation Rules — Interactive Rule Builder Spec<a class="headerlink" href="#validation-rules-interactive-rule-builder-spec" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>Add an interactive validation rule builder to the Schema Curation Wizard in forge-app. Users define cross-field business logic rules (e.g., “onset must precede diagnosis”, “LBD requires Brain Bank study type”) after curating all variables, using templates or custom expressions. Rules are published to the Registry schema’s metadata and enforced by DataForge at data submission time.</p>
+</section>
+<hr class="docutils" />
+<section id="background">
+<h2>Background<a class="headerlink" href="#background" title="Link to this heading"></a></h2>
+<section id="what-are-validation-rules">
+<h3>What Are Validation Rules?<a class="headerlink" href="#what-are-validation-rules" title="Link to this heading"></a></h3>
+<p>Validation rules are business logic checks that go beyond single-field constraints (type, required, enum values, min/max). They express <strong>relationships between fields</strong> or <strong>dataset-level invariants</strong>:</p>
+<ul class="simple">
+<li><p><strong>Conditional (row-level):</strong> “If diagnosis is PD, age_of_onset must be present”</p></li>
+<li><p><strong>Conditional (cross-field):</strong> “age_of_onset must be ≤ age_at_diagnosis”</p></li>
+<li><p><strong>Submission (dataset-level):</strong> “GP2sampleID must be unique across all rows”</p></li>
+</ul>
+</section>
+<section id="current-state">
+<h3>Current State<a class="headerlink" href="#current-state" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>DataForge</strong> already supports validation rules via <code class="docutils literal notranslate"><span class="pre">RuleConfig</span></code> model and <code class="docutils literal notranslate"><span class="pre">ValidationEngine</span></code></p></li>
+<li><p><strong>RegistrySchemaLoader</strong> reads rules from <code class="docutils literal notranslate"><span class="pre">schema.metadata.validation_rules</span></code></p></li>
+<li><p><strong>Registry Service</strong> stores rules in the schema’s <code class="docutils literal notranslate"><span class="pre">metadata</span></code> JSONB column</p></li>
+<li><p><strong>Publisher</strong> (<code class="docutils literal notranslate"><span class="pre">build_registry_payload</span></code>) accepts <code class="docutils literal notranslate"><span class="pre">validation_rules</span></code> and includes them in metadata</p></li>
+<li><p><strong>Current UI</strong> has a JSON file upload in Step 4 (Publish) — functional but not user-friendly</p></li>
+</ul>
+</section>
+<section id="why-rules-must-come-after-curation">
+<h3>Why Rules Must Come After Curation<a class="headerlink" href="#why-rules-must-come-after-curation" title="Link to this heading"></a></h3>
+<p>Rules reference variables by their curated names (e.g., <code class="docutils literal notranslate"><span class="pre">row['age_of_onset']</span></code>). During curation (Step 3), variable names may change, be merged, or be rejected. Rules can only be meaningfully authored once all variable names are finalized.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="design">
+<h2>Design<a class="headerlink" href="#design" title="Link to this heading"></a></h2>
+<section id="wizard-step-changes">
+<h3>Wizard Step Changes<a class="headerlink" href="#wizard-step-changes" title="Link to this heading"></a></h3>
+<p>The Schema Curation Wizard expands from 4 steps to 5:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Step</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p>Status</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>Upload</p></td>
+<td><p>Existing</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>Configure</p></td>
+<td><p>Existing</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>Curate Elements</p></td>
+<td><p>Existing</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>4</strong></p></td>
+<td><p><strong>Validation Rules</strong></p></td>
+<td><p><strong>New</strong></p></td>
+</tr>
+<tr class="row-even"><td><p>5</p></td>
+<td><p>Publish</p></td>
+<td><p>Existing (renumbered from 4)</p></td>
+</tr>
+</tbody>
+</table>
+<p>Step 4 is <strong>optional</strong> — schemas can be published with zero rules.</p>
+</section>
+<section id="rule-data-model">
+<h3>Rule Data Model<a class="headerlink" href="#rule-data-model" title="Link to this heading"></a></h3>
+<p>Rules are stored on <code class="docutils literal notranslate"><span class="pre">CurationSession.validation_rules:</span> <span class="pre">list[dict]</span></code> and follow DataForge’s <code class="docutils literal notranslate"><span class="pre">RuleConfig</span></code> structure:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;onset_before_diagnosis&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Age of onset must be ≤ age at diagnosis when both are present&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;rule_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;conditional&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;condition&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;row[&#39;age_of_onset&#39;] != &#39;&#39; and row[&#39;age_at_diagnosis&#39;] != &#39;&#39;&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;constraint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;float(row[&#39;age_of_onset&#39;]) &lt;= float(row[&#39;age_at_diagnosis&#39;])&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;severity&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;enabled&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Required</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>string</p></td>
+<td><p>Yes</p></td>
+<td><p>Unique slug identifier (auto-generated from template, editable)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">description</span></code></p></td>
+<td><p>string</p></td>
+<td><p>No</p></td>
+<td><p>Human-readable explanation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rule_type</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;conditional&quot;</span></code> | <code class="docutils literal notranslate"><span class="pre">&quot;submission&quot;</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Row-level or dataset-level</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">condition</span></code></p></td>
+<td><p>string | null</p></td>
+<td><p>No</p></td>
+<td><p>When to apply (Python expression). Null for submission rules.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">constraint</span></code></p></td>
+<td><p>string</p></td>
+<td><p>Yes</p></td>
+<td><p>What must be true (Python expression)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">severity</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;error&quot;</span></code> | <code class="docutils literal notranslate"><span class="pre">&quot;warning&quot;</span></code> | <code class="docutils literal notranslate"><span class="pre">&quot;info&quot;</span></code></p></td>
+<td><p>Yes</p></td>
+<td><p>Fail validation, flag for review, or informational</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">enabled</span></code></p></td>
+<td><p>bool</p></td>
+<td><p>Yes</p></td>
+<td><p>Whether the rule is active (default: true)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="expression-syntax">
+<h3>Expression Syntax<a class="headerlink" href="#expression-syntax" title="Link to this heading"></a></h3>
+<p>Rules use Python expressions evaluated by DataForge’s <code class="docutils literal notranslate"><span class="pre">ValidationEngine</span></code>:</p>
+<ul class="simple">
+<li><p><strong>Row access:</strong> <code class="docutils literal notranslate"><span class="pre">row['field_name']</span></code> — access a column value in the current row</p></li>
+<li><p><strong>Null checks:</strong> <code class="docutils literal notranslate"><span class="pre">row['field']</span> <span class="pre">is</span> <span class="pre">None</span> <span class="pre">or</span> <span class="pre">row['field']</span> <span class="pre">==</span> <span class="pre">''</span></code></p></li>
+<li><p><strong>Comparisons:</strong> <code class="docutils literal notranslate"><span class="pre">float(row['age'])</span> <span class="pre">&lt;=</span> <span class="pre">float(row['other_age'])</span></code></p></li>
+<li><p><strong>Set membership:</strong> <code class="docutils literal notranslate"><span class="pre">row['phenotype']</span> <span class="pre">in</span> <span class="pre">('PD',</span> <span class="pre">'LBD')</span></code></p></li>
+<li><p><strong>Submission functions:</strong> <code class="docutils literal notranslate"><span class="pre">column_unique('field_name')</span></code> — dataset-level uniqueness</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="ui-layout-step-4-validation-rules">
+<h2>UI Layout — Step 4: Validation Rules<a class="headerlink" href="#ui-layout-step-4-validation-rules" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Step 4 — Validation Rules (optional)
+
+  [Total Rules: 5]  [Errors: 3]  [Warnings: 2]
+
+  ┌─ Rules ──────────────────────────────────────────┐
+  │ Name              │ Description    │ Sev  │      │
+  │ pd_requires_onset │ PD phenotype…  │ warn │ [x]  │
+  │ onset_lte_diag    │ Onset must…    │ err  │ [x]  │
+  │ unique_sampleid   │ GP2sampleID…   │ err  │ [x]  │
+  └──────────────────────────────────────────────────┘
+
+  ┌─ Add New Rule ───────────────────────────────────┐
+  │                                                  │
+  │ Template: [Require field when... ▾]              │
+  │                                                  │
+  │ Field:    [age_of_onset ▾]                       │
+  │ When:     [GP2_phenotype ▾]  equals  [PD     ]   │
+  │                                                  │
+  │ ── Preview (editable) ──                         │
+  │ Name:        [age_of_onset_required_when_gp2_…]  │
+  │ Description: [                                ]  │
+  │ Rule Type:   [Conditional ▾]                     │
+  │ Condition:   [row[&#39;GP2_phenotype&#39;] == &#39;PD&#39;    ]  │
+  │ Constraint:  [row[&#39;age_of_onset&#39;] is not None…]  │
+  │ Severity:    [Error ▾]                           │
+  │                                                  │
+  │ [Add Rule]                                       │
+  └──────────────────────────────────────────────────┘
+
+  [← Back to Curate]            [Continue to Publish →]
+</pre></div>
+</div>
+<section id="templates">
+<h3>Templates<a class="headerlink" href="#templates" title="Link to this heading"></a></h3>
+<p>Templates auto-fill the expression fields based on user-selected variables. All generated fields remain editable before adding.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Template</p></th>
+<th class="head"><p>User Inputs</p></th>
+<th class="head"><p>Auto-generated</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Require field when…</strong></p></td>
+<td><p>field, trigger field, trigger value</p></td>
+<td><p>Condition: <code class="docutils literal notranslate"><span class="pre">row['{trigger}']</span> <span class="pre">==</span> <span class="pre">'{value}'</span></code>; Constraint: <code class="docutils literal notranslate"><span class="pre">row['{field}']</span> <span class="pre">is</span> <span class="pre">not</span> <span class="pre">None</span> <span class="pre">and</span> <span class="pre">row['{field}']</span> <span class="pre">!=</span> <span class="pre">''</span></code>; Severity: error</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Forbid field when…</strong></p></td>
+<td><p>field, trigger field, trigger value</p></td>
+<td><p>Condition: <code class="docutils literal notranslate"><span class="pre">row['{trigger}']</span> <span class="pre">==</span> <span class="pre">'{value}'</span></code>; Constraint: <code class="docutils literal notranslate"><span class="pre">row['{field}']</span> <span class="pre">is</span> <span class="pre">None</span> <span class="pre">or</span> <span class="pre">row['{field}']</span> <span class="pre">==</span> <span class="pre">''</span></code>; Severity: warning</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Field A ≤ Field B</strong></p></td>
+<td><p>field_a, field_b</p></td>
+<td><p>Condition: both not empty; Constraint: <code class="docutils literal notranslate"><span class="pre">float(row['{a}'])</span> <span class="pre">&lt;=</span> <span class="pre">float(row['{b}'])</span></code>; Severity: error</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Fields must match</strong></p></td>
+<td><p>field_a, field_b</p></td>
+<td><p>Condition: <code class="docutils literal notranslate"><span class="pre">True</span></code>; Constraint: <code class="docutils literal notranslate"><span class="pre">row['{a}']</span> <span class="pre">==</span> <span class="pre">row['{b}']</span></code>; Severity: error</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Must be unique</strong></p></td>
+<td><p>field</p></td>
+<td><p>Rule type: submission; Constraint: <code class="docutils literal notranslate"><span class="pre">column_unique('{field}')</span></code>; Severity: error</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Custom</strong></p></td>
+<td><p><em>(all manual)</em></p></td>
+<td><p><em>(empty fields)</em></p></td>
+</tr>
+</tbody>
+</table>
+<p>Field dropdowns are populated from <code class="docutils literal notranslate"><span class="pre">session.curated_elements</span></code> — all finalized variable names.</p>
+</section>
+<section id="interaction-details">
+<h3>Interaction Details<a class="headerlink" href="#interaction-details" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Add:</strong> Fill template or custom fields → click “Add Rule” → rule appended to <code class="docutils literal notranslate"><span class="pre">session.validation_rules</span></code> → page reruns</p></li>
+<li><p><strong>Delete:</strong> Click delete button on a rule row → rule removed → page reruns</p></li>
+<li><p><strong>Edit:</strong> Delete + re-add (no inline editing for v1)</p></li>
+<li><p><strong>Persist:</strong> Rules saved to <code class="docutils literal notranslate"><span class="pre">CurationSession</span></code> on every add/delete via <code class="docutils literal notranslate"><span class="pre">save_curation_session()</span></code></p></li>
+<li><p><strong>Skip:</strong> “Continue to Publish” works with zero rules</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="step-5-publish-updated">
+<h2>Step 5: Publish (Updated)<a class="headerlink" href="#step-5-publish-updated" title="Link to this heading"></a></h2>
+<p>The current Step 4 (Publish) becomes Step 5 with these changes:</p>
+<ul class="simple">
+<li><p><strong>Remove</strong> the JSON file uploader for validation rules</p></li>
+<li><p><strong>Add</strong> a read-only rules summary alongside the elements preview:</p>
+<ul>
+<li><p>Metric showing rule count</p></li>
+<li><p>Expandable table: Name | Description | Type | Severity</p></li>
+</ul>
+</li>
+<li><p>Pass <code class="docutils literal notranslate"><span class="pre">session.validation_rules</span></code> to <code class="docutils literal notranslate"><span class="pre">publish_to_registry()</span></code> (publisher already supports this)</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="files-to-modify">
+<h2>Files to Modify<a class="headerlink" href="#files-to-modify" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Change</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">services/forge-app/core/curation/models.py</span></code></p></td>
+<td><p>Add <code class="docutils literal notranslate"><span class="pre">validation_rules:</span> <span class="pre">list[dict]</span></code> to <code class="docutils literal notranslate"><span class="pre">CurationSession</span></code>, bump <code class="docutils literal notranslate"><span class="pre">current_step</span></code> max to 5</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">services/forge-app/pages/1_Schemas.py</span></code></p></td>
+<td><p>Add Step 4 (rules builder), renumber Step 4→5 (publish), remove file upload, update all step references</p></td>
+</tr>
+</tbody>
+</table>
+<section id="files-already-correct-no-changes-needed">
+<h3>Files Already Correct (No Changes Needed)<a class="headerlink" href="#files-already-correct-no-changes-needed" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">core/storage.py</span></code> — Pydantic serialization handles new field automatically</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">core/curation/publisher.py</span></code> — already accepts <code class="docutils literal notranslate"><span class="pre">validation_rules</span></code> param</p></li>
+<li><p>Registry Service — <code class="docutils literal notranslate"><span class="pre">metadata</span></code> JSONB field fully supported in create/update/response</p></li>
+<li><p>DataForge <code class="docutils literal notranslate"><span class="pre">RegistrySchemaLoader</span></code> — already reads <code class="docutils literal notranslate"><span class="pre">metadata.validation_rules</span></code></p></li>
+<li><p>DataForge <code class="docutils literal notranslate"><span class="pre">ValidationEngine</span></code> — already executes <code class="docutils literal notranslate"><span class="pre">RuleConfig</span></code> rules</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="end-to-end-data-flow">
+<h2>End-to-End Data Flow<a class="headerlink" href="#end-to-end-data-flow" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Schema Wizard Step 4          Step 5              Registry              DataForge
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│ User builds  │     │ Publish      │     │ metadata:    │     │ Registry     │
+│ rules via    │────&gt;│ includes     │────&gt;│  validation_ │────&gt;│ SchemaLoader │
+│ templates or │     │ rules in     │     │  rules: [..] │     │ reads rules  │
+│ custom exprs │     │ metadata     │     │              │     │ into Schema  │
+└──────────────┘     └──────────────┘     └──────────────┘     └──────┬───────┘
+                                                                       │
+                                                                       ▼
+                                                               ┌──────────────┐
+                                                               │ Validation   │
+                                                               │ Engine runs  │
+                                                               │ rules on     │
+                                                               │ uploaded CSV │
+                                                               └──────────────┘
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="verification">
+<h2>Verification<a class="headerlink" href="#verification" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Unit tests:</strong> <code class="docutils literal notranslate"><span class="pre">.venv/bin/python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">services/forge-app/tests/</span></code></p></li>
+<li><p><strong>Manual test:</strong></p>
+<ul class="simple">
+<li><p>Create a schema, curate variables through Step 3</p></li>
+<li><p>In Step 4, add rules using templates (e.g., “Require field when…”, “Must be unique”)</p></li>
+<li><p>Add a custom rule with a hand-written expression</p></li>
+<li><p>Verify rules persist when navigating back and forward</p></li>
+<li><p>Continue to Step 5 (Publish), verify rules summary shows</p></li>
+<li><p>Publish to Registry</p></li>
+<li><p>Verify via <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/v1/schemas/{id}</span></code> that <code class="docutils literal notranslate"><span class="pre">metadata.validation_rules</span></code> contains the rules</p></li>
+<li><p>Create a Data Project with that schema, upload a CSV, confirm rules fire during validation</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="future-enhancements-out-of-scope">
+<h2>Future Enhancements (Out of Scope)<a class="headerlink" href="#future-enhancements-out-of-scope" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Edit rules on published schemas</strong> — currently only at publish time; would need a dedicated schema management UI</p></li>
+<li><p><strong>Visual expression builder</strong> — full drag-and-drop rule builder (templates cover common cases for now)</p></li>
+<li><p><strong>Rule testing</strong> — dry-run rules against sample data before publishing</p></li>
+<li><p><strong>AI-suggested rules</strong> — infer common patterns from variable types and names</p></li>
+<li><p><strong>Rule versioning</strong> — track rule changes across schema versions</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="forge-unified-app-spec.html" class="btn btn-neutral float-left" title="Forge Unified App — MVP Specification" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../specs/api-first-decoupling.html" class="btn btn-neutral float-right" title="API-First Decoupling Spec" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

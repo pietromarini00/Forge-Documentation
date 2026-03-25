@@ -1,0 +1,551 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API-First Decoupling Spec &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SchemaForge: Curation Workbench" href="curation-workbench.html" />
+    <link rel="prev" title="Validation Rules — Interactive Rule Builder Spec" href="../platform/forge-validation-rules-spec.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API-First Decoupling Spec</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#preparatory-refactors-for-the-api-first-architecture">Preparatory Refactors for the API-First Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#purpose">Purpose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-five-refactors">The Five Refactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#r1-remove-st-session-state-from-core-storage-py">R1: Remove <code class="docutils literal notranslate"><span class="pre">st.session_state</span></code> from <code class="docutils literal notranslate"><span class="pre">core/storage.py</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#r2-extract-client-singletons-from-session-state">R2: Extract Client Singletons from Session State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#r3-add-user-id-org-id-fields-to-data-models">R3: Add <code class="docutils literal notranslate"><span class="pre">user_id</span></code> / <code class="docutils literal notranslate"><span class="pre">org_id</span></code> Fields to Data Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#r4-extract-wizard-orchestration-into-workflowservice">R4: Extract Wizard Orchestration into <code class="docutils literal notranslate"><span class="pre">WorkflowService</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#r5-document-implicit-api-contracts-in-pages">R5: Document Implicit API Contracts in Pages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sequencing-dependencies">Sequencing &amp; Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#relationship-to-existing-roadmap-phases">Relationship to Existing Roadmap Phases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-this-does-not-cover">What This Does NOT Cover</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#acceptance-criteria">Acceptance Criteria</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API-First Decoupling Spec</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/specs/api-first-decoupling.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-first-decoupling-spec">
+<h1>API-First Decoupling Spec<a class="headerlink" href="#api-first-decoupling-spec" title="Link to this heading"></a></h1>
+<section id="preparatory-refactors-for-the-api-first-architecture">
+<h2>Preparatory Refactors for the API-First Architecture<a class="headerlink" href="#preparatory-refactors-for-the-api-first-architecture" title="Link to this heading"></a></h2>
+<p><strong>Status:</strong> Pre-work — can begin during MVP deployment to initial organizations</p>
+<p><strong>Context:</strong> <a class="reference internal" href="../platform/forge-api-first-vision.html"><span class="std std-doc">forge-api-first-vision.md</span></a> · <a class="reference internal" href="../platform/forge-production-roadmap.html"><span class="std std-doc">forge-production-roadmap.md</span></a></p>
+</section>
+<hr class="docutils" />
+<section id="purpose">
+<h2>Purpose<a class="headerlink" href="#purpose" title="Link to this heading"></a></h2>
+<p>The current architecture has two FastAPI services (Registry, DataForge) that are well-structured, and a Streamlit app (forge-app) that contains significant business logic coupled to Streamlit’s session model. The roadmap moves toward React (Phase K) and an API-first architecture where every capability is accessible programmatically.</p>
+<p>This spec defines <strong>five targeted refactors</strong> that can be done incrementally — during or immediately after the MVP deployment — to reduce the cost of Phases G through K by roughly half. None of these changes alter user-facing behavior. All are internal.</p>
+</section>
+<hr class="docutils" />
+<section id="the-five-refactors">
+<h2>The Five Refactors<a class="headerlink" href="#the-five-refactors" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                    Low risk — do during MVP
+                    ────────────────────────
+    R1  Remove st.session_state from core/storage.py
+    R2  Extract client singletons from session state
+    R3  Add user_id / org_id fields to models
+
+                    Higher risk — do after MVP stabilizes
+                    ─────────────────────────────────────
+    R4  Extract wizard orchestration into WorkflowService
+    R5  Document implicit API contracts in pages
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="r1-remove-st-session-state-from-core-storage-py">
+<h2>R1: Remove <code class="docutils literal notranslate"><span class="pre">st.session_state</span></code> from <code class="docutils literal notranslate"><span class="pre">core/storage.py</span></code><a class="headerlink" href="#r1-remove-st-session-state-from-core-storage-py" title="Link to this heading"></a></h2>
+<p><strong>Problem:</strong> The storage layer reads <code class="docutils literal notranslate"><span class="pre">st.session_state[&quot;user_email&quot;]</span></code> directly to construct file paths. This means <code class="docutils literal notranslate"><span class="pre">core/storage.py</span></code> cannot be called from a FastAPI endpoint, a CLI, a test, or anything that isn’t Streamlit.</p>
+<p><strong>Current code:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># core/storage.py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_schema_project_dir</span><span class="p">(</span><span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">_CACHE_DIR</span> <span class="o">/</span> <span class="s2">&quot;schema_projects&quot;</span> <span class="o">/</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;user_email&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">project_id</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d</span>
+</pre></div>
+</div>
+<p><strong>Target:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_schema_project_dir</span><span class="p">(</span><span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">_CACHE_DIR</span> <span class="o">/</span> <span class="s2">&quot;schema_projects&quot;</span> <span class="o">/</span> <span class="n">user_id</span> <span class="o">/</span> <span class="n">project_id</span>
+    <span class="n">d</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">d</span>
+</pre></div>
+</div>
+<p><strong>Changes:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Change</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">core/storage.py</span></code></p></td>
+<td><p>Add <code class="docutils literal notranslate"><span class="pre">user_id:</span> <span class="pre">str</span></code> parameter to every public function. Remove all <code class="docutils literal notranslate"><span class="pre">st.session_state</span></code> references. Remove <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">streamlit</span> <span class="pre">as</span> <span class="pre">st</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pages/1_Schemas.py</span></code></p></td>
+<td><p>Pass <code class="docutils literal notranslate"><span class="pre">st.session_state[&quot;user_email&quot;]</span></code> at call sites.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pages/2_Data.py</span></code></p></td>
+<td><p>Same.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pages/3_Gold.py</span></code></p></td>
+<td><p>Same (if applicable).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tests/</span></code></p></td>
+<td><p>Update any test mocks — tests should become <em>simpler</em> since they no longer need to mock <code class="docutils literal notranslate"><span class="pre">st.session_state</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Risk:</strong> None. Pure signature change with no behavior change.</p>
+<p><strong>Priority:</strong> Highest-leverage change. Every future phase (G: Supabase migration, H: auth, K: React) needs a storage layer that doesn’t depend on Streamlit. Doing it now avoids compounding the coupling.</p>
+</section>
+<hr class="docutils" />
+<section id="r2-extract-client-singletons-from-session-state">
+<h2>R2: Extract Client Singletons from Session State<a class="headerlink" href="#r2-extract-client-singletons-from-session-state" title="Link to this heading"></a></h2>
+<p><strong>Problem:</strong> HTTP clients are cached in <code class="docutils literal notranslate"><span class="pre">st.session_state</span></code>, tying them to Streamlit’s lifecycle.</p>
+<p><strong>Current code:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># clients/registry_client.py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_registry_client</span><span class="p">(</span><span class="n">base_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RegistryClient</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">&quot;_registry_client&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">:</span>
+        <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;_registry_client&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">RegistryClient</span><span class="p">(</span><span class="n">base_url</span> <span class="ow">or</span> <span class="n">_default_url</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;_registry_client&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>Target:</strong> Module-level caching with <code class="docutils literal notranslate"><span class="pre">&#64;lru_cache</span></code> or a simple module variable:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">_registry_client</span><span class="p">:</span> <span class="n">RegistryClient</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_registry_client</span><span class="p">(</span><span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RegistryClient</span><span class="p">:</span>
+    <span class="k">global</span> <span class="n">_registry_client</span>
+    <span class="k">if</span> <span class="n">_registry_client</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_registry_client</span> <span class="o">=</span> <span class="n">RegistryClient</span><span class="p">(</span><span class="n">base_url</span> <span class="ow">or</span> <span class="n">_default_url</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">_registry_client</span>
+</pre></div>
+</div>
+<p><strong>Changes:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Change</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">clients/registry_client.py</span></code></p></td>
+<td><p>Replace <code class="docutils literal notranslate"><span class="pre">st.session_state</span></code> caching with module-level singleton. Remove <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">streamlit</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">clients/dataforge_client.py</span></code></p></td>
+<td><p>Same.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">clients/gold_client.py</span></code></p></td>
+<td><p>Same.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Any test that mocks <code class="docutils literal notranslate"><span class="pre">st.session_state</span></code> for clients</p></td>
+<td><p>Simplify to mock the module variable or use dependency injection.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Risk:</strong> None. Clients are stateless HTTP wrappers. Caching strategy doesn’t affect behavior.</p>
+</section>
+<hr class="docutils" />
+<section id="r3-add-user-id-org-id-fields-to-data-models">
+<h2>R3: Add <code class="docutils literal notranslate"><span class="pre">user_id</span></code> / <code class="docutils literal notranslate"><span class="pre">org_id</span></code> Fields to Data Models<a class="headerlink" href="#r3-add-user-id-org-id-fields-to-data-models" title="Link to this heading"></a></h2>
+<p><strong>Problem:</strong> When Phase H (auth) and Phase I (authorization) arrive, every model will need user/org ownership. Adding these fields later requires migrations, risks breaking serialization of existing data, and forces simultaneous changes across multiple services.</p>
+<p><strong>Target:</strong> Add nullable fields now. Don’t enforce them yet.</p>
+<p><strong>Changes:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Model</p></th>
+<th class="head"><p>File</p></th>
+<th class="head"><p>Field(s) to Add</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">SchemaProjectManifest</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">core/storage.py</span></code> or wherever defined</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">user_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DataProjectManifest</span></code></p></td>
+<td><p>same</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">user_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">CurationSession</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">core/curation/models.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">user_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">CuratedMatchSet</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">core/harmonization/models.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">user_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Submission</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/submission/models.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">user_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">org_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GoldDataset</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/gold/models.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">org_id:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>For Registry Service (PostgreSQL):</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Table</p></th>
+<th class="head"><p>Column</p></th>
+<th class="head"><p>Migration</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">schemas</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">owner_id</span> <span class="pre">UUID</span> <span class="pre">NULL</span></code></p></td>
+<td><p>Alembic migration, nullable</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">schemas</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">org_id</span> <span class="pre">UUID</span> <span class="pre">NULL</span></code></p></td>
+<td><p>Alembic migration, nullable</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Risk:</strong> Low. All fields are nullable with defaults. Existing data is unaffected. JSON serialization of Pydantic models handles <code class="docutils literal notranslate"><span class="pre">None</span></code> gracefully.</p>
+<p><strong>Priority:</strong> Adding a column to a Pydantic model is trivial. Adding a column to a PostgreSQL table with existing data is still easy but requires coordination. Doing both now means Phase H auth can simply start <em>populating</em> these fields instead of adding them.</p>
+</section>
+<hr class="docutils" />
+<section id="r4-extract-wizard-orchestration-into-workflowservice">
+<h2>R4: Extract Wizard Orchestration into <code class="docutils literal notranslate"><span class="pre">WorkflowService</span></code><a class="headerlink" href="#r4-extract-wizard-orchestration-into-workflowservice" title="Link to this heading"></a></h2>
+<p><strong>Problem:</strong> The 5-step schema curation wizard and 5-step data pipeline are encoded as conditional blocks in page files (<code class="docutils literal notranslate"><span class="pre">1_Schemas.py</span></code>, <code class="docutils literal notranslate"><span class="pre">2_Data.py</span></code>). Step transitions, validation of “can I move forward,” and available actions are all implicit in Streamlit callbacks. This logic cannot be reused by an API endpoint or a React frontend.</p>
+<p><strong>Target:</strong> A <code class="docutils literal notranslate"><span class="pre">WorkflowService</span></code> class that knows:</p>
+<ul class="simple">
+<li><p>What steps exist for a given workflow type</p></li>
+<li><p>What step a project is currently on</p></li>
+<li><p>What actions are available at the current step</p></li>
+<li><p>Whether a transition to the next step is valid (prerequisites met)</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># core/workflow.py</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">WorkflowType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">SCHEMA_CURATION</span> <span class="o">=</span> <span class="s2">&quot;schema_curation&quot;</span>
+    <span class="n">DATA_PIPELINE</span> <span class="o">=</span> <span class="s2">&quot;data_pipeline&quot;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">StepStatus</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">NOT_STARTED</span> <span class="o">=</span> <span class="s2">&quot;not_started&quot;</span>
+    <span class="n">IN_PROGRESS</span> <span class="o">=</span> <span class="s2">&quot;in_progress&quot;</span>
+    <span class="n">COMPLETE</span> <span class="o">=</span> <span class="s2">&quot;complete&quot;</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">WorkflowState</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">workflow_type</span><span class="p">:</span> <span class="n">WorkflowType</span>
+    <span class="n">current_step</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">steps</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">StepStatus</span><span class="p">]</span>
+    <span class="n">available_actions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">WorkflowService</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkflowState</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_advance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span> <span class="o">...</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">advance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkflowState</span><span class="p">:</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p><strong>The Streamlit pages become thin renderers:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Before (in page)</span>
+<span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_wizard_step&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;curate&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">element_curations</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="o">...</span><span class="p">):</span>
+        <span class="c1"># show &quot;Next&quot; button</span>
+        <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;Continue to Validation Rules&quot;</span><span class="p">):</span>
+            <span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;_wizard_step&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;rules&quot;</span>
+
+<span class="c1"># After (in page)</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">workflow_service</span><span class="o">.</span><span class="n">get_state</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">current_step</span> <span class="o">==</span> <span class="s2">&quot;curate&quot;</span><span class="p">:</span>
+    <span class="n">render_curate_step</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;advance&quot;</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">available_actions</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">st</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="s2">&quot;Continue to Validation Rules&quot;</span><span class="p">):</span>
+            <span class="n">workflow_service</span><span class="o">.</span><span class="n">advance</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Changes:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Change</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">core/workflow.py</span></code></p></td>
+<td><p><strong>New file.</strong> WorkflowService, WorkflowState, step definitions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pages/1_Schemas.py</span></code></p></td>
+<td><p>Replace inline step logic with WorkflowService calls. Reduce by ~200-400 lines.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pages/2_Data.py</span></code></p></td>
+<td><p>Same. Larger reduction (~300-500 lines).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tests/</span></code></p></td>
+<td><p>Add unit tests for WorkflowService (step transitions, prerequisites).</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Risk:</strong> Medium. Touching the page files risks regressions in the wizard flow. Mitigated by existing Journey A/B/C integration tests. Run the full test suite after each page is refactored.</p>
+<p><strong>Why after MVP:</strong> This refactor touches the most code and has the highest regression risk. Better to stabilize the MVP first, get user feedback on the workflows, then extract the now-proven logic.</p>
+<p><strong>Why it matters for Phase K:</strong> When you build the React frontend, you need an API that returns “here’s what step you’re on, here’s what you can do.” Without WorkflowService, the React team would be reverse-engineering this from 2,000-line Streamlit files.</p>
+</section>
+<hr class="docutils" />
+<section id="r5-document-implicit-api-contracts-in-pages">
+<h2>R5: Document Implicit API Contracts in Pages<a class="headerlink" href="#r5-document-implicit-api-contracts-in-pages" title="Link to this heading"></a></h2>
+<p><strong>Problem:</strong> The Streamlit pages contain hidden API design. Every time a page calls client X, transforms the result, and passes it to client Y, that’s an integration contract. These contracts are currently buried in UI code and will need to become explicit API endpoints (for the Harmonization API and Curation API that don’t exist yet).</p>
+<p><strong>Target:</strong> A markdown file that catalogs every backend interaction the pages perform, grouped by workflow step. Not a full API spec — just enough to inform one later.</p>
+<p><strong>Format:</strong></p>
+<div class="highlight-markdown notranslate"><div class="highlight"><pre><span></span><span class="gu">## Schema Curation Wizard</span>
+
+<span class="gu">### Step 1: Upload</span>
+<span class="k">-</span><span class="w"> </span>Parse file → <span class="sb">`core/curation/parser.parse_uploaded_file(bytes, filename)`</span>
+<span class="k">-</span><span class="w"> </span>Returns: <span class="sb">`list[RawElement]`</span>
+<span class="k">-</span><span class="w"> </span>Side effect: Creates <span class="sb">`CurationSession`</span>, saves to storage
+
+<span class="gu">### Step 2: Configure</span>
+<span class="k">-</span><span class="w"> </span>For each element: read <span class="sb">`session.element_curations[var_name]`</span>
+<span class="k">-</span><span class="w"> </span>AI suggestions: <span class="sb">`AISuggestionService.get_suggestions(elements, schema_context)`</span>
+<span class="k">-</span><span class="w"> </span>Duplicate detection: <span class="sb">`DuplicateDetector.find_duplicates(elements)`</span>
+...
+</pre></div>
+</div>
+<p><strong>Changes:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Change</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">docs/specs/api-contracts.md</span></code></p></td>
+<td><p><strong>New file.</strong> Catalog of every backend call made by each page, per workflow step.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Risk:</strong> None. Documentation only.</p>
+<p><strong>Why it matters:</strong> This becomes the requirements doc for the Harmonization API and Curation API. Without it, building those APIs means re-reading thousands of lines of Streamlit code.</p>
+</section>
+<hr class="docutils" />
+<section id="sequencing-dependencies">
+<h2>Sequencing &amp; Dependencies<a class="headerlink" href="#sequencing-dependencies" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>        Low risk (during MVP)           Higher risk (after MVP stabilizes)
+        ─────────────────────           ─────────────────────────────────
+
+        ┌─────┐  ┌─────┐
+        │ R1  │  │ R2  │               Independent, can be
+        └──┬──┘  └──┬──┘               done in parallel
+           │        │
+        ┌──▼────────▼──┐
+        │     R3        │               Benefits from R1
+        └───────────────┘               (user_id param exists)
+
+                                        ┌─────────────┐
+                                        │     R5      │    Do first
+                                        └──────┬──────┘
+                                               │
+                                        ┌──────▼──────┐
+                                        │     R4      │    Informed by R5
+                                        └─────────────┘    (contract catalog)
+</pre></div>
+</div>
+<p><strong>R1 + R2</strong> are independent, can be done in the same PR or separate. No functional change, trivial review.</p>
+<p><strong>R3</strong> benefits from R1 being done (since <code class="docutils literal notranslate"><span class="pre">user_id</span></code> is already a parameter in storage functions), but isn’t strictly blocked by it.</p>
+<p><strong>R5</strong> (documentation) can happen anytime. Best done before R4 so the WorkflowService design is informed by the actual call sequences.</p>
+<p><strong>R4</strong> is the big one. Do it after the MVP is stable and after R5 gives you the contract catalog.</p>
+</section>
+<hr class="docutils" />
+<section id="relationship-to-existing-roadmap-phases">
+<h2>Relationship to Existing Roadmap Phases<a class="headerlink" href="#relationship-to-existing-roadmap-phases" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Refactor</p></th>
+<th class="head"><p>Directly reduces cost of</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>R1 (storage decoupling)</p></td>
+<td><p>Phase G (Supabase migration — storage layer is already parameterized)</p></td>
+</tr>
+<tr class="row-odd"><td><p>R2 (client singletons)</p></td>
+<td><p>Phase K (React — clients are reusable outside Streamlit)</p></td>
+</tr>
+<tr class="row-even"><td><p>R3 (user_id / org_id fields)</p></td>
+<td><p>Phase H (auth) and Phase I (authorization — fields already exist)</p></td>
+</tr>
+<tr class="row-odd"><td><p>R4 (WorkflowService)</p></td>
+<td><p>Phase K (React — workflow state is API-exposable)</p></td>
+</tr>
+<tr class="row-even"><td><p>R5 (contract docs)</p></td>
+<td><p>New Harmonization API + Curation API (spec already written)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="what-this-does-not-cover">
+<h2>What This Does NOT Cover<a class="headerlink" href="#what-this-does-not-cover" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Harmonization API design</strong> — a separate spec. R5 produces the input for it.</p></li>
+<li><p><strong>Curation API design</strong> — same.</p></li>
+<li><p><strong>Auth implementation</strong> — still Phase H. R3 just pre-stages the model fields.</p></li>
+<li><p><strong>Supabase migration</strong> — still Phase G. R1 just makes storage swappable.</p></li>
+<li><p><strong>React frontend</strong> — still Phase K. R4 just ensures the backend is ready for it.</p></li>
+</ul>
+<p>This spec is explicitly about <strong>reducing coupling now</strong> so those future phases are cheaper and less risky.</p>
+</section>
+<hr class="docutils" />
+<section id="acceptance-criteria">
+<h2>Acceptance Criteria<a class="headerlink" href="#acceptance-criteria" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Refactor</p></th>
+<th class="head"><p>Done when</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>R1</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">core/storage.py</span></code> has zero <code class="docutils literal notranslate"><span class="pre">streamlit</span></code> imports. All tests pass.</p></td>
+</tr>
+<tr class="row-odd"><td><p>R2</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">clients/*.py</span></code> have zero <code class="docutils literal notranslate"><span class="pre">streamlit</span></code> imports. All tests pass.</p></td>
+</tr>
+<tr class="row-even"><td><p>R3</p></td>
+<td><p>All listed models have nullable <code class="docutils literal notranslate"><span class="pre">user_id</span></code>/<code class="docutils literal notranslate"><span class="pre">org_id</span></code>. Registry migration applied. All tests pass.</p></td>
+</tr>
+<tr class="row-odd"><td><p>R4</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">core/workflow.py</span></code> exists with tests. Pages delegate step logic to it. Journey A/B/C tests pass.</p></td>
+</tr>
+<tr class="row-even"><td><p>R5</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">docs/specs/api-contracts.md</span></code> exists and covers all page workflows.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../platform/forge-validation-rules-spec.html" class="btn btn-neutral float-left" title="Validation Rules — Interactive Rule Builder Spec" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="curation-workbench.html" class="btn btn-neutral float-right" title="SchemaForge: Curation Workbench" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

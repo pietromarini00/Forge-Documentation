@@ -1,0 +1,643 @@
+# Forge Platform — Roles, Permissions & Governance
+
+## Specification v0.1
+
+---
+
+## Executive Summary
+
+This spec defines the authorization model for the Forge platform: **who can do what, where, and how resources are shared.** It covers organizations, user roles, project-level permissions, schema versioning governance, and compliance workflows.
+
+The model is designed JSON-first (for the current file-based backend) and maps directly to Supabase/PostgreSQL tables with Row-Level Security when that migration happens.
+
+**Key design principles:**
+
+- **Org-scoped resources.** Every schema, project, and dataset belongs to an org.
+- **Personal orgs.** Every user gets an implicit single-member org for solo work.
+- **Two project types** with distinct role sets: Schema Projects (curation) and Data Projects (harmonization + validation).
+- **Creator-as-manager.** Whoever creates a resource automatically manages it.
+- **Accepted data is never silently invalidated.** Schema upgrades flag non-compliance; humans decide what to do.
+
+---
+
+## Entity Model
+
+### Overview
+
+```
+User
+ └─ personal_org ──→ Org (is_personal=true)
+
+Org
+ ├─ OrgMembership[] ──→ User (role: owner|manager|member)
+ ├─ SchemaProject[]
+ │   ├─ ProjectMembership[] ──→ User (role: manager|contributor)
+ │   └─ output ──→ PublishedSchema (in Registry)
+ └─ DataProject[]
+     ├─ ProjectMembership[] ──→ User (role: manager|submitter|reviewer)
+     ├─ harmonization mappings
+     └─ submissions (DataForge lifecycle)
+
+PublishedSchema
+ ├─ org_id (owner org)
+ ├─ visibility: private|public
+ └─ versions[]
+
+ElementProposal (Phase 5+)
+ ├─ source: DataProject
+ ├─ target: PublishedSchema
+ └─ status: pending|approved|rejected
+```
+
+---
+
+### User
+
+A person with an account on the platform.
+
+```
+User:
+  id:              uuid
+  email:           str (unique)
+  name:            str
+  personal_org_id: uuid → Org
+  created_at:      datetime
+```
+
+On signup, a personal org is automatically created and linked. The user is the `owner` of their personal org.
+
+---
+
+### Org
+
+A team or workspace that shares resources. Every user has a personal org; team orgs are created explicitly.
+
+```
+Org:
+  id:          uuid
+  name:        str
+  slug:        str (unique, url-friendly, lowercase)
+  is_personal: bool
+  created_by:  uuid → User
+  created_at:  datetime
+```
+
+**Rules:**
+
+- Any user can create a team org.
+- Personal orgs are auto-created on signup, named after the user.
+- `slug` is used in URLs and must match `^[a-z0-9_-]+$`.
+- Deleting an org is a destructive action requiring owner confirmation (future).
+
+---
+
+### OrgMembership
+
+Links a user to an org with a role.
+
+```
+OrgMembership:
+  org_id:    uuid → Org
+  user_id:   uuid → User
+  role:      "owner" | "manager" | "member"
+  added_by:  uuid → User
+  added_at:  datetime
+```
+
+**Org Roles:**
+
+| Role | Description |
+|------|-------------|
+| **Owner** | Full control. Can delete org, transfer ownership, manage all members and projects. Every org has at least one owner. |
+| **Manager** | Can create projects, invite/remove members (except owners), manage schemas. Cannot delete the org. |
+| **Member** | Can browse org schemas, be added to projects. Cannot create projects or invite others unless granted project-level roles. |
+
+**Rules:**
+
+- The org creator is automatically assigned `owner`.
+- An org must always have at least one `owner`.
+- For personal orgs, the user is the sole `owner`; they can invite others as `manager` or `member`.
+- Adding a user to an org requires `owner` or `manager` role.
+- Removing a user from an org removes them from all projects within that org.
+
+---
+
+### SchemaProject
+
+A workspace for curating and publishing a canonical schema. Output is a versioned schema in the Registry.
+
+```
+SchemaProject:
+  id:                   uuid
+  org_id:               uuid → Org
+  name:                 str
+  status:               "draft" | "published"
+  published_schema_id:  uuid → PublishedSchema (set after first publish)
+  created_by:           uuid → User
+  created_at:           datetime
+```
+
+**Rules:**
+
+- Only org `owner` or `manager` can create schema projects.
+- Creator is automatically assigned `manager` role on the project.
+- A schema project can publish multiple versions over its lifetime.
+- `status` reflects whether any version has been published yet.
+
+---
+
+### DataProject
+
+A workspace for harmonizing source data to a schema and managing data submissions through validation and QC.
+
+```
+DataProject:
+  id:                     uuid
+  org_id:                 uuid → Org
+  name:                   str
+  status:                 "active" | "archived"
+  schema_id:              uuid → PublishedSchema
+  schema_version:         str (pinned version, e.g., "2.0")
+  schema_upgraded_at:     datetime | null
+  schema_upgraded_by:     uuid → User | null
+  created_by:             uuid → User
+  created_at:             datetime
+```
+
+**Rules:**
+
+- Any org member (including `member` role) can create data projects. This is intentional — members are typically data contributors who need to set up their own harmonization/submission workspaces.
+- Creator is automatically assigned `manager` role on the project.
+- `schema_version` is pinned at project creation and only updated through the explicit upgrade workflow (see Schema Version Governance below).
+
+---
+
+### ProjectMembership
+
+Links a user to a project with a role. Roles differ by project type.
+
+```
+ProjectMembership:
+  project_id:   uuid → SchemaProject | DataProject
+  project_type: "schema" | "data"
+  user_id:      uuid → User
+  role:         str (see below)
+  added_by:     uuid → User
+  added_at:     datetime
+```
+
+**Schema Project Roles:**
+
+| Role | Description |
+|------|-------------|
+| **Manager** | Full curation control: edit elements, configure schema, publish versions, manage project members. |
+| **Contributor** | Can suggest additions or changes to elements. Suggestions go into a review queue for managers to approve or reject. |
+
+**Data Project Roles:**
+
+| Role | Description |
+|------|-------------|
+| **Manager** | Full control: configure project, run harmonization, upload data, review/accept/reject submissions, manage project members. Superset of all other roles. |
+| **Submitter** | Can run harmonization (map fields), upload data submissions, view validation results for own submissions, propose new schema elements. |
+| **Reviewer** | Can view all submissions in the project, claim submissions for review, accept or reject submissions. |
+
+**Rules:**
+
+- A user has exactly **one role** per project. No multi-role assignments. If someone needs to both submit and review, they should be a `manager`.
+- Only project `manager` (or org `owner`/`manager`) can add/remove project members.
+- A user must be an org member before they can be added to a project within that org.
+
+---
+
+### PublishedSchema
+
+A schema published to the Registry. Owned by an org, optionally visible to all.
+
+```
+PublishedSchema:
+  id:            uuid
+  org_id:        uuid → Org
+  name:          str
+  slug:          str (unique, matches ^[a-z0-9_-]+$)
+  visibility:    "private" | "public"
+  current_version: str
+  published_by:  uuid → User
+  created_at:    datetime
+```
+
+**Visibility:**
+
+| Level | Who can see | Who can use as harmonization target |
+|-------|------------|-------------------------------------|
+| **Private** | Only members of the owning org | Only members of the owning org |
+| **Public** | Anyone on the platform (read-only browse) | Anyone — can link as target in their own Data Projects |
+
+**Rules:**
+
+- Visibility is set at publish time and can be changed by schema project managers or org owners/managers.
+- Public schemas are read-only to non-org users. Only the owning org can publish new versions.
+- Using a public schema as a harmonization target does not grant any access to the owning org's other resources.
+
+---
+
+### Submission (extended)
+
+Extends the existing DataForge Submission model with governance fields.
+
+```
+Submission:
+  ...existing DataForge fields (id, study, status, etc.)...
+
+  # Governance additions
+  validated_against_version:  str          # schema version at validation time
+  compliance_status:          "compliant" | "non_compliant" | "exempt" | null
+  compliance_checked_at:      datetime | null
+  compliance_reviewed_by:     uuid → User | null
+  compliance_note:            str | null   # reason for exemption
+  superseded_by:              uuid → Submission | null  # pointer to correction
+```
+
+See **Schema Version Governance** section below for how these fields are used.
+
+---
+
+### ElementProposal (Phase 5+)
+
+Allows Data Project users to propose new elements for a schema they're harmonizing against. Modeled now, built later.
+
+```
+ElementProposal:
+  id:                       uuid
+  source_data_project_id:   uuid → DataProject
+  target_schema_id:         uuid → PublishedSchema
+  proposed_by:              uuid → User
+  element_name:             str
+  element_type:             str (string, integer, float, etc.)
+  description:              str
+  constraints:              dict | null (allowed_values, range, etc.)
+  justification:            str (why this element is needed)
+  status:                   "pending" | "approved" | "rejected"
+  reviewed_by:              uuid → User | null
+  reviewed_at:              datetime | null
+  review_notes:             str | null
+  created_at:               datetime
+```
+
+**Workflow (Phase 5+):**
+
+1. During harmonization, a submitter encounters a source field with no match.
+2. They click "Propose New Element" — fills in name, type, description, justification.
+3. Proposal is created, linked to the Data Project and target schema.
+4. Schema Project managers see proposals in their review queue.
+5. Manager approves (element added to next schema version) or rejects (with explanation).
+6. Proposer is notified of the outcome.
+
+**Rules:**
+
+- Any Data Project `manager` or `submitter` can create proposals for the schema their project is linked to.
+- Only Schema Project `manager` can approve or reject proposals.
+- Approved proposals don't auto-publish — they're queued for the next schema version.
+
+---
+
+## Permission Matrix
+
+### Org-Level Permissions
+
+| Action | Owner | Manager | Member |
+|--------|:-----:|:-------:|:------:|
+| Delete org | x | | |
+| Transfer ownership | x | | |
+| Manage org settings | x | x | |
+| Invite / remove members | x | x | |
+| Change member roles | x | x* | |
+| Create schema project | x | x | |
+| Create data project | x | x | x |
+| Browse org schemas | x | x | x |
+| View all org projects | x | x | |
+| View own projects | x | x | x |
+
+*Managers can change roles up to `manager` but cannot promote to `owner` or demote other managers/owners.
+
+### Schema Project Permissions
+
+| Action | Manager | Contributor |
+|--------|:-------:|:-----------:|
+| Edit schema elements | x | |
+| Configure schema metadata | x | |
+| Publish schema version | x | |
+| Set schema visibility | x | |
+| Suggest element additions/changes | x | x |
+| Review suggestions | x | |
+| Manage project members | x | |
+| View schema (read-only) | x | x |
+
+### Data Project Permissions
+
+| Action | Manager | Submitter | Reviewer |
+|--------|:-------:|:---------:|:--------:|
+| Configure project (link schema, settings) | x | | |
+| Manage project members | x | | |
+| Upgrade schema version | x | | |
+| Run compliance sweep | x | | |
+| Run harmonization (map fields) | x | x | |
+| Upload data submissions | x | x | |
+| View own submissions | x | x | |
+| View all submissions | x | | x |
+| Propose new schema element | x | x | |
+| Claim submission for review | x | | x |
+| Accept / reject submission | x | | x |
+| Exempt submission from compliance | x | | |
+
+**Note:** A submitter can only view their own submissions. Reviewers and managers can view all submissions in the project. This supports separation of duties — submitters from different sites don't see each other's data.
+
+---
+
+## Permission Resolution Logic
+
+Permissions are resolved with a simple cascade:
+
+```
+can_do(user, action, resource):
+
+  1. Identify the org that owns the resource.
+  2. Check OrgMembership:
+     - If user has no org membership → DENY
+     - If action is org-level → check org role → ALLOW or DENY
+  3. Check ProjectMembership:
+     - If user has no project membership:
+       - Org owner/manager can VIEW any project (read-only admin access)
+       - Otherwise → DENY
+     - If user has project membership → check project role against action → ALLOW or DENY
+
+  Special rules:
+  - Org owner/manager can always manage project membership (even without a ProjectMembership record)
+  - Org owner can override any project-level decision (emergency access)
+  - Public schema browse does not require org membership
+```
+
+For the JSON backend, this is a simple function that loads the relevant membership records and checks roles. For Supabase, it maps to RLS policies on each table.
+
+---
+
+## Schema Version Governance
+
+### Version Pinning
+
+Every Data Project pins to a specific schema version at creation time. This ensures validation consistency — all submissions within a project are validated against the same schema definition.
+
+```
+DataProject:
+  schema_id: "gp2-clinical"
+  schema_version: "2.0"  ← pinned
+```
+
+### Upgrade Detection
+
+Upgrade detection is **computed at render time**, not stored. When the UI loads a Data Project:
+
+```python
+pinned = project.schema_version          # "2.0"
+latest = registry.get_latest_version(project.schema_id)  # "2.1"
+
+if latest > pinned:
+    show_upgrade_banner(pinned, latest)
+```
+
+No notification infrastructure needed. Works identically on JSON and Supabase backends.
+
+### Version Diff
+
+When a manager considers upgrading, the system computes a diff between the pinned and latest versions:
+
+```
+SchemaVersionDiff:
+  from_version:      str
+  to_version:        str
+  changes: [
+    {
+      element:      str        # element name
+      change_type:  str        # added | removed | modified
+      breaking:     bool       # see classification below
+      field:        str | null # which field changed (for modifications)
+      old_value:    any | null
+      new_value:    any | null
+    }
+  ]
+  has_breaking_changes: bool   # convenience flag
+```
+
+**Breaking Change Classification:**
+
+| Change | Breaking? | Why |
+|--------|:---------:|-----|
+| New optional element added | No | Existing data unaffected |
+| Description or label updated | No | No impact on data validity |
+| Constraint loosened (range widened, values added) | No | Previously valid data is still valid |
+| Constraint tightened (range narrowed, values removed) | **Yes** | Previously valid data may now fail |
+| Allowed values changed | **Yes** | Old values no longer valid |
+| Element type changed | **Yes** | Old data may not parse |
+| Required field added | **Yes** | Old submissions may lack this field |
+| Element removed | **Yes** | Mapped fields reference something that no longer exists |
+
+The diff is computed from Registry version history — not stored separately.
+
+### Upgrade Workflow
+
+#### Path A: Non-Breaking Changes Only
+
+```
+Manager clicks "Upgrade to v2.1"
+  → Pinned version updated
+  → Harmonization: new unmapped elements flagged ("new in v2.1")
+  → Pending submissions: re-validate against v2.1
+  → Accepted submissions: no change needed
+  → Done
+```
+
+#### Path B: Breaking Changes Detected
+
+```
+Manager clicks "Upgrade to v2.1"
+  → Diff computed, breaking changes found
+  → Warning shown with change details
+  → Manager confirms → Upgrade proceeds + Compliance Sweep triggered
+```
+
+### Compliance Sweep
+
+A compliance sweep re-validates all accepted submissions against the new schema version. It is **read-only** — no submission statuses change automatically.
+
+**Trigger:** Automatically offered when upgrading with breaking changes. Can also be run manually by a manager at any time.
+
+**Process:**
+
+1. Load all accepted submissions in the project.
+2. Re-validate each against the new schema version.
+3. For each submission, compute: would it pass or fail under the new rules?
+4. Generate a Compliance Report.
+
+**Compliance Report:**
+
+```
+Schema Upgrade Compliance: v2.0 → v2.1
+──────────────────────────────────────
+
+12 accepted submissions re-validated
+
+  Compliant:      3  (pass under new schema)
+  Non-compliant:  9  (would fail under new schema)
+
+Non-compliant submissions:
+
+  S-012 (Site-A): "sex" — 48 rows contain "male" (not in new allowed values)
+  S-015 (Site-A): "sex" — 31 rows contain "male"
+  S-023 (Site-B): "sex" — 62 rows contain "female"
+  ...
+```
+
+### Resolution Strategies
+
+For each non-compliant submission, the manager chooses a resolution:
+
+| Strategy | Description | Effect |
+|----------|-------------|--------|
+| **Request correction** | Send back to original submitter for re-submission with corrected values. | `compliance_status = "non_compliant"`, submitter notified. Original submission's `superseded_by` will point to the new submission once resubmitted. |
+| **Exempt** | Accept the non-compliance with a documented reason. | `compliance_status = "exempt"`, `compliance_note` recorded, `compliance_reviewed_by` set. |
+| **Apply transform** *(Phase 5+)* | Auto-remap values based on a mapping table (e.g., `male → 1`). | Creates a new submission version with transformed values. Original preserved in history. |
+
+**Rules:**
+
+- Only Data Project `manager` can resolve compliance issues.
+- `exempt` requires a written note (enforced by UI).
+- All resolutions are recorded in the audit trail.
+- `Request correction` uses the existing reject/resubmit workflow — no new submission lifecycle needed.
+- Accepted data is **never silently invalidated**. Every status change requires a human decision.
+
+### Submission Lifecycle with Compliance
+
+```
+                                    ┌──────────────────────┐
+                                    │     Schema Upgrade    │
+                                    │   (breaking change)   │
+                                    └──────────┬───────────┘
+                                               │
+                                               ▼
+                                    ┌──────────────────────┐
+                                    │   Compliance Sweep    │
+                                    │   (re-validate all)   │
+                                    └──────────┬───────────┘
+                                               │
+                              ┌────────────────┼────────────────┐
+                              │                │                │
+                              ▼                ▼                ▼
+                        ┌──────────┐    ┌──────────┐    ┌──────────┐
+                        │Compliant │    │  Exempt  │    │ Request  │
+                        │ (no-op)  │    │ (noted)  │    │Correction│
+                        └──────────┘    └──────────┘    └────┬─────┘
+                                                             │
+                                                             ▼
+                                                    ┌──────────────┐
+                                                    │  Submitter   │
+                                                    │ fixes & re-  │
+                                                    │ submits      │
+                                                    └──────┬───────┘
+                                                           │
+                                                           ▼
+                                                    ┌──────────────┐
+                                                    │  Normal QC   │
+                                                    │  review flow │
+                                                    └──────────────┘
+```
+
+---
+
+## JSON Backend Implementation Notes
+
+For the current file-based backend, these entities map to JSON files:
+
+```
+.forge/
+├── users/
+│   └── {user_id}.json              # User profile
+├── orgs/
+│   ├── {org_id}/
+│   │   ├── org.json                # Org metadata
+│   │   ├── members.json            # OrgMembership[]
+│   │   ├── schema-projects/
+│   │   │   └── {project_id}/
+│   │   │       ├── project.json    # SchemaProject metadata
+│   │   │       └── members.json    # ProjectMembership[]
+│   │   └── data-projects/
+│   │       └── {project_id}/
+│   │           ├── project.json    # DataProject metadata
+│   │           ├── members.json    # ProjectMembership[]
+│   │           └── compliance/
+│   │               └── sweep_{timestamp}.json  # Compliance reports
+│   └── index.json                  # Org listing for quick lookup
+└── proposals/
+    └── {proposal_id}.json          # ElementProposal (Phase 5+)
+```
+
+Permission checks are simple function calls that load the relevant JSON files and check role fields. No middleware or framework needed.
+
+### Supabase Migration Path
+
+Each JSON entity maps 1:1 to a Supabase table:
+
+| JSON File | Supabase Table | RLS Policy |
+|-----------|---------------|------------|
+| `users/{id}.json` | `users` | User can read/write own row |
+| `orgs/{id}/org.json` | `orgs` | Members can read; owner/manager can write |
+| `orgs/{id}/members.json` | `org_memberships` | Members can read; owner/manager can insert/delete |
+| `schema-projects/{id}/project.json` | `schema_projects` | Project members can read; manager can write |
+| `data-projects/{id}/project.json` | `data_projects` | Project members can read; manager can write |
+| `*/members.json` | `project_memberships` | Project members can read; manager can write |
+| `proposals/{id}.json` | `element_proposals` | Creator can read/write; schema manager can review |
+
+The permission resolution logic (see above) translates directly to Supabase RLS policies using `auth.uid()` and membership lookups.
+
+---
+
+## Audit Trail
+
+All permission-sensitive actions are logged:
+
+```
+AuditEntry:
+  id:          uuid
+  timestamp:   datetime
+  actor_id:    uuid → User
+  org_id:      uuid → Org
+  project_id:  uuid | null → Project
+  action:      str (see below)
+  target_type: str (org|project|schema|submission|membership|proposal)
+  target_id:   uuid
+  details:     dict (action-specific metadata)
+```
+
+**Audited Actions:**
+
+| Category | Actions |
+|----------|---------|
+| Org management | `org.created`, `org.member_added`, `org.member_removed`, `org.member_role_changed` |
+| Schema projects | `schema_project.created`, `schema.published`, `schema.visibility_changed` |
+| Data projects | `data_project.created`, `data_project.schema_upgraded`, `data_project.archived` |
+| Project membership | `project.member_added`, `project.member_removed`, `project.member_role_changed` |
+| Submissions | `submission.uploaded`, `submission.validated`, `submission.claimed`, `submission.accepted`, `submission.rejected` |
+| Compliance | `compliance.sweep_run`, `compliance.exempted`, `compliance.correction_requested` |
+| Proposals | `proposal.created`, `proposal.approved`, `proposal.rejected` |
+
+---
+
+## Open Items & Future Considerations
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Element Proposals (suggest from harmonization) | **Phase 5+** | Entity modeled, UI deferred. Critical for multi-site workflows. |
+| Apply Transform (auto-remap on compliance) | **Phase 5+** | Powerful but complex. Requires value mapping UI and new submission versioning. |
+| Org billing / quotas | **Future** | Not relevant until hosted/SaaS model. |
+| Cross-org collaboration | **Future** | Orgs can share via public schemas. Direct cross-org project sharing deferred. |
+| Fine-grained field-level permissions | **Not planned** | Adds complexity without clear need. Role-based access is sufficient. |
+| Invitation accept/reject flow | **Supabase phase** | JSON backend: direct add. Supabase: add email invite → accept flow. |
+| SSO / institutional login | **Supabase phase** | Supabase Auth supports Google, SAML. Layer on after base auth. |

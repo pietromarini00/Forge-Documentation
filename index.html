@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forge Documentation &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Harmonization Engine - Cloud Run Deployment Guide" href="guides/deployment.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="specs/api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specs/curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specs/dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specs/harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specs/registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specs/roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Forge Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="forge-documentation">
+<h1>Forge Documentation<a class="headerlink" href="#forge-documentation" title="Link to this heading"></a></h1>
+<p>This site documents Forge Python APIs and functions from the app client and core layers.</p>
+<p>For platform/product specs, see the Markdown docs under:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">../platform</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">../specs</span></code></p></li>
+</ul>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="guides/deployment.html#table-of-contents">Table of Contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/deployment.html#quick-start-5-minutes">Quick Start (5 Minutes)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/deployment.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/deployment.html#automated-setup">Automated Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/deployment.html#manual-setup">Manual Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/deployment.html#configuration-options">Configuration Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/deployment.html#monitoring-and-logging">Monitoring and Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/deployment.html#troubleshooting">Troubleshooting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/deployment.html#cost-optimization">Cost Optimization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/deployment.html#security-best-practices">Security Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/deployment.html#ci-cd-pipeline">CI/CD Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/deployment.html#rollback-procedure">Rollback Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/deployment.html#next-steps-after-deployment">Next Steps After Deployment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="guides/deployment.html#support-and-maintenance">Support and Maintenance</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-api-first-vision.html">Forge — API-First Platform Vision</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-api-first-vision.html#the-problem">The Problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-api-first-vision.html#the-insight">The Insight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-api-first-vision.html#architecture-api-core-pluggable-clients">Architecture: API Core + Pluggable Clients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-api-first-vision.html#core-apis">Core APIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-api-first-vision.html#what-makes-this-defensible">What Makes This Defensible</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-api-first-vision.html#deployment-tiers">Deployment Tiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-api-first-vision.html#near-term-roadmap">Near-Term Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-api-first-vision.html#positioning">Positioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-api-first-vision.html#summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-executive-summary.html">Forge</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-executive-summary.html#the-problem">The Problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-executive-summary.html#the-solution">The Solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-executive-summary.html#schemaforge">SchemaForge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-executive-summary.html#dataforge">DataForge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-executive-summary.html#the-handoff">The Handoff</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-executive-summary.html#target-users">Target Users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-executive-summary.html#why-this-architecture">Why This Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-executive-summary.html#summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-identifier-scheme-spec.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-identifier-scheme-spec.html#problem-statement">Problem Statement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-identifier-scheme-spec.html#design">Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-identifier-scheme-spec.html#use-case-walkthroughs">Use Case Walkthroughs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-identifier-scheme-spec.html#implementation">Implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-identifier-scheme-spec.html#api-changes">API Changes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-identifier-scheme-spec.html#migration">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-identifier-scheme-spec.html#verification">Verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-identifier-scheme-spec.html#future-enhancements-out-of-scope">Future Enhancements (Out of Scope)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-production-roadmap.html">Forge Production Roadmap</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-production-roadmap.html#from-cde-engine-to-forge-platform">From CDE Engine to Forge Platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-production-roadmap.html#how-cde-engine-maps-to-forge">How CDE Engine Maps to Forge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-production-roadmap.html#current-state">Current State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-production-roadmap.html#production-roadmap">Production Roadmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-production-roadmap.html#phased-timeline">Phased Timeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-production-roadmap.html#immediate-priorities">Immediate Priorities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-production-roadmap.html#decision-points">Decision Points</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-production-roadmap.html#success-metrics">Success Metrics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-unified-app-spec.html">Forge Unified App — MVP Specification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-unified-app-spec.html#overview">1. Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-unified-app-spec.html#architecture">2. Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-unified-app-spec.html#data-model-two-project-types">3. Data Model: Two Project Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-unified-app-spec.html#page-specifications">4. Page Specifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-unified-app-spec.html#navigation-shared-components">5. Navigation &amp; Shared Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-unified-app-spec.html#user-journeys">6. User Journeys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-unified-app-spec.html#dataforge-registry-integration">7. DataForge ↔ Registry Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-unified-app-spec.html#technical-implementation">8. Technical Implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-unified-app-spec.html#implementation-phases">9. Implementation Phases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-unified-app-spec.html#decisions-resolved">10. Decisions (Resolved)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-unified-app-spec.html#success-criteria">11. Success Criteria</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-validation-rules-spec.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-validation-rules-spec.html#background">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-validation-rules-spec.html#design">Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-validation-rules-spec.html#ui-layout-step-4-validation-rules">UI Layout — Step 4: Validation Rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-validation-rules-spec.html#step-5-publish-updated">Step 5: Publish (Updated)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-validation-rules-spec.html#files-to-modify">Files to Modify</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-validation-rules-spec.html#end-to-end-data-flow">End-to-End Data Flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-validation-rules-spec.html#verification">Verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="platform/forge-validation-rules-spec.html#future-enhancements-out-of-scope">Future Enhancements (Out of Scope)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="specs/api-first-decoupling.html">API-First Decoupling Spec</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="specs/api-first-decoupling.html#preparatory-refactors-for-the-api-first-architecture">Preparatory Refactors for the API-First Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/api-first-decoupling.html#purpose">Purpose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/api-first-decoupling.html#the-five-refactors">The Five Refactors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/api-first-decoupling.html#r1-remove-st-session-state-from-core-storage-py">R1: Remove <code class="docutils literal notranslate"><span class="pre">st.session_state</span></code> from <code class="docutils literal notranslate"><span class="pre">core/storage.py</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/api-first-decoupling.html#r2-extract-client-singletons-from-session-state">R2: Extract Client Singletons from Session State</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/api-first-decoupling.html#r3-add-user-id-org-id-fields-to-data-models">R3: Add <code class="docutils literal notranslate"><span class="pre">user_id</span></code> / <code class="docutils literal notranslate"><span class="pre">org_id</span></code> Fields to Data Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/api-first-decoupling.html#r4-extract-wizard-orchestration-into-workflowservice">R4: Extract Wizard Orchestration into <code class="docutils literal notranslate"><span class="pre">WorkflowService</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/api-first-decoupling.html#r5-document-implicit-api-contracts-in-pages">R5: Document Implicit API Contracts in Pages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/api-first-decoupling.html#sequencing-dependencies">Sequencing &amp; Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/api-first-decoupling.html#relationship-to-existing-roadmap-phases">Relationship to Existing Roadmap Phases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/api-first-decoupling.html#what-this-does-not-cover">What This Does NOT Cover</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/api-first-decoupling.html#acceptance-criteria">Acceptance Criteria</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="specs/curation-workbench.html">SchemaForge: Curation Workbench</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="specs/curation-workbench.html#product-specification-v1-0">Product Specification v1.0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/curation-workbench.html#executive-summary">Executive Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/curation-workbench.html#problem-statement">Problem Statement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/curation-workbench.html#solution">Solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/curation-workbench.html#target-users">Target Users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/curation-workbench.html#core-workflow">Core Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/curation-workbench.html#key-features">Key Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/curation-workbench.html#data-model">Data Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/curation-workbench.html#technical-architecture">Technical Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/curation-workbench.html#implementation-phases">Implementation Phases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/curation-workbench.html#success-metrics">Success Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/curation-workbench.html#integration-with-forge-ecosystem">Integration with Forge Ecosystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/curation-workbench.html#open-questions">Open Questions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/curation-workbench.html#related-documentation">Related Documentation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="specs/dataforge.html">DataForge</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="specs/dataforge.html#product-specification-v0-1">Product Specification v0.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/dataforge.html#executive-summary">Executive Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/dataforge.html#problem-statement">Problem Statement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/dataforge.html#solution">Solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/dataforge.html#target-users">Target Users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/dataforge.html#core-concepts">Core Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/dataforge.html#features">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/dataforge.html#api-design">API Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/dataforge.html#integration-with-schemaforge">Integration with SchemaForge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/dataforge.html#data-model">Data Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/dataforge.html#implementation-phases">Implementation Phases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/dataforge.html#success-metrics">Success Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/dataforge.html#risks-mitigations">Risks &amp; Mitigations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/dataforge.html#what-dataforge-does-not-do">What DataForge Does NOT Do</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="specs/harmonization-engine.html">SchemaForge: Harmonization Engine</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#product-specification-v0-3">Product Specification v0.3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#executive-summary">Executive Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#problem-statement">Problem Statement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#solution">Solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#target-users">Target Users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#core-concepts">Core Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#features">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#user-interface">User Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#api-design">API Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#data-model">Data Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#shared-infrastructure-retrieval-core">Shared Infrastructure: Retrieval Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#implementation-phases">Implementation Phases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#success-metrics">Success Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#risks-mitigations">Risks &amp; Mitigations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#integration-with-forge-ecosystem">Integration with Forge Ecosystem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#design-decisions">Design Decisions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#open-questions">Open Questions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#appendix-a-retrieval-algorithm-details">Appendix A: Retrieval Algorithm Details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/harmonization-engine.html#appendix-b-evaluation-prompt-template">Appendix B: Evaluation Prompt Template</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="specs/registry-service.html">SchemaForge: Registry Service</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#product-specification-v0-2">Product Specification v0.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#executive-summary">Executive Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#problem-statement">Problem Statement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#solution">Solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#target-users">Target Users</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#core-concepts">Core Concepts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#features">Features</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#api-design">API Design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#data-model">Data Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#technical-architecture">Technical Architecture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#implementation-phases">Implementation Phases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#success-metrics">Success Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#risks-mitigations">Risks &amp; Mitigations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#integration-contracts">Integration Contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#proposal-review-ui-phase-c-curation-workbench">Proposal Review UI <em>(Phase C — Curation Workbench)</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#event-types">Event Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/registry-service.html#open-questions">Open Questions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="specs/roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="specs/roles-and-governance.html#specification-v0-1">Specification v0.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/roles-and-governance.html#executive-summary">Executive Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/roles-and-governance.html#entity-model">Entity Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/roles-and-governance.html#permission-matrix">Permission Matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/roles-and-governance.html#permission-resolution-logic">Permission Resolution Logic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/roles-and-governance.html#schema-version-governance">Schema Version Governance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/roles-and-governance.html#json-backend-implementation-notes">JSON Backend Implementation Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/roles-and-governance.html#audit-trail">Audit Trail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specs/roles-and-governance.html#open-items-future-considerations">Open Items &amp; Future Considerations</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/api-reference.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/api-reference.html#registry-service-8000">Registry Service — <code class="docutils literal notranslate"><span class="pre">:8000</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/api-reference.html#dataforge-api-8001">DataForge API — <code class="docutils literal notranslate"><span class="pre">:8001</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/api-reference.html#key-conventions">Key Conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/api-reference.html#what-doesn-t-have-an-api-yet">What Doesn’t Have an API Yet</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/data-models.html">Data Model Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/data-models.html#registry-service-postgresql-orm">Registry Service (PostgreSQL ORM)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/data-models.html#dataforge-pydantic-persisted-as-json-files">DataForge (Pydantic, persisted as JSON files)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/data-models.html#forge-app-pydantic-persisted-as-local-json-csv-files">forge-app (Pydantic, persisted as local JSON/CSV files)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/data-models.html#cross-service-relationships">Cross-Service Relationships</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/data-models.html#storage-locations">Storage Locations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/glossary.html">Glossary</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/glossary.html#domain-terms">Domain Terms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/glossary.html#platform-terms">Platform Terms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/glossary.html#technical-terms">Technical Terms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/glossary.html#abbreviations">Abbreviations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/local-dev-setup.html">Local Development Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/local-dev-setup.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/local-dev-setup.html#quick-start-docker-all-services">Quick Start (Docker — all services)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/local-dev-setup.html#local-python-setup-for-running-tests-and-linting">Local Python Setup (for running tests and linting)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/local-dev-setup.html#environment-variables">Environment Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/local-dev-setup.html#common-issues">Common Issues</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/local-dev-setup.html#project-structure-abbreviated">Project Structure (abbreviated)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/service-interactions.html">Service Interaction Sequences</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/service-interactions.html#journey-a-schema-curation">Journey A: Schema Curation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/service-interactions.html#journey-b-data-harmonization-validation">Journey B: Data Harmonization + Validation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/service-interactions.html#journey-b-continued-submission-review">Journey B (continued): Submission Review</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/service-interactions.html#journey-c-gold-dataset-management">Journey C: Gold Dataset Management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/service-interactions.html#client-service-mapping">Client → Service Mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/service-interactions.html#what-calls-claude-api-directly">What Calls Claude API Directly</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="local-deploy.html">Local Developer Workflow</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="local-deploy.html#commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="local-deploy.html#tips">Tips</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gcloud-deploy.html">GCloud Deploy Workflow</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gcloud-deploy.html#commands">Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gcloud-deploy.html#tip">Tip</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="forge.html">Forge API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="forge.html#module-forge_retrieval_core.tfidf_engine">Retrieval Engines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forge.html#module-clients.dataforge_client">Clients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forge.html#module-components.status_badge">Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forge.html#core-utilities">Core Utilities</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="presentations">
+<h2>Presentations<a class="headerlink" href="#presentations" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="_downloads/530b3505050466dc71e968559bceab03/Forge-Architecture-Deck.pptx"><code class="xref download docutils literal notranslate"><span class="pre">Forge</span> <span class="pre">Architecture</span> <span class="pre">Deck</span></code></a></p></li>
+<li><p><a class="reference download internal" download="" href="_downloads/dafb8e5ec9a1d4a5455ef0158757a853/forge-overview.pptx"><code class="xref download docutils literal notranslate"><span class="pre">Forge</span> <span class="pre">Overview</span></code></a></p></li>
+<li><p><a class="reference download internal" download="" href="_downloads/158446d0ceb76c630320108cc1dc98d7/forge-walkthrough.pptx"><code class="xref download docutils literal notranslate"><span class="pre">Forge</span> <span class="pre">Walkthrough</span></code></a></p></li>
+<li><p><a class="reference download internal" download="" href="_downloads/d12878700efa3c9407c5befec0b47c7d/forge-gp2-walkthrough.pptx"><code class="xref download docutils literal notranslate"><span class="pre">Forge</span> <span class="pre">GP2</span> <span class="pre">Walkthrough</span></code></a></p></li>
+<li><p><a class="reference download internal" download="" href="_downloads/4486a9eda33ec67cc9d3ccba398002ea/forge-one-pager.docx"><code class="xref download docutils literal notranslate"><span class="pre">Forge</span> <span class="pre">One</span> <span class="pre">Pager</span></code></a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="guides/deployment.html" class="btn btn-neutral float-right" title="Harmonization Engine - Cloud Run Deployment Guide" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

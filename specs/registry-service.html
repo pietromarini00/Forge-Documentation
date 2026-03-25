@@ -1,0 +1,1622 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SchemaForge: Registry Service &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Forge Platform — Roles, Permissions &amp; Governance" href="roles-and-governance.html" />
+    <link rel="prev" title="SchemaForge: Harmonization Engine" href="harmonization-engine.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SchemaForge: Registry Service</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#product-specification-v0-2">Product Specification v0.2</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#executive-summary">Executive Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#solution">Solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#target-users">Target Users</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#primary-other-forge-services">Primary: Other Forge Services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#secondary-data-engineers">Secondary: Data Engineers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tertiary-external-systems">Tertiary: External Systems</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#core-concepts">Core Concepts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#schema">Schema</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#element">Element</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version">Version</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#change-record">Change Record</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#proposal-phase-c">Proposal <em>(Phase C)</em></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#features">Features</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#f1-schema-management">F1: Schema Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f2-element-management">F2: Element Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f3-versioning">F3: Versioning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f4-api-layer">F4: API Layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f5-export-engine">F5: Export Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f6-event-system">F6: Event System</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f7-access-control">F7: Access Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f8-proposal-management-phase-c">F8: Proposal Management <em>(Phase C)</em></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#api-design">API Design</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#restful-endpoints">RESTful Endpoints</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#response-format">Response Format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#error-format">Error Format</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data-model">Data Model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#database-schema-postgresql">Database Schema (PostgreSQL)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#technical-architecture">Technical Architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#service-components">Service Components</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#caching-strategy">Caching Strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#similar-element-detection">Similar Element Detection</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#implementation-phases">Implementation Phases</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#phase-1-core-storage-complete">Phase 1: Core Storage ✅ Complete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-2-versioning-complete">Phase 2: Versioning ✅ Complete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-3-export-engine-complete">Phase 3: Export Engine ✅ Complete</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-4-events-webhooks-phase-b">Phase 4: Events &amp; Webhooks (Phase B)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-5-access-control-phase-b-c">Phase 5: Access Control (Phase B/C)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-6-proposal-management-phase-c">Phase 6: Proposal Management (Phase C)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#success-metrics">Success Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#reliability">Reliability</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#performance">Performance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adoption">Adoption</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#risks-mitigations">Risks &amp; Mitigations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#integration-contracts">Integration Contracts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#for-curation-workbench">For Curation Workbench</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#for-harmonization-engine">For Harmonization Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#for-dataforge">For DataForge</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#proposal-review-ui-phase-c-curation-workbench">Proposal Review UI <em>(Phase C — Curation Workbench)</em></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#proposal-review-queue">Proposal Review Queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#proposal-detail-view">Proposal Detail View</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#event-types">Event Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#schema-events">Schema Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#element-events">Element Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-events">Version Events</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#proposal-events-phase-c">Proposal Events <em>(Phase C)</em></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#open-questions">Open Questions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">SchemaForge: Registry Service</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/specs/registry-service.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="schemaforge-registry-service">
+<h1>SchemaForge: Registry Service<a class="headerlink" href="#schemaforge-registry-service" title="Link to this heading"></a></h1>
+<section id="product-specification-v0-2">
+<h2>Product Specification v0.2<a class="headerlink" href="#product-specification-v0-2" title="Link to this heading"></a></h2>
+</section>
+<hr class="docutils" />
+<section id="executive-summary">
+<h2>Executive Summary<a class="headerlink" href="#executive-summary" title="Link to this heading"></a></h2>
+<p>The <strong>Registry Service</strong> is SchemaForge’s shared foundation—the single source of truth for canonical schemas, elements, and their versions. It provides the storage layer, versioning system, and API access that the Curation Workbench and Harmonization Engine depend on.</p>
+<p>Think of it as the “database + API” layer that other services build upon. It handles the fundamental operations: creating schemas, storing elements, tracking versions, and exposing everything through a consistent API.</p>
+</section>
+<hr class="docutils" />
+<section id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Link to this heading"></a></h2>
+<p>Without a central registry:</p>
+<ul class="simple">
+<li><p>Each service maintains its own copy of schema data</p></li>
+<li><p>Version conflicts arise when schemas are edited in multiple places</p></li>
+<li><p>No single API for external systems to query schemas</p></li>
+<li><p>Export formats are inconsistent across tools</p></li>
+<li><p>Access control is fragmented</p></li>
+</ul>
+<p><strong>Result:</strong> Data duplication, version drift, integration complexity.</p>
+</section>
+<hr class="docutils" />
+<section id="solution">
+<h2>Solution<a class="headerlink" href="#solution" title="Link to this heading"></a></h2>
+<p>The Registry Service provides:</p>
+<ol class="arabic simple">
+<li><p><strong>Schema Storage</strong> — Canonical schemas and elements in PostgreSQL</p></li>
+<li><p><strong>Versioning</strong> — Semantic versioning with full history</p></li>
+<li><p><strong>API Layer</strong> — RESTful API for all schema operations</p></li>
+<li><p><strong>Export Engine</strong> — Multiple format exports (JSON, YAML, CSV, Markdown)</p></li>
+<li><p><strong>Event System</strong> — Notify other services of schema changes</p></li>
+<li><p><strong>Access Control</strong> — Permissions and audit logging</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────┐
+│                      REGISTRY SERVICE                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐       │
+│   │   STORAGE   │     │ VERSIONING  │     │   EVENTS    │       │
+│   │             │     │             │     │             │       │
+│   │ PostgreSQL  │     │ Semantic    │     │ Schema      │       │
+│   │ Schemas     │     │ versions    │     │ changes     │       │
+│   │ Elements    │     │ Snapshots   │     │ Webhooks    │       │
+│   │ History     │     │ Diff/merge  │     │ Pub/sub     │       │
+│   └─────────────┘     └─────────────┘     └─────────────┘       │
+│                                                                  │
+│   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐       │
+│   │   REST API  │     │   EXPORT    │     │   ACCESS    │       │
+│   │             │     │             │     │             │       │
+│   │ CRUD ops    │     │ JSON/YAML   │     │ Roles       │       │
+│   │ Search      │     │ CSV         │     │ Permissions │       │
+│   │ Bulk ops    │     │ Markdown    │     │ Audit log   │       │
+│   │ Pagination  │     │ JSON Schema │     │ API keys    │       │
+│   └─────────────┘     └─────────────┘     └─────────────┘       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="target-users">
+<h2>Target Users<a class="headerlink" href="#target-users" title="Link to this heading"></a></h2>
+<section id="primary-other-forge-services">
+<h3>Primary: Other Forge Services<a class="headerlink" href="#primary-other-forge-services" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Curation Workbench (read/write schemas)</p></li>
+<li><p>Harmonization Engine (read schemas for matching)</p></li>
+<li><p>DataForge (read schemas for validation)</p></li>
+</ul>
+</section>
+<section id="secondary-data-engineers">
+<h3>Secondary: Data Engineers<a class="headerlink" href="#secondary-data-engineers" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Query schemas via API</p></li>
+<li><p>Integrate with ETL pipelines</p></li>
+<li><p>Export for external tools</p></li>
+</ul>
+</section>
+<section id="tertiary-external-systems">
+<h3>Tertiary: External Systems<a class="headerlink" href="#tertiary-external-systems" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Data catalogs syncing schema metadata</p></li>
+<li><p>Validation services checking against schema</p></li>
+<li><p>Documentation generators</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="core-concepts">
+<h2>Core Concepts<a class="headerlink" href="#core-concepts" title="Link to this heading"></a></h2>
+<section id="schema">
+<h3>Schema<a class="headerlink" href="#schema" title="Link to this heading"></a></h3>
+<p>A versioned container for elements.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">schema</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;BRAIN-CODE</span><span class="nv"> </span><span class="s">CDEs&quot;</span>
+<span class="w">  </span><span class="nt">slug</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;brain-code-cdes&quot;</span><span class="w">              </span><span class="c1"># URL-friendly identifier</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Common</span><span class="nv"> </span><span class="s">Data</span><span class="nv"> </span><span class="s">Elements</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">neurodegenerative</span><span class="nv"> </span><span class="s">disease</span><span class="nv"> </span><span class="s">research&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Version info</span>
+<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2.1.0&quot;</span>
+<span class="w">  </span><span class="nt">version_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span><span class="w">                   </span><span class="c1"># Specific version record</span>
+<span class="w">  </span><span class="nt">latest_version</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2.1.0&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Status</span>
+<span class="w">  </span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;active&quot;</span><span class="w">                     </span><span class="c1"># draft | active | deprecated</span>
+<span class="w">  </span><span class="nt">visibility</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;public&quot;</span><span class="w">                 </span><span class="c1"># public | private | internal</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Stats</span>
+<span class="w">  </span><span class="nt">element_count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1626</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Metadata</span>
+<span class="w">  </span><span class="nt">owner_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">organization_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;clinical&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;neurodegeneration&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;research&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Timestamps</span>
+<span class="w">  </span><span class="nt">created_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2024-01-15T00:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">updated_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-15T00:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">created_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_id&quot;</span>
+<span class="w">  </span><span class="nt">updated_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_id&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="element">
+<h3>Element<a class="headerlink" href="#element" title="Link to this heading"></a></h3>
+<p>A field definition within a schema.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">element</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">schema_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Identity</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;path_braak_nft&quot;</span>
+<span class="w">  </span><span class="nt">display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Braak</span><span class="nv"> </span><span class="s">NFT</span><span class="nv"> </span><span class="s">Stage&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Definition</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Neurofibrillary</span><span class="nv"> </span><span class="s">tangle</span><span class="nv"> </span><span class="s">staging</span><span class="nv"> </span><span class="s">per</span><span class="nv"> </span><span class="s">Braak</span><span class="nv"> </span><span class="s">criteria&quot;</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;enum&quot;</span>
+<span class="w">  </span><span class="nt">required</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Type-specific</span>
+<span class="w">  </span><span class="nt">allowed_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">3</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">value_labels</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">0</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Stage</span><span class="nv"> </span><span class="s">0&quot;</span>
+<span class="w">    </span><span class="nt">1</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Stage</span><span class="nv"> </span><span class="s">I&quot;</span>
+<span class="w">    </span><span class="c1"># ...</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="nt">constraints</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">    </span><span class="nt">pattern</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Provenance</span>
+<span class="w">  </span><span class="nt">sources</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;NACC&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;Path-ND&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">aliases</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;NACCBRAA&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;braak_stage&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Organization</span>
+<span class="w">  </span><span class="nt">category</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;neuropathology&quot;</span>
+<span class="w">  </span><span class="nt">priority</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">  </span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;staging&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;tau&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Audit</span>
+<span class="w">  </span><span class="nt">created_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2024-06-01T00:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">updated_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-10T00:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">created_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_id&quot;</span>
+<span class="w">  </span><span class="nt">updated_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_id&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="version">
+<h3>Version<a class="headerlink" href="#version" title="Link to this heading"></a></h3>
+<p>A snapshot of a schema at a point in time.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">schema_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="nt">version_number</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2.1.0&quot;</span>
+<span class="w">  </span><span class="nt">version_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;minor&quot;</span><span class="w">                </span><span class="c1"># major | minor | patch</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Content</span>
+<span class="w">  </span><span class="nt">element_count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1626</span>
+<span class="w">  </span><span class="nt">snapshot_path</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;s3://schemas/brain-code/v2.1.0.json&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Change summary</span>
+<span class="w">  </span><span class="nt">changes</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">added</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span>
+<span class="w">    </span><span class="nt">modified</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">34</span>
+<span class="w">    </span><span class="nt">removed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">  </span><span class="nt">release_notes</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Added</span><span class="nv"> </span><span class="s">new</span><span class="nv"> </span><span class="s">biomarker</span><span class="nv"> </span><span class="s">elements,</span><span class="nv"> </span><span class="s">standardized</span><span class="nv"> </span><span class="s">staging</span><span class="nv"> </span><span class="s">fields&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Metadata</span>
+<span class="w">  </span><span class="nt">created_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-15T00:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">created_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;user_id&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Lineage</span>
+<span class="w">  </span><span class="nt">parent_version_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span><span class="w">            </span><span class="c1"># Previous version</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Status</span>
+<span class="w">  </span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;released&quot;</span><span class="w">                   </span><span class="c1"># draft | released | deprecated</span>
+</pre></div>
+</div>
+</section>
+<section id="change-record">
+<h3>Change Record<a class="headerlink" href="#change-record" title="Link to this heading"></a></h3>
+<p>An audit log entry for any modification.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">change</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">timestamp</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-15T14:30:00Z&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Target</span>
+<span class="w">  </span><span class="nt">schema_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">element_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span><span class="w">                   </span><span class="c1"># null for schema-level changes</span>
+<span class="w">  </span><span class="nt">version_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Action</span>
+<span class="w">  </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;update&quot;</span><span class="w">                     </span><span class="c1"># create | update | delete | merge | split</span>
+<span class="w">  </span><span class="nt">target_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;element&quot;</span><span class="w">               </span><span class="c1"># schema | element | version</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Content</span>
+<span class="w">  </span><span class="nt">before</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"> </span><span class="nv">...</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w">                      </span><span class="c1"># State before change</span>
+<span class="w">  </span><span class="nt">after</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"> </span><span class="nv">...</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w">                       </span><span class="c1"># State after change</span>
+<span class="w">  </span><span class="nt">diff</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="w"> </span><span class="nv">...</span><span class="w"> </span><span class="p p-Indicator">}</span><span class="w">                        </span><span class="c1"># Computed diff</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Context</span>
+<span class="w">  </span><span class="nt">user_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">reason</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Standardized</span><span class="nv"> </span><span class="s">naming</span><span class="nv"> </span><span class="s">convention&quot;</span>
+<span class="w">  </span><span class="nt">source_service</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;curation_workbench&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Reversibility</span>
+<span class="w">  </span><span class="nt">reversible</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">reverted</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</pre></div>
+</div>
+</section>
+<section id="proposal-phase-c">
+<h3>Proposal <em>(Phase C)</em><a class="headerlink" href="#proposal-phase-c" title="Link to this heading"></a></h3>
+<p>A request to add a new element to a schema, typically created by data managers during harmonization when they encounter fields that don’t match existing elements.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">proposal</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">schema_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Proposed element definition</span>
+<span class="w">  </span><span class="nt">proposed_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;moca_total_score&quot;</span>
+<span class="w">  </span><span class="nt">proposed_display_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MoCA</span><span class="nv"> </span><span class="s">Total</span><span class="nv"> </span><span class="s">Score&quot;</span>
+<span class="w">  </span><span class="nt">proposed_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;integer&quot;</span>
+<span class="w">  </span><span class="nt">proposed_description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Montreal</span><span class="nv"> </span><span class="s">Cognitive</span><span class="nv"> </span><span class="s">Assessment</span><span class="nv"> </span><span class="s">total</span><span class="nv"> </span><span class="s">score</span><span class="nv"> </span><span class="s">(0-30)&quot;</span>
+<span class="w">  </span><span class="nt">proposed_constraints</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">    </span><span class="nt">max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
+<span class="w">  </span><span class="nt">suggested_category</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;cognitive_assessments&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Context from source</span>
+<span class="w">  </span><span class="nt">source_context</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">source_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Cohort</span><span class="nv"> </span><span class="s">D</span><span class="nv"> </span><span class="s">Clinical&quot;</span>
+<span class="w">    </span><span class="nt">source_field_name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;moca_score&quot;</span>
+<span class="w">    </span><span class="nt">sample_values</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;28&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;24&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;19&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;30&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;22&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">field_description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MoCA</span><span class="nv"> </span><span class="s">score</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">baseline</span><span class="nv"> </span><span class="s">visit&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Justification</span>
+<span class="w">  </span><span class="nt">justification</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;MoCA</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">widely-used</span><span class="nv"> </span><span class="s">cognitive</span><span class="nv"> </span><span class="s">screening</span><span class="nv"> </span><span class="s">tool...&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># AI analysis (computed on creation)</span>
+<span class="w">  </span><span class="nt">similar_elements</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">element_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mmse_total&quot;</span>
+<span class="w">      </span><span class="nt">similarity_score</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.62</span>
+<span class="w">      </span><span class="nt">similarity_reason</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Both</span><span class="nv"> </span><span class="s">are</span><span class="nv"> </span><span class="s">cognitive</span><span class="nv"> </span><span class="s">assessment</span><span class="nv"> </span><span class="s">scores&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Status</span>
+<span class="w">  </span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;pending&quot;</span><span class="w">                    </span><span class="c1"># pending | under_review | approved | rejected | withdrawn</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Review</span>
+<span class="w">  </span><span class="nt">reviewer_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">reviewed_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-28T09:00:00Z&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Resolution</span>
+<span class="w">  </span><span class="nt">created_element_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span><span class="w">           </span><span class="c1"># If approved</span>
+<span class="w">  </span><span class="nt">rejection_reason</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;text&quot;</span><span class="w">             </span><span class="c1"># If rejected</span>
+<span class="w">  </span><span class="nt">suggested_alternative_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span><span class="w">     </span><span class="c1"># If rejected with alternative</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Audit</span>
+<span class="w">  </span><span class="nt">proposed_by_user_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">proposed_by_email</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;troy@research.org&quot;</span>
+<span class="w">  </span><span class="nt">created_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-27T15:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">updated_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-28T09:00:00Z&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
+<section id="f1-schema-management">
+<h3>F1: Schema Management<a class="headerlink" href="#f1-schema-management" title="Link to this heading"></a></h3>
+<p><strong>F1.1: CRUD Operations</strong></p>
+<ul class="simple">
+<li><p>Create schema with metadata</p></li>
+<li><p>Read schema by ID or slug</p></li>
+<li><p>Update schema metadata</p></li>
+<li><p>Delete (soft delete with audit)</p></li>
+</ul>
+<p><strong>F1.2: Schema Listing</strong></p>
+<ul class="simple">
+<li><p>List all schemas (paginated)</p></li>
+<li><p>Filter by status, visibility, tags</p></li>
+<li><p>Sort by name, updated_at, element_count</p></li>
+<li><p>Full-text search across name/description</p></li>
+</ul>
+<p><strong>F1.3: Schema Import/Export</strong></p>
+<ul class="simple">
+<li><p>Import from JSON, YAML, CSV</p></li>
+<li><p>Export to JSON, YAML, CSV, Markdown</p></li>
+<li><p>Bulk import with validation</p></li>
+<li><p>Schema migration between instances</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="f2-element-management">
+<h3>F2: Element Management<a class="headerlink" href="#f2-element-management" title="Link to this heading"></a></h3>
+<p><strong>F2.1: CRUD Operations</strong></p>
+<ul class="simple">
+<li><p>Create element with validation</p></li>
+<li><p>Read element by ID</p></li>
+<li><p>Update element properties</p></li>
+<li><p>Delete element (soft delete)</p></li>
+</ul>
+<p><strong>F2.2: Element Listing</strong></p>
+<ul class="simple">
+<li><p>List elements for schema (paginated)</p></li>
+<li><p>Filter by type, category, priority, tags</p></li>
+<li><p>Sort by name, updated_at</p></li>
+<li><p>Search across name, description, aliases</p></li>
+</ul>
+<p><strong>F2.3: Bulk Operations</strong></p>
+<ul class="simple">
+<li><p>Bulk create from import</p></li>
+<li><p>Bulk update (patch multiple)</p></li>
+<li><p>Bulk delete with cascade handling</p></li>
+</ul>
+<p><strong>F2.4: Element Relationships</strong></p>
+<ul class="simple">
+<li><p>Link related elements</p></li>
+<li><p>Track aliases</p></li>
+<li><p>Maintain source provenance</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="f3-versioning">
+<h3>F3: Versioning<a class="headerlink" href="#f3-versioning" title="Link to this heading"></a></h3>
+<p><strong>F3.1: Create Version</strong></p>
+<ul class="simple">
+<li><p>Semantic version numbering (major.minor.patch)</p></li>
+<li><p>Auto-increment based on change type</p></li>
+<li><p>Snapshot current state</p></li>
+<li><p>Release notes support</p></li>
+</ul>
+<p><strong>F3.2: Version History</strong></p>
+<ul class="simple">
+<li><p>List all versions for schema</p></li>
+<li><p>Get specific version details</p></li>
+<li><p>Compare versions (diff view)</p></li>
+</ul>
+<p><strong>F3.3: Version Operations</strong></p>
+<ul class="simple">
+<li><p>Rollback to previous version</p></li>
+<li><p>Branch from version (fork)</p></li>
+<li><p>Deprecate old versions</p></li>
+</ul>
+<p><strong>F3.4: Snapshot Management</strong></p>
+<ul class="simple">
+<li><p>Store version snapshots</p></li>
+<li><p>Efficient storage (diff-based optional)</p></li>
+<li><p>Quick retrieval</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="f4-api-layer">
+<h3>F4: API Layer<a class="headerlink" href="#f4-api-layer" title="Link to this heading"></a></h3>
+<p><strong>F4.1: RESTful Endpoints</strong></p>
+<ul class="simple">
+<li><p>Standard CRUD for schemas and elements</p></li>
+<li><p>Pagination, filtering, sorting</p></li>
+<li><p>Consistent error responses</p></li>
+<li><p>OpenAPI documentation</p></li>
+</ul>
+<p><strong>F4.2: GraphQL</strong> (Future)</p>
+<ul class="simple">
+<li><p>Flexible queries for complex needs</p></li>
+<li><p>Reduced over-fetching</p></li>
+<li><p>Subscriptions for real-time updates</p></li>
+</ul>
+<p><strong>F4.3: API Authentication</strong></p>
+<ul class="simple">
+<li><p>API key management</p></li>
+<li><p>JWT token support</p></li>
+<li><p>Rate limiting</p></li>
+<li><p>Usage tracking</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="f5-export-engine">
+<h3>F5: Export Engine<a class="headerlink" href="#f5-export-engine" title="Link to this heading"></a></h3>
+<p><strong>F5.1: JSON Export</strong></p>
+<ul class="simple">
+<li><p>Full fidelity export</p></li>
+<li><p>Pretty-printed or compact</p></li>
+<li><p>Streaming for large schemas</p></li>
+</ul>
+<p><strong>F5.2: YAML Export</strong></p>
+<ul class="simple">
+<li><p>Human-readable format</p></li>
+<li><p>Comments preserved</p></li>
+<li><p>Multi-document support</p></li>
+</ul>
+<p><strong>F5.3: CSV Export</strong></p>
+<ul class="simple">
+<li><p>Spreadsheet-compatible</p></li>
+<li><p>Configurable columns</p></li>
+<li><p>Hierarchical flattening</p></li>
+</ul>
+<p><strong>F5.4: Markdown Documentation</strong></p>
+<ul class="simple">
+<li><p>Auto-generated docs</p></li>
+<li><p>Configurable templates</p></li>
+<li><p>Category grouping</p></li>
+<li><p>Table of contents</p></li>
+</ul>
+<p><strong>F5.5: JSON Schema</strong></p>
+<ul class="simple">
+<li><p>Generate validation schemas</p></li>
+<li><p>OpenAPI compatible</p></li>
+<li><p>Custom vocabulary support</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="f6-event-system">
+<h3>F6: Event System<a class="headerlink" href="#f6-event-system" title="Link to this heading"></a></h3>
+<p><strong>F6.1: Internal Events</strong></p>
+<ul class="simple">
+<li><p>Schema created/updated/deleted</p></li>
+<li><p>Element created/updated/deleted</p></li>
+<li><p>Version released</p></li>
+<li><p>Publish to message queue</p></li>
+</ul>
+<p><strong>F6.2: Webhooks</strong></p>
+<ul class="simple">
+<li><p>Configure endpoints per event type</p></li>
+<li><p>Retry with exponential backoff (3 retries: 1s, 5s, 30s)</p></li>
+<li><p>Payload signing (HMAC-SHA256)</p></li>
+<li><p>Event filtering</p></li>
+</ul>
+<p><strong>F6.3: Change Notifications</strong></p>
+<ul class="simple">
+<li><p>Notify Harmonization Engine of schema updates</p></li>
+<li><p>Trigger index rebuilds</p></li>
+<li><p>Notify DataForge of schema changes</p></li>
+<li><p>Cascade to dependent services</p></li>
+</ul>
+<p><strong>Webhook Payload Format:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;event&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;element.updated&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2025-01-28T10:30:00Z&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;schema_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;element_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;element_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;age_at_onset&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;change_type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;update&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;fields_changed&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;constraints&quot;</span><span class="p">]</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;signature&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sha256=...&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="f7-access-control">
+<h3>F7: Access Control<a class="headerlink" href="#f7-access-control" title="Link to this heading"></a></h3>
+<p><strong>F7.1: Roles</strong></p>
+<ul class="simple">
+<li><p>Viewer: Read-only access</p></li>
+<li><p>Editor: Create/update elements</p></li>
+<li><p>Admin: Full access including delete</p></li>
+<li><p>Owner: Manage permissions</p></li>
+</ul>
+<p><strong>F7.2: Permissions</strong></p>
+<ul class="simple">
+<li><p>Schema-level permissions</p></li>
+<li><p>Organization-level defaults</p></li>
+<li><p>API key scoping</p></li>
+</ul>
+<p><strong>F7.3: Audit Logging</strong></p>
+<ul class="simple">
+<li><p>Log all API calls</p></li>
+<li><p>Track user actions</p></li>
+<li><p>Exportable audit trail</p></li>
+<li><p>Compliance support</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="f8-proposal-management-phase-c">
+<h3>F8: Proposal Management <em>(Phase C)</em><a class="headerlink" href="#f8-proposal-management-phase-c" title="Link to this heading"></a></h3>
+<p><strong>Purpose:</strong> Enable data managers to propose new canonical elements and schema admins to review and resolve proposals.</p>
+<p><strong>F8.1: Create Proposal</strong></p>
+<ul class="simple">
+<li><p>Accept proposal from Harmonization Engine or API</p></li>
+<li><p>Validate proposed element structure</p></li>
+<li><p>Compute similar existing elements (using embedding similarity)</p></li>
+<li><p>Store with <code class="docutils literal notranslate"><span class="pre">pending</span></code> status</p></li>
+<li><p>Emit <code class="docutils literal notranslate"><span class="pre">proposal.created</span></code> event</p></li>
+</ul>
+<p><strong>F8.2: List Proposals</strong></p>
+<ul class="simple">
+<li><p>Filter by schema, status, proposer, date range</p></li>
+<li><p>Sort by created_at, status, similarity score</p></li>
+<li><p>Include similar elements summary</p></li>
+<li><p>Paginate results</p></li>
+</ul>
+<p><strong>F8.3: Review Proposal</strong></p>
+<ul class="simple">
+<li><p>Claim proposal for review (prevents concurrent edits)</p></li>
+<li><p>View full proposal details with source context</p></li>
+<li><p>View similar elements with diff</p></li>
+<li><p>Add comments for discussion</p></li>
+</ul>
+<p><strong>F8.4: Approve Proposal</strong></p>
+<ul class="simple">
+<li><p>Validate final element definition</p></li>
+<li><p>Create element in schema</p></li>
+<li><p>Update proposal with <code class="docutils literal notranslate"><span class="pre">approved</span></code> status and <code class="docutils literal notranslate"><span class="pre">created_element_id</span></code></p></li>
+<li><p>Emit <code class="docutils literal notranslate"><span class="pre">proposal.resolved</span></code> event with <code class="docutils literal notranslate"><span class="pre">approved</span></code> action</p></li>
+<li><p>Notify proposer</p></li>
+</ul>
+<p><strong>F8.5: Reject Proposal</strong></p>
+<ul class="simple">
+<li><p>Require rejection reason</p></li>
+<li><p>Optionally suggest alternative element</p></li>
+<li><p>Update proposal with <code class="docutils literal notranslate"><span class="pre">rejected</span></code> status</p></li>
+<li><p>Emit <code class="docutils literal notranslate"><span class="pre">proposal.resolved</span></code> event with <code class="docutils literal notranslate"><span class="pre">rejected</span></code> action</p></li>
+<li><p>Notify proposer</p></li>
+</ul>
+<p><strong>F8.6: Withdraw Proposal</strong></p>
+<ul class="simple">
+<li><p>Allow proposer to withdraw before resolution</p></li>
+<li><p>Update proposal with <code class="docutils literal notranslate"><span class="pre">withdrawn</span></code> status</p></li>
+<li><p>No notification needed</p></li>
+</ul>
+<p><strong>F8.7: Proposal Comments</strong></p>
+<ul class="simple">
+<li><p>Add comments to proposals for discussion</p></li>
+<li><p>Thread comments for context</p></li>
+<li><p>Notify mentioned users</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="api-design">
+<h2>API Design<a class="headerlink" href="#api-design" title="Link to this heading"></a></h2>
+<section id="restful-endpoints">
+<h3>RESTful Endpoints<a class="headerlink" href="#restful-endpoints" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Schemas
+GET    /api/v1/schemas                      # List schemas
+POST   /api/v1/schemas                      # Create schema
+GET    /api/v1/schemas/:id                  # Get schema
+GET    /api/v1/schemas/slug/:slug           # Get schema by slug
+PUT    /api/v1/schemas/:id                  # Update schema
+DELETE /api/v1/schemas/:id                  # Delete schema
+POST   /api/v1/schemas/import               # Import schema
+
+# Elements
+GET    /api/v1/schemas/:id/elements         # List elements
+POST   /api/v1/schemas/:id/elements         # Create element
+POST   /api/v1/schemas/:id/elements/bulk    # Bulk create
+GET    /api/v1/elements/:id                 # Get element
+PUT    /api/v1/elements/:id                 # Update element
+DELETE /api/v1/elements/:id                 # Delete element
+GET    /api/v1/elements/:id/history         # Element change history
+
+# Versions
+GET    /api/v1/schemas/:id/versions         # List versions
+POST   /api/v1/schemas/:id/versions         # Create version
+GET    /api/v1/versions/:id                 # Get version
+GET    /api/v1/versions/:id/snapshot        # Get version snapshot
+GET    /api/v1/versions/compare             # Compare two versions
+POST   /api/v1/schemas/:id/rollback         # Rollback to version
+
+# Export
+GET    /api/v1/schemas/:id/export           # Export schema
+        ?format=json|yaml|csv|markdown|jsonschema
+        &amp;version=latest|:version_number
+
+# Search
+GET    /api/v1/search/schemas               # Search schemas
+GET    /api/v1/search/elements              # Search elements across schemas
+
+# Changes
+GET    /api/v1/schemas/:id/changes          # Get change history
+GET    /api/v1/changes/:id                  # Get specific change
+
+# Webhooks
+GET    /api/v1/webhooks                     # List webhooks
+POST   /api/v1/webhooks                     # Create webhook
+PUT    /api/v1/webhooks/:id                 # Update webhook
+DELETE /api/v1/webhooks/:id                 # Delete webhook
+POST   /api/v1/webhooks/:id/test            # Test webhook
+
+# API Keys
+GET    /api/v1/api-keys                     # List API keys
+POST   /api/v1/api-keys                     # Create API key
+DELETE /api/v1/api-keys/:id                 # Revoke API key
+
+# Proposals (Phase C)
+GET    /api/v1/schemas/:id/proposals        # List proposals for schema
+POST   /api/v1/schemas/:id/proposals        # Create proposal
+GET    /api/v1/proposals/:id                # Get proposal details
+PUT    /api/v1/proposals/:id                # Update proposal (draft only)
+DELETE /api/v1/proposals/:id                # Withdraw proposal
+POST   /api/v1/proposals/:id/claim          # Claim for review
+POST   /api/v1/proposals/:id/release        # Release claim
+POST   /api/v1/proposals/:id/approve        # Approve proposal
+POST   /api/v1/proposals/:id/reject         # Reject proposal
+GET    /api/v1/proposals/:id/comments       # List comments
+POST   /api/v1/proposals/:id/comments       # Add comment
+</pre></div>
+</div>
+</section>
+<section id="response-format">
+<h3>Response Format<a class="headerlink" href="#response-format" title="Link to this heading"></a></h3>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;data&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;meta&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;total&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1626</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;page&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;per_page&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;total_pages&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">33</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;links&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;self&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/api/v1/schemas/abc/elements?page=1&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;next&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/api/v1/schemas/abc/elements?page=2&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;prev&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="error-format">
+<h3>Error Format<a class="headerlink" href="#error-format" title="Link to this heading"></a></h3>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;code&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;validation_error&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Element name already exists in this schema&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;field&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;name&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;duplicate_name&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;constraint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;unique&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="data-model">
+<h2>Data Model<a class="headerlink" href="#data-model" title="Link to this heading"></a></h2>
+<section id="database-schema-postgresql">
+<h3>Database Schema (PostgreSQL)<a class="headerlink" href="#database-schema-postgresql" title="Link to this heading"></a></h3>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="c1">-- Organizations</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">organizations</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">slug</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">settings</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
+<span class="p">);</span>
+
+<span class="c1">-- Users (reference, may be external auth)</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">organization_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">organizations</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">email</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
+<span class="w">    </span><span class="k">role</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;viewer&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
+<span class="p">);</span>
+
+<span class="c1">-- Schemas</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">schemas</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">organization_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">organizations</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">slug</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">description</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;draft&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">visibility</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;private&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">current_version</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+<span class="w">    </span><span class="n">current_version_id</span><span class="w"> </span><span class="n">UUID</span><span class="p">,</span>
+<span class="w">    </span><span class="n">element_count</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="n">tags</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">[],</span>
+<span class="w">    </span><span class="n">metadata</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">updated_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">created_by</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">updated_by</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">deleted_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="p">,</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">UNIQUE</span><span class="p">(</span><span class="n">organization_id</span><span class="p">,</span><span class="w"> </span><span class="n">slug</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- Elements</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">elements</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">schema_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">schemas</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">display_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
+<span class="w">    </span><span class="n">description</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="k">type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">required</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">allowed_values</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">value_labels</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="k">constraints</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">sources</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">[],</span>
+<span class="w">    </span><span class="n">aliases</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">[],</span>
+<span class="w">    </span><span class="n">related_element_ids</span><span class="w"> </span><span class="n">UUID</span><span class="p">[],</span>
+<span class="w">    </span><span class="n">category</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+<span class="w">    </span><span class="n">priority</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span>
+<span class="w">    </span><span class="n">tags</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">[],</span>
+<span class="w">    </span><span class="n">metadata</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">updated_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">created_by</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">updated_by</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">deleted_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="p">,</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">UNIQUE</span><span class="p">(</span><span class="n">schema_id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- Versions</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">versions</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">schema_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">schemas</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">version_number</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">version_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+<span class="w">    </span><span class="n">element_count</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span>
+<span class="w">    </span><span class="n">snapshot_path</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">500</span><span class="p">),</span>
+<span class="w">    </span><span class="n">snapshot_data</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span><span class="w">              </span><span class="c1">-- For smaller schemas, store inline</span>
+<span class="w">    </span><span class="n">changes_summary</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">release_notes</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">parent_version_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="k">versions</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;draft&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">created_by</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">UNIQUE</span><span class="p">(</span><span class="n">schema_id</span><span class="p">,</span><span class="w"> </span><span class="n">version_number</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- Change Log</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">changes</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">schema_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">schemas</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">element_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">elements</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">version_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="k">versions</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="k">timestamp</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">action</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">target_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">before_state</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">after_state</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">diff</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">user_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">reason</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">source_service</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+<span class="w">    </span><span class="n">reversible</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">reverted</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">FALSE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">reverted_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="p">,</span>
+<span class="w">    </span><span class="n">reverted_by</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- Proposals (Phase C)</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">proposals</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">schema_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">schemas</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c1">-- Proposed element</span>
+<span class="w">    </span><span class="n">proposed_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">proposed_display_name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
+<span class="w">    </span><span class="n">proposed_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">proposed_description</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">proposed_constraints</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">suggested_category</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c1">-- Source context</span>
+<span class="w">    </span><span class="n">source_context</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">justification</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">similar_elements</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c1">-- Status</span>
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;pending&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">reviewer_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">claimed_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="p">,</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c1">-- Resolution</span>
+<span class="w">    </span><span class="n">created_element_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">elements</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">rejection_reason</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">suggested_alternative_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">elements</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">resolved_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="p">,</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="c1">-- Audit</span>
+<span class="w">    </span><span class="n">proposed_by_user_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">proposed_by_email</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">updated_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
+<span class="p">);</span>
+
+<span class="c1">-- Proposal Comments (Phase C)</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">proposal_comments</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">proposal_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">proposals</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">user_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">content</span><span class="w"> </span><span class="nb">TEXT</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">parent_comment_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">proposal_comments</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">updated_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
+<span class="p">);</span>
+
+<span class="c1">-- API Keys</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">api_keys</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">organization_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">organizations</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">user_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">key_hash</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">   </span><span class="c1">-- Hashed key</span>
+<span class="w">    </span><span class="n">key_prefix</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">  </span><span class="c1">-- First chars for identification</span>
+<span class="w">    </span><span class="n">scopes</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">[],</span>
+<span class="w">    </span><span class="n">rate_limit</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">1000</span><span class="p">,</span>
+<span class="w">    </span><span class="n">last_used_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="p">,</span>
+<span class="w">    </span><span class="n">expires_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">revoked_at</span><span class="w"> </span><span class="k">TIMESTAMP</span>
+<span class="p">);</span>
+
+<span class="c1">-- Webhooks</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">webhooks</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">organization_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">organizations</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">schema_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">schemas</span><span class="p">(</span><span class="n">id</span><span class="p">),</span><span class="w">  </span><span class="c1">-- null = all schemas</span>
+<span class="w">    </span><span class="n">url</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">secret</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
+<span class="w">    </span><span class="n">events</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">[],</span><span class="w">                    </span><span class="c1">-- [&#39;schema.updated&#39;, &#39;element.created&#39;, ...]</span>
+<span class="w">    </span><span class="n">active</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">TRUE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">failure_count</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span>
+<span class="w">    </span><span class="n">last_triggered_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
+<span class="p">);</span>
+
+<span class="c1">-- Webhook Deliveries (for debugging)</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">webhook_deliveries</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">webhook_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">webhooks</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">event_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span>
+<span class="w">    </span><span class="n">payload</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">response_status</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span>
+<span class="w">    </span><span class="n">response_body</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">delivered_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">duration_ms</span><span class="w"> </span><span class="nb">INTEGER</span>
+<span class="p">);</span>
+
+<span class="c1">-- Indexes</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_schemas_org</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">schemas</span><span class="p">(</span><span class="n">organization_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_schemas_slug</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">schemas</span><span class="p">(</span><span class="n">slug</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_schemas_status</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">schemas</span><span class="p">(</span><span class="n">status</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_schemas_tags</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">schemas</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="n">GIN</span><span class="p">(</span><span class="n">tags</span><span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_elements_schema</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">elements</span><span class="p">(</span><span class="n">schema_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_elements_name</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">elements</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_elements_type</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">elements</span><span class="p">(</span><span class="k">type</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_elements_category</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">elements</span><span class="p">(</span><span class="n">category</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_elements_sources</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">elements</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="n">GIN</span><span class="p">(</span><span class="n">sources</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_elements_aliases</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">elements</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="n">GIN</span><span class="p">(</span><span class="n">aliases</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_elements_tags</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">elements</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="n">GIN</span><span class="p">(</span><span class="n">tags</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_elements_fulltext</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">elements</span><span class="w"> </span>
+<span class="w">    </span><span class="k">USING</span><span class="w"> </span><span class="n">GIN</span><span class="p">(</span><span class="n">to_tsvector</span><span class="p">(</span><span class="s1">&#39;english&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s1">&#39; &#39;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">COALESCE</span><span class="p">(</span><span class="n">description</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">)));</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_versions_schema</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">versions</span><span class="p">(</span><span class="n">schema_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_versions_number</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">versions</span><span class="p">(</span><span class="n">version_number</span><span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_changes_schema</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">changes</span><span class="p">(</span><span class="n">schema_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_changes_element</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">changes</span><span class="p">(</span><span class="n">element_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_changes_timestamp</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">changes</span><span class="p">(</span><span class="k">timestamp</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_changes_user</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">changes</span><span class="p">(</span><span class="n">user_id</span><span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_proposals_schema</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">proposals</span><span class="p">(</span><span class="n">schema_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_proposals_status</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">proposals</span><span class="p">(</span><span class="n">status</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_proposals_proposer</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">proposals</span><span class="p">(</span><span class="n">proposed_by_user_id</span><span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_api_keys_org</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">api_keys</span><span class="p">(</span><span class="n">organization_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_api_keys_prefix</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">api_keys</span><span class="p">(</span><span class="n">key_prefix</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="technical-architecture">
+<h2>Technical Architecture<a class="headerlink" href="#technical-architecture" title="Link to this heading"></a></h2>
+<section id="service-components">
+<h3>Service Components<a class="headerlink" href="#service-components" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────┐
+│                     REGISTRY SERVICE                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                      API GATEWAY                          │   │
+│  │                                                           │   │
+│  │  • Rate limiting    • Auth middleware    • Request logging│   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                              │                                   │
+│           ┌──────────────────┼──────────────────┐               │
+│           ▼                  ▼                  ▼               │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐         │
+│  │   Schema    │    │   Element   │    │   Version   │         │
+│  │   Service   │    │   Service   │    │   Service   │         │
+│  └─────────────┘    └─────────────┘    └─────────────┘         │
+│           │                  │                  │               │
+│           └──────────────────┼──────────────────┘               │
+│                              ▼                                   │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                    DATA ACCESS LAYER                      │   │
+│  │                                                           │   │
+│  │  • Repository pattern    • Query builders    • Caching    │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                              │                                   │
+│           ┌──────────────────┼──────────────────┐               │
+│           ▼                  ▼                  ▼               │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐         │
+│  │ PostgreSQL  │    │    Redis    │    │     S3      │         │
+│  │  (primary)  │    │   (cache)   │    │ (snapshots) │         │
+│  └─────────────┘    └─────────────┘    └─────────────┘         │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                    EVENT PUBLISHER                        │   │
+│  │                                                           │   │
+│  │  • Change events    • Webhooks    • Message queue         │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+<section id="caching-strategy">
+<h3>Caching Strategy<a class="headerlink" href="#caching-strategy" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Cache layers</span>
+<span class="n">CACHE_CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;schema_metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ttl&quot;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>           <span class="c1"># 5 minutes</span>
+        <span class="s2">&quot;invalidate_on&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;schema.updated&quot;</span><span class="p">,</span> <span class="s2">&quot;schema.deleted&quot;</span><span class="p">]</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;element_list&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ttl&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span>            <span class="c1"># 1 minute</span>
+        <span class="s2">&quot;invalidate_on&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;element.created&quot;</span><span class="p">,</span> <span class="s2">&quot;element.updated&quot;</span><span class="p">,</span> <span class="s2">&quot;element.deleted&quot;</span><span class="p">]</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;version_snapshot&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ttl&quot;</span><span class="p">:</span> <span class="mi">3600</span><span class="p">,</span>          <span class="c1"># 1 hour (immutable)</span>
+        <span class="s2">&quot;invalidate_on&quot;</span><span class="p">:</span> <span class="p">[]</span>   <span class="c1"># Never invalidate</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;search_results&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ttl&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>            <span class="c1"># 30 seconds</span>
+        <span class="s2">&quot;invalidate_on&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;element.created&quot;</span><span class="p">,</span> <span class="s2">&quot;element.updated&quot;</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="similar-element-detection">
+<h3>Similar Element Detection<a class="headerlink" href="#similar-element-detection" title="Link to this heading"></a></h3>
+<p>When a proposal is created, the Registry Service computes similar existing elements to help reviewers identify potential duplicates.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">compute_similar_elements</span><span class="p">(</span>
+    <span class="n">schema_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">proposed_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">proposed_description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">proposed_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">SimilarElement</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find elements similar to the proposed element.</span>
+<span class="sd">    </span>
+<span class="sd">    Uses combination of:</span>
+<span class="sd">    1. Name similarity (Levenshtein distance, normalized)</span>
+<span class="sd">    2. Description embedding similarity (cosine)</span>
+<span class="sd">    3. Type matching (exact match bonus)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Get all elements in schema</span>
+    <span class="n">elements</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_schema_elements</span><span class="p">(</span><span class="n">schema_id</span><span class="p">)</span>
+    
+    <span class="n">similarities</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="c1"># Encode proposed description</span>
+    <span class="n">proposed_embedding</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">proposed_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">proposed_description</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+        <span class="c1"># Name similarity (0-1)</span>
+        <span class="n">name_sim</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">levenshtein</span><span class="p">(</span><span class="n">proposed_name</span><span class="p">,</span> <span class="n">element</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">/</span> 
+                       <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">proposed_name</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
+        
+        <span class="c1"># Description similarity (0-1)</span>
+        <span class="n">element_embedding</span> <span class="o">=</span> <span class="n">embed</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">element</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">element</span><span class="o">.</span><span class="n">description</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">desc_sim</span> <span class="o">=</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">proposed_embedding</span><span class="p">,</span> <span class="n">element_embedding</span><span class="p">)</span>
+        
+        <span class="c1"># Type bonus</span>
+        <span class="n">type_bonus</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="k">if</span> <span class="n">proposed_type</span> <span class="o">==</span> <span class="n">element</span><span class="o">.</span><span class="n">type</span> <span class="k">else</span> <span class="mi">0</span>
+        
+        <span class="c1"># Combined score (weighted)</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.3</span> <span class="o">*</span> <span class="n">name_sim</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.6</span> <span class="o">*</span> <span class="n">desc_sim</span><span class="p">)</span> <span class="o">+</span> <span class="n">type_bonus</span>
+        
+        <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="mf">0.3</span><span class="p">:</span>  <span class="c1"># Threshold</span>
+            <span class="n">similarities</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;element_id&quot;</span><span class="p">:</span> <span class="n">element</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">element</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="s2">&quot;display_name&quot;</span><span class="p">:</span> <span class="n">element</span><span class="o">.</span><span class="n">display_name</span><span class="p">,</span>
+                <span class="s2">&quot;similarity_score&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="s2">&quot;similarity_reason&quot;</span><span class="p">:</span> <span class="n">generate_reason</span><span class="p">(</span><span class="n">name_sim</span><span class="p">,</span> <span class="n">desc_sim</span><span class="p">,</span> <span class="n">type_bonus</span><span class="p">)</span>
+            <span class="p">})</span>
+    
+    <span class="c1"># Sort by score, return top_k</span>
+    <span class="n">similarities</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;similarity_score&quot;</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">similarities</span><span class="p">[:</span><span class="n">top_k</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_reason</span><span class="p">(</span><span class="n">name_sim</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">desc_sim</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">type_bonus</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate human-readable similarity reason.&quot;&quot;&quot;</span>
+    <span class="n">reasons</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">name_sim</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">:</span>
+        <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Similar name&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">desc_sim</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">:</span>
+        <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Similar description&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">type_bonus</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">reasons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Same data type&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">reasons</span><span class="p">)</span> <span class="k">if</span> <span class="n">reasons</span> <span class="k">else</span> <span class="s2">&quot;Semantic similarity&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="implementation-phases">
+<h2>Implementation Phases<a class="headerlink" href="#implementation-phases" title="Link to this heading"></a></h2>
+<section id="phase-1-core-storage-complete">
+<h3>Phase 1: Core Storage ✅ Complete<a class="headerlink" href="#phase-1-core-storage-complete" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Basic schema and element CRUD</p>
+<ul class="simple">
+<li><p>[x] Database schema setup</p></li>
+<li><p>[x] Schema CRUD API</p></li>
+<li><p>[x] Element CRUD API</p></li>
+<li><p>[x] Basic validation</p></li>
+<li><p>[x] Soft delete implementation</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Functional storage layer</p>
+</section>
+<section id="phase-2-versioning-complete">
+<h3>Phase 2: Versioning ✅ Complete<a class="headerlink" href="#phase-2-versioning-complete" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Version management and snapshots</p>
+<ul class="simple">
+<li><p>[x] Version creation</p></li>
+<li><p>[x] Snapshot storage</p></li>
+<li><p>[x] Version comparison</p></li>
+<li><p>[x] Rollback functionality</p></li>
+<li><p>[x] Version history API</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Complete version control</p>
+</section>
+<section id="phase-3-export-engine-complete">
+<h3>Phase 3: Export Engine ✅ Complete<a class="headerlink" href="#phase-3-export-engine-complete" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Multiple export formats</p>
+<ul class="simple">
+<li><p>[x] JSON export</p></li>
+<li><p>[x] YAML export</p></li>
+<li><p>[x] CSV export</p></li>
+<li><p>[x] Markdown generation</p></li>
+<li><p>[x] JSON Schema generation</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Flexible export options</p>
+</section>
+<section id="phase-4-events-webhooks-phase-b">
+<h3>Phase 4: Events &amp; Webhooks (Phase B)<a class="headerlink" href="#phase-4-events-webhooks-phase-b" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Change notification system</p>
+<ul class="simple">
+<li><p>[ ] Event publishing</p></li>
+<li><p>[ ] Webhook management</p></li>
+<li><p>[ ] Retry logic with exponential backoff</p></li>
+<li><p>[ ] Delivery tracking</p></li>
+<li><p>[ ] Payload signing</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Real-time change notifications</p>
+</section>
+<section id="phase-5-access-control-phase-b-c">
+<h3>Phase 5: Access Control (Phase B/C)<a class="headerlink" href="#phase-5-access-control-phase-b-c" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Security and audit</p>
+<ul class="simple">
+<li><p>[ ] API key management</p></li>
+<li><p>[ ] Role-based permissions</p></li>
+<li><p>[ ] Audit logging</p></li>
+<li><p>[ ] Rate limiting</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Production-ready security</p>
+</section>
+<section id="phase-6-proposal-management-phase-c">
+<h3>Phase 6: Proposal Management (Phase C)<a class="headerlink" href="#phase-6-proposal-management-phase-c" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Element proposal workflow</p>
+<ul class="simple">
+<li><p>[ ] Proposals table and API</p></li>
+<li><p>[ ] Similar element detection</p></li>
+<li><p>[ ] Claim/release workflow</p></li>
+<li><p>[ ] Approve/reject actions</p></li>
+<li><p>[ ] Comment threading</p></li>
+<li><p>[ ] Proposal events for webhooks</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Complete proposal workflow</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="success-metrics">
+<h2>Success Metrics<a class="headerlink" href="#success-metrics" title="Link to this heading"></a></h2>
+<section id="reliability">
+<h3>Reliability<a class="headerlink" href="#reliability" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>API uptime &gt; 99.9%</p></li>
+<li><p>Data consistency: zero conflicts</p></li>
+<li><p>Backup success rate: 100%</p></li>
+</ul>
+</section>
+<section id="performance">
+<h3>Performance<a class="headerlink" href="#performance" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>API p95 latency &lt; 100ms</p></li>
+<li><p>Search latency &lt; 200ms</p></li>
+<li><p>Export generation &lt; 5s for 10k elements</p></li>
+</ul>
+</section>
+<section id="adoption">
+<h3>Adoption<a class="headerlink" href="#adoption" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>API calls per day</p></li>
+<li><p>External integrations</p></li>
+<li><p>Webhook deliveries</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="risks-mitigations">
+<h2>Risks &amp; Mitigations<a class="headerlink" href="#risks-mitigations" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Risk</p></th>
+<th class="head"><p>Impact</p></th>
+<th class="head"><p>Mitigation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Data corruption</p></td>
+<td><p>Loss of schema data</p></td>
+<td><p>Immutable change log, backups</p></td>
+</tr>
+<tr class="row-odd"><td><p>Version conflicts</p></td>
+<td><p>Inconsistent state</p></td>
+<td><p>Optimistic locking, conflict detection</p></td>
+</tr>
+<tr class="row-even"><td><p>Performance degradation</p></td>
+<td><p>Slow API</p></td>
+<td><p>Caching, query optimization, pagination</p></td>
+</tr>
+<tr class="row-odd"><td><p>Security breach</p></td>
+<td><p>Data exposure</p></td>
+<td><p>API key scoping, audit logging</p></td>
+</tr>
+<tr class="row-even"><td><p>Integration failures</p></td>
+<td><p>Broken webhooks</p></td>
+<td><p>Retry logic, circuit breakers</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="integration-contracts">
+<h2>Integration Contracts<a class="headerlink" href="#integration-contracts" title="Link to this heading"></a></h2>
+<section id="for-curation-workbench">
+<h3>For Curation Workbench<a class="headerlink" href="#for-curation-workbench" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Read schema with elements</span>
+<span class="n">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">schemas</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="err">?</span><span class="n">include</span><span class="o">=</span><span class="n">elements</span>
+
+<span class="c1"># Update element</span>
+<span class="n">PUT</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">elements</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span>
+<span class="n">Content</span><span class="o">-</span><span class="n">Type</span><span class="p">:</span> <span class="n">application</span><span class="o">/</span><span class="n">json</span>
+<span class="n">X</span><span class="o">-</span><span class="n">Source</span><span class="o">-</span><span class="n">Service</span><span class="p">:</span> <span class="n">curation_workbench</span>
+<span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;updated_name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;Standardized naming&quot;</span>
+<span class="p">}</span>
+
+<span class="c1"># Create version after curation session</span>
+<span class="n">POST</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">schemas</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">versions</span>
+<span class="p">{</span>
+    <span class="s2">&quot;version_type&quot;</span><span class="p">:</span> <span class="s2">&quot;minor&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;release_notes&quot;</span><span class="p">:</span> <span class="s2">&quot;Curation session: 45 elements updated&quot;</span>
+<span class="p">}</span>
+
+<span class="c1"># Review proposals (Phase C)</span>
+<span class="n">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">schemas</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">proposals</span><span class="err">?</span><span class="n">status</span><span class="o">=</span><span class="n">pending</span>
+<span class="n">POST</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">proposals</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">approve</span>
+<span class="p">{</span>
+    <span class="s2">&quot;element_overrides&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="s2">&quot;cognitive_assessments&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;reviewer_notes&quot;</span><span class="p">:</span> <span class="s2">&quot;Approved with category assignment&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="for-harmonization-engine">
+<h3>For Harmonization Engine<a class="headerlink" href="#for-harmonization-engine" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get elements for indexing</span>
+<span class="n">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">schemas</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">elements</span><span class="err">?</span><span class="n">per_page</span><span class="o">=</span><span class="mi">1000</span><span class="o">&amp;</span><span class="n">include</span><span class="o">=</span><span class="n">aliases</span><span class="p">,</span><span class="n">sources</span>
+
+<span class="c1"># Subscribe to schema changes</span>
+<span class="n">POST</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">webhooks</span>
+<span class="p">{</span>
+    <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://harmonization.internal/webhooks/schema-changed&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;events&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;element.created&quot;</span><span class="p">,</span> <span class="s2">&quot;element.updated&quot;</span><span class="p">,</span> <span class="s2">&quot;element.deleted&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;schema_id&quot;</span><span class="p">:</span> <span class="s2">&quot;uuid&quot;</span>
+<span class="p">}</span>
+
+<span class="c1"># Submit proposal (Phase C)</span>
+<span class="n">POST</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">schemas</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">proposals</span>
+<span class="p">{</span>
+    <span class="s2">&quot;proposed_name&quot;</span><span class="p">:</span> <span class="s2">&quot;moca_total_score&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;proposed_type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;proposed_description&quot;</span><span class="p">:</span> <span class="s2">&quot;Montreal Cognitive Assessment total score&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;proposed_constraints&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">},</span>
+    <span class="s2">&quot;source_context&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;source_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Cohort D Clinical&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;source_field_name&quot;</span><span class="p">:</span> <span class="s2">&quot;moca_score&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sample_values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;28&quot;</span><span class="p">,</span> <span class="s2">&quot;24&quot;</span><span class="p">,</span> <span class="s2">&quot;19&quot;</span><span class="p">]</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;justification&quot;</span><span class="p">:</span> <span class="s2">&quot;MoCA is widely used...&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;proposed_by_email&quot;</span><span class="p">:</span> <span class="s2">&quot;troy@research.org&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="for-dataforge">
+<h3>For DataForge<a class="headerlink" href="#for-dataforge" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get schema for validation</span>
+<span class="n">GET</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">schemas</span><span class="o">/</span><span class="p">:</span><span class="nb">id</span><span class="o">/</span><span class="n">export</span><span class="err">?</span><span class="nb">format</span><span class="o">=</span><span class="n">jsonschema</span>
+
+<span class="c1"># Subscribe to schema changes for validation rule updates</span>
+<span class="n">POST</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">webhooks</span>
+<span class="p">{</span>
+    <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;https://dataforge.internal/webhooks/schema-updated&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;events&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;schema.updated&quot;</span><span class="p">,</span> <span class="s2">&quot;version.released&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;schema_id&quot;</span><span class="p">:</span> <span class="s2">&quot;uuid&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="proposal-review-ui-phase-c-curation-workbench">
+<h2>Proposal Review UI <em>(Phase C — Curation Workbench)</em><a class="headerlink" href="#proposal-review-ui-phase-c-curation-workbench" title="Link to this heading"></a></h2>
+<section id="proposal-review-queue">
+<h3>Proposal Review Queue<a class="headerlink" href="#proposal-review-queue" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────┐
+│                    PROPOSAL QUEUE                            │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  Schema: genetics-consortium-cdes                            │
+│  Pending: 3  |  Under Review: 1  |  This Week: 7             │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │ ○ moca_total_score                          Pending     │ │
+│  │   Proposed by: troy@research.org            2h ago      │ │
+│  │   Similar: mmse_total (62%)                             │ │
+│  │   [Review] [Quick Approve] [Quick Reject]               │ │
+│  ├─────────────────────────────────────────────────────────┤ │
+│  │ ○ gds_total                                 Pending     │ │
+│  │   Proposed by: troy@research.org            2h ago      │ │
+│  │   Similar: depression_score (58%)                       │ │
+│  │   [Review] [Quick Approve] [Quick Reject]               │ │
+│  ├─────────────────────────────────────────────────────────┤ │
+│  │ ● falls_past_year                         Under Review  │ │
+│  │   Proposed by: troy@research.org            1d ago      │ │
+│  │   Reviewer: gorb@research.org                           │ │
+│  │   Similar: fall_history (71%)                           │ │
+│  │   [View]                                                │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+<section id="proposal-detail-view">
+<h3>Proposal Detail View<a class="headerlink" href="#proposal-detail-view" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────┐
+│                  REVIEW PROPOSAL                             │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  Proposed Element                  Source Context            │
+│  ─────────────────                 ──────────────            │
+│  Name: moca_total_score            Source: Cohort D Clinical │
+│  Display: MoCA Total Score         Field: moca_score         │
+│  Type: integer                     Values: 28, 24, 19, 30... │
+│  Range: 0-30                                                 │
+│  Category: cognitive_assessments                             │
+│                                                              │
+│  Description:                                                │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │ Montreal Cognitive Assessment total score. Range 0-30,  │ │
+│  │ higher scores indicate better cognitive function.       │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                                                              │
+│  Justification:                                              │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │ MoCA is a widely-used cognitive screening tool. This    │ │
+│  │ element is needed for Cohort D data and has been        │ │
+│  │ requested by the research team.                         │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                                                              │
+│  Similar Existing Elements:                                  │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │ • mmse_total (62%) - MMSE Total Score                   │ │
+│  │   Different assessment instrument                       │ │
+│  │   [View Element] [Use Instead]                          │ │
+│  │                                                          │ │
+│  │ • cognitive_status (45%) - Cognitive Status             │ │
+│  │   Categorical, not continuous score                     │ │
+│  │   [View Element] [Use Instead]                          │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                                                              │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │ Reviewer Notes:                                         │ │
+│  │ [____________________________________________]          │ │
+│  └─────────────────────────────────────────────────────────┘ │
+│                                                              │
+│  [Approve] [Reject with Reason] [Request Changes] [Cancel]   │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="event-types">
+<h2>Event Types<a class="headerlink" href="#event-types" title="Link to this heading"></a></h2>
+<section id="schema-events">
+<h3>Schema Events<a class="headerlink" href="#schema-events" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">schema.created</span></code> — New schema created</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">schema.updated</span></code> — Schema metadata updated</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">schema.deleted</span></code> — Schema soft-deleted</p></li>
+</ul>
+</section>
+<section id="element-events">
+<h3>Element Events<a class="headerlink" href="#element-events" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">element.created</span></code> — New element added to schema</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">element.updated</span></code> — Element properties changed</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">element.deleted</span></code> — Element soft-deleted</p></li>
+</ul>
+</section>
+<section id="version-events">
+<h3>Version Events<a class="headerlink" href="#version-events" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">version.created</span></code> — New version drafted</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">version.released</span></code> — Version published</p></li>
+</ul>
+</section>
+<section id="proposal-events-phase-c">
+<h3>Proposal Events <em>(Phase C)</em><a class="headerlink" href="#proposal-events-phase-c" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">proposal.created</span></code> — New proposal submitted</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">proposal.resolved</span></code> — Proposal approved or rejected</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="open-questions">
+<h2>Open Questions<a class="headerlink" href="#open-questions" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Multi-tenancy:</strong> Shared database with row-level security, or separate databases?</p></li>
+<li><p><strong>Snapshot storage:</strong> Inline JSONB for small schemas, S3 for large—what’s the threshold?</p></li>
+<li><p><strong>Version strategy:</strong> Full snapshots or incremental diffs?</p></li>
+<li><p><strong>Search:</strong> PostgreSQL full-text sufficient, or Elasticsearch needed?</p></li>
+<li><p><strong>Event bus:</strong> Redis Pub/Sub sufficient, or need dedicated message queue?</p></li>
+</ol>
+<hr class="docutils" />
+<p><em>Document Version: 0.2</em>
+<em>Last Updated: 2025-01-28</em>
+<em>Author: Forge Team</em></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="harmonization-engine.html" class="btn btn-neutral float-left" title="SchemaForge: Harmonization Engine" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="roles-and-governance.html" class="btn btn-neutral float-right" title="Forge Platform — Roles, Permissions &amp; Governance" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

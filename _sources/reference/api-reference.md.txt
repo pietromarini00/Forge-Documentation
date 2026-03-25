@@ -1,0 +1,145 @@
+# API Reference
+
+Two FastAPI services. No authentication currently.
+
+---
+
+## Registry Service — `:8000`
+
+Schema storage, versioning, and export.
+
+### Schemas
+
+| Method | Path | What it does |
+|--------|------|-------------|
+| `GET` | `/api/v1/schemas/` | List schemas. Query: `skip`, `limit`, `include_inactive`. |
+| `POST` | `/api/v1/schemas/` | Create schema (optionally with elements inline). Body: `SchemaCreate`. Returns 201. |
+| `GET` | `/api/v1/schemas/{id}` | Get schema + all active elements. |
+| `GET` | `/api/v1/schemas/name/{name}` | Get schema by slug name. |
+| `PUT` | `/api/v1/schemas/{id}` | Update schema. Auto-increments version, creates snapshot. Query: `change_summary`. Body: `SchemaUpdate`. |
+| `DELETE` | `/api/v1/schemas/{id}` | Soft-delete (default) or hard-delete. Query: `hard_delete`. |
+| `POST` | `/api/v1/schemas/{id}/publish` | Mark schema as published. |
+| `GET` | `/api/v1/schemas/{id}/versions` | List version history. |
+| `POST` | `/api/v1/schemas/{id}/versions/{v}/restore` | Restore to a previous version. |
+| `GET` | `/api/v1/schemas/{id}/export` | Export as JSON, YAML, CSV, or TSV. Query: `format`, `include_metadata`. |
+
+### Schema Elements
+
+| Method | Path | What it does |
+|--------|------|-------------|
+| `GET` | `/api/v1/schemas/{id}/elements` | List elements. Query: `collection`, `skip`, `limit`. |
+| `POST` | `/api/v1/schemas/{id}/elements` | Add one element. Body: `ElementCreate`. |
+| `POST` | `/api/v1/schemas/{id}/elements/bulk` | Add many elements. Body: `list[ElementCreate]`. |
+| `GET` | `/api/v1/elements/` | List all elements across schemas. Query: `schema_id`, `collection`, `skip`, `limit`. |
+| `GET` | `/api/v1/elements/search` | Search by name/description/aliases. Query: `q` (required), `schema_id`, `limit`. |
+| `POST` | `/api/v1/elements/` | Create element. Query: `schema_id` (required). |
+| `GET` | `/api/v1/elements/{id}` | Get element by ID. |
+| `PUT` | `/api/v1/elements/{id}` | Update element. |
+| `DELETE` | `/api/v1/elements/{id}` | Soft or hard delete. |
+| `GET` | `/api/v1/elements/{id}/history` | Change history (derived from schema version snapshots). |
+
+### Value Sets
+
+| Method | Path | What it does |
+|--------|------|-------------|
+| `GET` | `/api/v1/value-sets/` | List value sets. Query: `published_only`, `value_set_type`, `skip`, `limit`. |
+| `POST` | `/api/v1/value-sets/` | Create value set. Body: `ValueSetCreate`. |
+| `POST` | `/api/v1/value-sets/upload` | Create from CSV/TSV file upload. Form: `file`, `name`, `display_name`, `code_column`, `display_column`, etc. |
+| `GET` | `/api/v1/value-sets/{id}` | Get value set + entries. Query: `version` (optional, for historical). |
+| `GET` | `/api/v1/value-sets/name/{name}` | Get by slug name. |
+| `PUT` | `/api/v1/value-sets/{id}` | Update. Auto-increments version. |
+| `DELETE` | `/api/v1/value-sets/{id}` | Soft or hard delete. |
+| `POST` | `/api/v1/value-sets/{id}/publish` | Mark as published. |
+| `GET` | `/api/v1/value-sets/{id}/versions` | Version history. |
+| `POST` | `/api/v1/value-sets/{id}/versions/{v}/restore` | Restore to previous version. |
+| `GET` | `/api/v1/value-sets/{id}/codes` | Flat list of code values (lightweight, for validation). |
+
+### Health
+
+| Method | Path | What it does |
+|--------|------|-------------|
+| `GET` | `/health` | Returns status + database connectivity. |
+| `GET` | `/` | Service info (name, version). |
+
+---
+
+## DataForge API — `:8001`
+
+Data validation, review workflows, and gold datasets.
+
+### Submissions
+
+| Method | Path | What it does |
+|--------|------|-------------|
+| `POST` | `/api/v1/submissions/` | Upload CSV + run validation. Form: `file`, `project`, `study`, `submitter`, `schema_id` (required), `gold_dataset_id` (optional). Returns 201. |
+| `GET` | `/api/v1/submissions/` | List submissions. Query: `status`, `project`. |
+| `GET` | `/api/v1/submissions/{id}` | Get submission detail. |
+| `POST` | `/api/v1/submissions/{id}/resubmit` | Upload corrected file. Only valid when status is `CORRECTIONS_NEEDED`. Form: `file`, `submitter`. |
+| `GET` | `/api/v1/submissions/{id}/report` | Download validation report. Query: `format` (json or csv). |
+
+### Review Workflow
+
+| Method | Path | What it does |
+|--------|------|-------------|
+| `POST` | `/api/v1/submissions/{id}/claim` | Claim for review. Body: `{reviewer, notes?}`. |
+| `POST` | `/api/v1/submissions/{id}/release` | Release claim. Body: `{reviewer}`. |
+| `POST` | `/api/v1/submissions/{id}/accept` | Accept submission. Appends data to gold dataset (if assigned). Body: `{reviewer, notes?}`. |
+| `POST` | `/api/v1/submissions/{id}/reject` | Reject with feedback. Body: `{reviewer, notes?}`. |
+| `PATCH` | `/api/v1/submissions/{id}/gold-dataset` | Assign/clear gold dataset. Reviewer must hold claim. Body: `{reviewer, gold_dataset_id?}`. |
+
+### Gold Datasets
+
+| Method | Path | What it does |
+|--------|------|-------------|
+| `POST` | `/api/v1/gold/` | Create gold dataset. Body: `{name, schema_id, schema_name?, description?, identifier_scheme?, created_by}`. |
+| `GET` | `/api/v1/gold/` | List gold datasets. Query: `schema_id`. |
+| `GET` | `/api/v1/gold/{id}` | Get gold dataset metadata. |
+| `DELETE` | `/api/v1/gold/{id}` | Delete gold dataset. |
+| `GET` | `/api/v1/gold/{id}/download` | Download as CSV (includes provenance columns). |
+
+### Submission State Machine
+
+```
+UPLOADED → VALIDATING → PENDING_REVIEW → ACCEPTED
+                                       → REJECTED
+                                       → CORRECTIONS_NEEDED → (resubmit) → UPLOADED
+```
+
+### Health
+
+| Method | Path | What it does |
+|--------|------|-------------|
+| `GET` | `/health` | Returns `{status: "healthy"}`. |
+| `GET` | `/` | Service info. |
+
+---
+
+## Key Conventions
+
+- **IDs** are UUIDs everywhere.
+- **Schema names** must match `^[a-z0-9_-]+$` (lowercase slug). 409 if name already exists.
+- **Pagination** uses `skip` / `limit` (not page/page_size).
+- **Soft delete** is the default. Pass `hard_delete=true` to permanently remove.
+- **Versioning** is automatic — updating a schema or value set increments the version and saves a snapshot.
+- **Validation** happens at upload time. `POST /submissions/` returns the submission object with validation results inline.
+- **Review claims** expire after 1 hour of inactivity.
+- **Gold dataset provenance columns**: `_submission_id`, `_version`, `_source_row`, `_accepted_at`, `_accepted_by`.
+
+---
+
+## What Doesn't Have an API Yet
+
+These capabilities exist in `forge-app/core/` but are only accessible through the Streamlit UI:
+
+| Capability | Module | Notes |
+|------------|--------|-------|
+| CDE file parsing | `core/curation/parser.py` | CSV/TSV/Excel parsing with column auto-detection |
+| AI suggestions | `core/curation/suggestion_service.py` | Claude-powered name/type/constraint suggestions |
+| Duplicate detection | `core/curation/duplicate_detector.py` | TF-IDF + embedding similarity |
+| Schema publish orchestration | `core/curation/publisher.py` | Coordinates Registry API calls |
+| Harmonization matching | `core/harmonization/matcher.py` | 2-tier exact + AI matching |
+| Hybrid retrieval | `core/harmonization/retrieval.py` | TF-IDF + embedding candidate retrieval |
+| Match curation | `core/harmonization/curation.py` | Accept/reject/modify match decisions |
+| Project/workflow state | `core/storage.py` | Manifest CRUD, session persistence |
+
+These are the future Harmonization API and Curation API surfaces. See [api-first-decoupling.md](../specs/api-first-decoupling.md) R5 for the extraction plan.

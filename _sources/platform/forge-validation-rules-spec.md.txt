@@ -1,0 +1,219 @@
+# Validation Rules — Interactive Rule Builder Spec
+
+## Overview
+
+Add an interactive validation rule builder to the Schema Curation Wizard in forge-app. Users define cross-field business logic rules (e.g., "onset must precede diagnosis", "LBD requires Brain Bank study type") after curating all variables, using templates or custom expressions. Rules are published to the Registry schema's metadata and enforced by DataForge at data submission time.
+
+---
+
+## Background
+
+### What Are Validation Rules?
+
+Validation rules are business logic checks that go beyond single-field constraints (type, required, enum values, min/max). They express **relationships between fields** or **dataset-level invariants**:
+
+- **Conditional (row-level):** "If diagnosis is PD, age_of_onset must be present"
+- **Conditional (cross-field):** "age_of_onset must be ≤ age_at_diagnosis"
+- **Submission (dataset-level):** "GP2sampleID must be unique across all rows"
+
+### Current State
+
+- **DataForge** already supports validation rules via `RuleConfig` model and `ValidationEngine`
+- **RegistrySchemaLoader** reads rules from `schema.metadata.validation_rules`
+- **Registry Service** stores rules in the schema's `metadata` JSONB column
+- **Publisher** (`build_registry_payload`) accepts `validation_rules` and includes them in metadata
+- **Current UI** has a JSON file upload in Step 4 (Publish) — functional but not user-friendly
+
+### Why Rules Must Come After Curation
+
+Rules reference variables by their curated names (e.g., `row['age_of_onset']`). During curation (Step 3), variable names may change, be merged, or be rejected. Rules can only be meaningfully authored once all variable names are finalized.
+
+---
+
+## Design
+
+### Wizard Step Changes
+
+The Schema Curation Wizard expands from 4 steps to 5:
+
+| Step | Name | Status |
+|------|------|--------|
+| 1 | Upload | Existing |
+| 2 | Configure | Existing |
+| 3 | Curate Elements | Existing |
+| **4** | **Validation Rules** | **New** |
+| 5 | Publish | Existing (renumbered from 4) |
+
+Step 4 is **optional** — schemas can be published with zero rules.
+
+### Rule Data Model
+
+Rules are stored on `CurationSession.validation_rules: list[dict]` and follow DataForge's `RuleConfig` structure:
+
+```json
+{
+  "name": "onset_before_diagnosis",
+  "description": "Age of onset must be ≤ age at diagnosis when both are present",
+  "rule_type": "conditional",
+  "condition": "row['age_of_onset'] != '' and row['age_at_diagnosis'] != ''",
+  "constraint": "float(row['age_of_onset']) <= float(row['age_at_diagnosis'])",
+  "severity": "error",
+  "enabled": true
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Unique slug identifier (auto-generated from template, editable) |
+| `description` | string | No | Human-readable explanation |
+| `rule_type` | `"conditional"` \| `"submission"` | Yes | Row-level or dataset-level |
+| `condition` | string \| null | No | When to apply (Python expression). Null for submission rules. |
+| `constraint` | string | Yes | What must be true (Python expression) |
+| `severity` | `"error"` \| `"warning"` \| `"info"` | Yes | Fail validation, flag for review, or informational |
+| `enabled` | bool | Yes | Whether the rule is active (default: true) |
+
+### Expression Syntax
+
+Rules use Python expressions evaluated by DataForge's `ValidationEngine`:
+
+- **Row access:** `row['field_name']` — access a column value in the current row
+- **Null checks:** `row['field'] is None or row['field'] == ''`
+- **Comparisons:** `float(row['age']) <= float(row['other_age'])`
+- **Set membership:** `row['phenotype'] in ('PD', 'LBD')`
+- **Submission functions:** `column_unique('field_name')` — dataset-level uniqueness
+
+---
+
+## UI Layout — Step 4: Validation Rules
+
+```
+Step 4 — Validation Rules (optional)
+
+  [Total Rules: 5]  [Errors: 3]  [Warnings: 2]
+
+  ┌─ Rules ──────────────────────────────────────────┐
+  │ Name              │ Description    │ Sev  │      │
+  │ pd_requires_onset │ PD phenotype…  │ warn │ [x]  │
+  │ onset_lte_diag    │ Onset must…    │ err  │ [x]  │
+  │ unique_sampleid   │ GP2sampleID…   │ err  │ [x]  │
+  └──────────────────────────────────────────────────┘
+
+  ┌─ Add New Rule ───────────────────────────────────┐
+  │                                                  │
+  │ Template: [Require field when... ▾]              │
+  │                                                  │
+  │ Field:    [age_of_onset ▾]                       │
+  │ When:     [GP2_phenotype ▾]  equals  [PD     ]   │
+  │                                                  │
+  │ ── Preview (editable) ──                         │
+  │ Name:        [age_of_onset_required_when_gp2_…]  │
+  │ Description: [                                ]  │
+  │ Rule Type:   [Conditional ▾]                     │
+  │ Condition:   [row['GP2_phenotype'] == 'PD'    ]  │
+  │ Constraint:  [row['age_of_onset'] is not None…]  │
+  │ Severity:    [Error ▾]                           │
+  │                                                  │
+  │ [Add Rule]                                       │
+  └──────────────────────────────────────────────────┘
+
+  [← Back to Curate]            [Continue to Publish →]
+```
+
+### Templates
+
+Templates auto-fill the expression fields based on user-selected variables. All generated fields remain editable before adding.
+
+| Template | User Inputs | Auto-generated |
+|----------|------------|----------------|
+| **Require field when...** | field, trigger field, trigger value | Condition: `row['{trigger}'] == '{value}'`; Constraint: `row['{field}'] is not None and row['{field}'] != ''`; Severity: error |
+| **Forbid field when...** | field, trigger field, trigger value | Condition: `row['{trigger}'] == '{value}'`; Constraint: `row['{field}'] is None or row['{field}'] == ''`; Severity: warning |
+| **Field A ≤ Field B** | field_a, field_b | Condition: both not empty; Constraint: `float(row['{a}']) <= float(row['{b}'])`; Severity: error |
+| **Fields must match** | field_a, field_b | Condition: `True`; Constraint: `row['{a}'] == row['{b}']`; Severity: error |
+| **Must be unique** | field | Rule type: submission; Constraint: `column_unique('{field}')`; Severity: error |
+| **Custom** | _(all manual)_ | _(empty fields)_ |
+
+Field dropdowns are populated from `session.curated_elements` — all finalized variable names.
+
+### Interaction Details
+
+- **Add:** Fill template or custom fields → click "Add Rule" → rule appended to `session.validation_rules` → page reruns
+- **Delete:** Click delete button on a rule row → rule removed → page reruns
+- **Edit:** Delete + re-add (no inline editing for v1)
+- **Persist:** Rules saved to `CurationSession` on every add/delete via `save_curation_session()`
+- **Skip:** "Continue to Publish" works with zero rules
+
+---
+
+## Step 5: Publish (Updated)
+
+The current Step 4 (Publish) becomes Step 5 with these changes:
+
+- **Remove** the JSON file uploader for validation rules
+- **Add** a read-only rules summary alongside the elements preview:
+  - Metric showing rule count
+  - Expandable table: Name | Description | Type | Severity
+- Pass `session.validation_rules` to `publish_to_registry()` (publisher already supports this)
+
+---
+
+## Files to Modify
+
+| File | Change |
+|------|--------|
+| `services/forge-app/core/curation/models.py` | Add `validation_rules: list[dict]` to `CurationSession`, bump `current_step` max to 5 |
+| `services/forge-app/pages/1_Schemas.py` | Add Step 4 (rules builder), renumber Step 4→5 (publish), remove file upload, update all step references |
+
+### Files Already Correct (No Changes Needed)
+
+- `core/storage.py` — Pydantic serialization handles new field automatically
+- `core/curation/publisher.py` — already accepts `validation_rules` param
+- Registry Service — `metadata` JSONB field fully supported in create/update/response
+- DataForge `RegistrySchemaLoader` — already reads `metadata.validation_rules`
+- DataForge `ValidationEngine` — already executes `RuleConfig` rules
+
+---
+
+## End-to-End Data Flow
+
+```
+Schema Wizard Step 4          Step 5              Registry              DataForge
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│ User builds  │     │ Publish      │     │ metadata:    │     │ Registry     │
+│ rules via    │────>│ includes     │────>│  validation_ │────>│ SchemaLoader │
+│ templates or │     │ rules in     │     │  rules: [..] │     │ reads rules  │
+│ custom exprs │     │ metadata     │     │              │     │ into Schema  │
+└──────────────┘     └──────────────┘     └──────────────┘     └──────┬───────┘
+                                                                       │
+                                                                       ▼
+                                                               ┌──────────────┐
+                                                               │ Validation   │
+                                                               │ Engine runs  │
+                                                               │ rules on     │
+                                                               │ uploaded CSV │
+                                                               └──────────────┘
+```
+
+---
+
+## Verification
+
+1. **Unit tests:** `.venv/bin/python -m pytest services/forge-app/tests/`
+2. **Manual test:**
+   - Create a schema, curate variables through Step 3
+   - In Step 4, add rules using templates (e.g., "Require field when...", "Must be unique")
+   - Add a custom rule with a hand-written expression
+   - Verify rules persist when navigating back and forward
+   - Continue to Step 5 (Publish), verify rules summary shows
+   - Publish to Registry
+   - Verify via `GET /api/v1/schemas/{id}` that `metadata.validation_rules` contains the rules
+   - Create a Data Project with that schema, upload a CSV, confirm rules fire during validation
+
+---
+
+## Future Enhancements (Out of Scope)
+
+- **Edit rules on published schemas** — currently only at publish time; would need a dedicated schema management UI
+- **Visual expression builder** — full drag-and-drop rule builder (templates cover common cases for now)
+- **Rule testing** — dry-run rules against sample data before publishing
+- **AI-suggested rules** — infer common patterns from variable types and names
+- **Rule versioning** — track rule changes across schema versions

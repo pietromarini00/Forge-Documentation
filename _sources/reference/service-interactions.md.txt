@@ -1,0 +1,293 @@
+# Service Interaction Sequences
+
+What backend calls happen, in what order, for each user workflow. This is the implicit API contract that lives inside the Streamlit pages today. When the Harmonization API and Curation API are built, these sequences become the endpoint design spec.
+
+---
+
+## Journey A: Schema Curation
+
+**Page:** `pages/1_Schemas.py`
+**Goal:** Upload a raw CDE list → curate with AI assistance → publish to Registry
+
+### Step 1: Upload
+
+```
+User uploads CSV/TSV/Excel file
+    │
+    ├─→ parser.parse_uploaded_file(content, filename, sheet_name?)
+    │       Returns: ParseResult (list of RawElement + column mapping)
+    │
+    ├─→ save_curation_session(project_id, session)          [local storage]
+    ├─→ save_schema_project(manifest)                        [local storage]
+    ├─→ save_source_file(project_id, df, filename)           [local storage]
+    └─→ save_parse_result(project_id, parse_result)          [local storage]
+```
+
+### Step 2: Configure (AI Suggestions + Duplicate Detection)
+
+```
+Page loads → runs AI + similarity in one pass
+    │
+    ├─→ DuplicateDetector(retrieval_config)
+    │       Uses: forge-retrieval-core (TF-IDF + embeddings)
+    │
+    ├─→ detector.index_elements(raw_elements)
+    ├─→ detector.get_pairwise_similarities(threshold)
+    │       Returns: dict[var, dict[var, float]]
+    │
+    ├─→ AISuggestionService(anthropic_client, curation_config)
+    ├─→ svc.generate_all_suggestions(raw_elements, batch_size=10)
+    │       Calls: Claude API (batches of 10 elements)
+    │       Returns: SuggestionsResult (per-element suggestions for name, type, constraints)
+    │
+    ├─→ save_batch_suggestions(project_id, suggestions_result)  [local storage]
+    ├─→ save_element_hashes(project_id, hashes)                  [local storage]
+    └─→ save_curation_session(project_id, session)               [local storage]
+```
+
+### Step 3: Curate (per variable)
+
+```
+User reviews each variable, accepts/modifies/rejects
+    │
+    ├─→ session.get_filtered_variables(filter)           [in-memory]
+    ├─→ session.get_similar_variables(var, threshold)     [in-memory]
+    │
+    │   If variable has a linked value set:
+    ├─→ registry_client.get_value_set(value_set_id)      [Registry API]
+    │
+    │   If user creates a new value set:
+    ├─→ registry_client.list_value_sets(published_only=False)   [Registry API]
+    ├─→ registry_client.upload_value_set(bytes, name, meta)     [Registry API]
+    │
+    └─→ save_curation_session(project_id, session)       [local storage]
+```
+
+### Step 4: Validation Rules
+
+```
+User builds conditional rules using templates or custom expressions
+    │
+    ├─→ (all in-memory: rules stored in session.validation_rules)
+    └─→ save_curation_session(project_id, session)       [local storage]
+```
+
+### Step 5: Publish
+
+```
+User clicks Publish
+    │
+    ├─→ publish_to_registry(client, schema_name, display_name, description, elements, rules)
+    │       Internally:
+    │       ├─→ registry_client.create_schema(SchemaCreate)     [Registry API → 201]
+    │       └─→ registry_client.create_schema_elements(...)     [Registry API]
+    │
+    └─→ save_schema_project(manifest)                            [local storage]
+            Sets: published_schema_id, published_schema_name
+```
+
+---
+
+## Journey B: Data Harmonization + Validation
+
+**Page:** `pages/2_Data.py`
+**Goal:** Map source fields to a published schema → validate data → submit for review
+
+### Step 1: Setup
+
+```
+User uploads source data dictionary (and optionally a data file)
+    │
+    ├─→ (if data file uploaded) _extract_data_dict_from_data_file(df)
+    │       Auto-generates data dict from column headers
+    │
+    ├─→ save_harm_data_dict(project_id, data_dict_df)    [local storage]
+    ├─→ save_harm_data_file(project_id, bytes, name)     [local storage]
+    └─→ save_data_project(manifest)                       [local storage]
+```
+
+### Step 2: Match
+
+```
+System runs 2-tier matching against the target schema
+    │
+    ├─→ load_harm_data_dict(project_id)                          [local storage]
+    │
+    ├─→ registry_client.get_schema_elements(schema_id)           [Registry API]
+    ├─→ elements_to_reference_df(elements)                       [in-memory transform]
+    │
+    ├─→ ComprehensiveMatcher(api_key, use_hybrid_retrieval=True)
+    ├─→ matcher.load_reference_cdes(df=reference_df)
+    │       Internally builds TF-IDF + embedding index via HybridRetriever
+    │
+    ├─→ run_matching(matcher, data_dict_df, progress_callback)
+    │       For each source field:
+    │       ├─→ Tier 1: Exact name match against CDE items + alternate names
+    │       │       If match → confidence 1.0, skip AI
+    │       └─→ Tier 2: HybridRetriever.retrieve(query) → top 15 candidates
+    │                    → Claude API evaluates candidates → best match + confidence
+    │
+    ├─→ save_harm_results(project_id, results_df)                [local storage]
+    └─→ save_data_project(manifest)                               [local storage]
+```
+
+### Step 3: Curate
+
+```
+User reviews AI match suggestions, accepts/rejects/modifies
+    │
+    ├─→ load_curated_match_set(project_id)                       [local storage]
+    │       OR create_curated_match_set_from_results(results_df)
+    │       (auto-accepts exact matches on first creation)
+    │
+    │   Per-field operations:
+    ├─→ filter_curations(cms, decision_filter, max_confidence)   [in-memory]
+    ├─→ sort_curations(curations, sort_by)                        [in-memory]
+    ├─→ update_curation_decision(fc, decision, match_id?)         [in-memory]
+    │
+    │   Bulk operations:
+    ├─→ accept_all_exact_matches(cms)                             [in-memory]
+    ├─→ reset_exact_matches_to_pending(cms)                       [in-memory]
+    │
+    │   Exports:
+    ├─→ cms.to_simple_mapping_tsv()                               [in-memory → download]
+    ├─→ cms.to_summary_report()                                   [in-memory → download]
+    ├─→ cms.to_gap_report_tsv()                                   [in-memory → download]
+    │
+    ├─→ save_curated_match_set(project_id, cms)                   [local storage]
+    └─→ save_data_project(manifest)                                [local storage]
+```
+
+### Step 4: Validate
+
+```
+User submits data file for validation against the schema
+    │
+    │   If data file was preloaded in Step 1:
+    ├─→ load_harm_data_file(project_id)                          [local storage]
+    ├─→ _load_mapping(project_id)                                 [from curated match set]
+    ├─→ _apply_column_mapping(file_bytes, mapping)                [in-memory rename]
+    │
+    │   Gold dataset selection:
+    ├─→ gold_client.list_gold_datasets(schema_id)                [DataForge API]
+    │   (optionally) gold_client.create_gold_dataset(...)        [DataForge API]
+    │
+    │   Submit to DataForge:
+    ├─→ dataforge_client.upload_submission(                       [DataForge API → 201]
+    │       file, project, study, submitter,
+    │       schema_id, gold_dataset_id?)
+    │
+    │   OR for corrections:
+    ├─→ dataforge_client.resubmit_submission(                    [DataForge API]
+    │       submission_id, file, filename, submitter)
+    │
+    └─→ save_data_project(manifest)                               [local storage]
+            Sets: active_submission_id, appends to submission_ids
+```
+
+### Step 5: Results
+
+```
+Display validation results
+    │
+    ├─→ dataforge_client.get_submission(submission_id)           [DataForge API]
+    ├─→ dataforge_client.get_report(submission_id, format="json") [DataForge API]
+    └─→ dataforge_client.get_report(submission_id, format="csv")  [DataForge API → download]
+```
+
+---
+
+## Journey B (continued): Submission Review
+
+**Page:** `pages/2_Data.py` — Review View (`?submission={id}`)
+
+```
+Reviewer opens a submission
+    │
+    ├─→ dataforge_client.get_submission(submission_id)           [DataForge API]
+    ├─→ dataforge_client.get_report(submission_id, "json")       [DataForge API]
+    │
+    │   Gold dataset assignment (before accepting):
+    ├─→ gold_client.list_gold_datasets(schema_id)                [DataForge API]
+    ├─→ dataforge_client.assign_gold_dataset(                    [DataForge API]
+    │       submission_id, reviewer, gold_dataset_id?)
+    │
+    │   Review actions:
+    ├─→ dataforge_client.claim_submission(id, reviewer)          [DataForge API]
+    ├─→ dataforge_client.accept_submission(id, reviewer, notes?) [DataForge API]
+    │       Internally: appends data to gold dataset with provenance
+    ├─→ dataforge_client.reject_submission(id, reviewer, notes?) [DataForge API]
+    └─→ dataforge_client.release_submission(id, reviewer)        [DataForge API]
+```
+
+---
+
+## Journey C: Gold Dataset Management
+
+**Page:** `pages/3_Gold.py`
+
+### Dashboard
+
+```
+├─→ gold_client.list_gold_datasets()                             [DataForge API]
+└─→ gold_client.delete_gold_dataset(dataset_id)                  [DataForge API]
+```
+
+### Create
+
+```
+├─→ registry_client.list_schemas()                               [Registry API]
+└─→ gold_client.create_gold_dataset(                             [DataForge API → 201]
+        name, schema_id, schema_name,
+        description?, identifier_scheme?, created_by)
+```
+
+### Detail View (`?gold_dataset={id}`)
+
+```
+├─→ gold_client.get_gold_dataset(dataset_id)                     [DataForge API]
+└─→ gold_client.download_gold_csv(dataset_id)                    [DataForge API]
+        Returns CSV with provenance columns:
+        _submission_id, _version, _source_row, _accepted_at, _accepted_by
+```
+
+---
+
+## Client → Service Mapping
+
+| Client method | HTTP call |
+|---------------|-----------|
+| `registry_client.list_schemas()` | `GET /api/v1/schemas/` |
+| `registry_client.get_schema(id)` | `GET /api/v1/schemas/{id}` |
+| `registry_client.get_schema_elements(id)` | `GET /api/v1/schemas/{id}/elements` |
+| `registry_client.create_schema(payload)` | `POST /api/v1/schemas/` |
+| `registry_client.list_value_sets()` | `GET /api/v1/value-sets/` |
+| `registry_client.get_value_set(id)` | `GET /api/v1/value-sets/{id}` |
+| `registry_client.upload_value_set(file, ...)` | `POST /api/v1/value-sets/upload` |
+| `dataforge_client.upload_submission(...)` | `POST /api/v1/submissions/` |
+| `dataforge_client.get_submission(id)` | `GET /api/v1/submissions/{id}` |
+| `dataforge_client.resubmit_submission(...)` | `POST /api/v1/submissions/{id}/resubmit` |
+| `dataforge_client.get_report(id, fmt)` | `GET /api/v1/submissions/{id}/report` |
+| `dataforge_client.claim_submission(id, ...)` | `POST /api/v1/submissions/{id}/claim` |
+| `dataforge_client.accept_submission(id, ...)` | `POST /api/v1/submissions/{id}/accept` |
+| `dataforge_client.reject_submission(id, ...)` | `POST /api/v1/submissions/{id}/reject` |
+| `dataforge_client.release_submission(id, ...)` | `POST /api/v1/submissions/{id}/release` |
+| `dataforge_client.assign_gold_dataset(...)` | `PATCH /api/v1/submissions/{id}/gold-dataset` |
+| `gold_client.list_gold_datasets(schema_id?)` | `GET /api/v1/gold/` |
+| `gold_client.create_gold_dataset(...)` | `POST /api/v1/gold/` |
+| `gold_client.get_gold_dataset(id)` | `GET /api/v1/gold/{id}` |
+| `gold_client.delete_gold_dataset(id)` | `DELETE /api/v1/gold/{id}` |
+| `gold_client.download_gold_csv(id)` | `GET /api/v1/gold/{id}/download` |
+
+---
+
+## What Calls Claude API Directly
+
+Only two modules make LLM calls. Everything else is deterministic.
+
+| Module | When | What it sends |
+|--------|------|---------------|
+| `core/curation/suggestion_service.py` | Step 2 of Schema Curation | Batches of 10 raw elements → gets name, type, constraint, description suggestions |
+| `core/harmonization/matcher.py` | Step 2 of Data Harmonization (Tier 2 only) | Source field + 15 retrieval candidates → gets best match + confidence + rationale |
+
+Both use `claude-sonnet-4-6`, temperature 0.0, with retry logic via `core/retry.py`.

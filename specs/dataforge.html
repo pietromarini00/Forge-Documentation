@@ -1,0 +1,966 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DataForge &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SchemaForge: Harmonization Engine" href="harmonization-engine.html" />
+    <link rel="prev" title="SchemaForge: Curation Workbench" href="curation-workbench.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">DataForge</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#product-specification-v0-1">Product Specification v0.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#executive-summary">Executive Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#solution">Solution</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#target-users">Target Users</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#primary-data-submitter">Primary: Data Submitter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#secondary-qc-reviewer">Secondary: QC Reviewer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tertiary-data-consumer">Tertiary: Data Consumer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#core-concepts">Core Concepts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#project">Project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#submission">Submission</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version">Version</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#record">Record</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#validation-rule">Validation Rule</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#action">Action</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#features">Features</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#f1-data-ingestion">F1: Data Ingestion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f2-validation-engine">F2: Validation Engine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f3-qc-workflow">F3: QC Workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f4-corrections-flow">F4: Corrections Flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f5-data-serving">F5: Data Serving</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#f6-provenance-audit">F6: Provenance &amp; Audit</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#api-design">API Design</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submissions">Submissions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#versions">Versions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#records">Records</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-access">Data Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#audit">Audit</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#integration-with-schemaforge">Integration with SchemaForge</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#consuming-schemas">Consuming Schemas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#consuming-mappings">Consuming Mappings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#providing-feedback">Providing Feedback</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data-model">Data Model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#database-schema-postgresql">Database Schema (PostgreSQL)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#implementation-phases">Implementation Phases</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#phase-1-mvp">Phase 1: MVP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-2-corrections">Phase 2: Corrections</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-3-advanced-validation">Phase 3: Advanced Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-4-schemaforge-integration">Phase 4: SchemaForge Integration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-5-scale-serve">Phase 5: Scale &amp; Serve</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#success-metrics">Success Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#quality">Quality</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#efficiency">Efficiency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compliance">Compliance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#risks-mitigations">Risks &amp; Mitigations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-dataforge-does-not-do">What DataForge Does NOT Do</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">DataForge</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/specs/dataforge.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="dataforge">
+<h1>DataForge<a class="headerlink" href="#dataforge" title="Link to this heading"></a></h1>
+<section id="product-specification-v0-1">
+<h2>Product Specification v0.1<a class="headerlink" href="#product-specification-v0-1" title="Link to this heading"></a></h2>
+</section>
+<hr class="docutils" />
+<section id="executive-summary">
+<h2>Executive Summary<a class="headerlink" href="#executive-summary" title="Link to this heading"></a></h2>
+<p><strong>DataForge</strong> is the data lifecycle layer of the Forge platform. It receives harmonized data, validates it against canonical schemas, manages QC workflows, handles corrections, and serves production-ready data.</p>
+<p>While SchemaForge handles “what should data look like,” DataForge handles “here’s actual data—make sure it conforms.”</p>
+</section>
+<hr class="docutils" />
+<section id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Link to this heading"></a></h2>
+<p>After mapping source fields to a canonical schema, organizations still face:</p>
+<ul class="simple">
+<li><p><strong>No automated validation</strong> — Manual checks or custom scripts</p></li>
+<li><p><strong>No QC workflow</strong> — Email chains, spreadsheets, ad-hoc review</p></li>
+<li><p><strong>No correction handling</strong> — Errors discovered post-acceptance require manual remediation</p></li>
+<li><p><strong>No versioning</strong> — Changes overwrite history</p></li>
+<li><p><strong>No provenance</strong> — Can’t trace data lineage</p></li>
+</ul>
+<p><strong>Result:</strong> Data quality issues slip through. Corrections are painful. Audit requirements aren’t met.</p>
+</section>
+<hr class="docutils" />
+<section id="solution">
+<h2>Solution<a class="headerlink" href="#solution" title="Link to this heading"></a></h2>
+<p>DataForge provides a structured data lifecycle:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────────────────────────────────────────────────────┐
+│                          DATAFORGE                                   │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   INGEST          VALIDATE         REVIEW           SERVE          │
+│   ──────          ────────         ──────           ─────          │
+│                                                                     │
+│   Upload data     Schema checks    QC queue         Query API      │
+│   Apply mappings  Rule evaluation  Claim/release    Export         │
+│   Parse &amp; store   Cross-ref        Approve/reject   Push to        │
+│                   validation       Corrections      downstream     │
+│                                                                     │
+│   ─────────────────────────────────────────────────────────────    │
+│                                                                     │
+│   VERSIONING              PROVENANCE              AUDIT            │
+│   ──────────              ──────────              ─────            │
+│   Every change tracked    Full data lineage      Every action     │
+│                                                   logged           │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="target-users">
+<h2>Target Users<a class="headerlink" href="#target-users" title="Link to this heading"></a></h2>
+<section id="primary-data-submitter">
+<h3>Primary: Data Submitter<a class="headerlink" href="#primary-data-submitter" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Uploads harmonized data batches</p></li>
+<li><p>Reviews validation errors</p></li>
+<li><p>Submits corrections</p></li>
+</ul>
+</section>
+<section id="secondary-qc-reviewer">
+<h3>Secondary: QC Reviewer<a class="headerlink" href="#secondary-qc-reviewer" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Reviews flagged submissions</p></li>
+<li><p>Approves or rejects with comments</p></li>
+<li><p>Manages review queue</p></li>
+</ul>
+</section>
+<section id="tertiary-data-consumer">
+<h3>Tertiary: Data Consumer<a class="headerlink" href="#tertiary-data-consumer" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Queries accepted data via API</p></li>
+<li><p>Exports for downstream use</p></li>
+<li><p>Trusts data quality</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="core-concepts">
+<h2>Core Concepts<a class="headerlink" href="#core-concepts" title="Link to this heading"></a></h2>
+<section id="project">
+<h3>Project<a class="headerlink" href="#project" title="Link to this heading"></a></h3>
+<p>A tenant container for schemas, submissions, and users.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">project</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Neurodegenerative</span><span class="nv"> </span><span class="s">Research</span><span class="nv"> </span><span class="s">Consortium&quot;</span>
+<span class="w">  </span><span class="nt">slug</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;nrc&quot;</span>
+<span class="w">  </span><span class="nt">schema_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span><span class="w">                    </span><span class="c1"># From SchemaForge Registry</span>
+<span class="w">  </span><span class="nt">settings</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">require_review</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">auto_accept_threshold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">        </span><span class="c1"># Confidence score for auto-accept</span>
+<span class="w">    </span><span class="nt">retention_days</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">365</span>
+<span class="w">  </span><span class="nt">created_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-01T00:00:00Z&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="submission">
+<h3>Submission<a class="headerlink" href="#submission" title="Link to this heading"></a></h3>
+<p>A batch of data going through the validation pipeline.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">submission</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">project_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">external_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;STUDY_A_batch_47&quot;</span><span class="w">      </span><span class="c1"># User-provided identifier</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Status</span>
+<span class="w">  </span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;pending_review&quot;</span><span class="w">             </span><span class="c1"># uploaded | validating | pending_review | </span>
+<span class="w">                                       </span><span class="c1"># accepted | rejected | correcting</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Content</span>
+<span class="w">  </span><span class="nt">record_count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">847</span>
+<span class="w">  </span><span class="nt">current_version_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Workflow</span>
+<span class="w">  </span><span class="nt">claimed_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span><span class="w">                   </span><span class="c1"># Reviewer who claimed it</span>
+<span class="w">  </span><span class="nt">claimed_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-15T10:00:00Z&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Timestamps</span>
+<span class="w">  </span><span class="nt">uploaded_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">uploaded_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-15T09:00:00Z&quot;</span>
+<span class="w">  </span><span class="nt">accepted_at</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span>
+</pre></div>
+</div>
+</section>
+<section id="version">
+<h3>Version<a class="headerlink" href="#version" title="Link to this heading"></a></h3>
+<p>An immutable snapshot of submission data.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">submission_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">version_number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Content</span>
+<span class="w">  </span><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">...</span><span class="p p-Indicator">]</span><span class="w">                          </span><span class="c1"># Array of records (JSONB)</span>
+<span class="w">  </span><span class="nt">record_count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">847</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Validation</span>
+<span class="w">  </span><span class="nt">validation_result</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">valid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">    </span><span class="nt">error_count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span>
+<span class="w">    </span><span class="nt">warning_count</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">34</span>
+<span class="w">    </span><span class="nt">errors</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">...</span><span class="p p-Indicator">]</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Metadata</span>
+<span class="w">  </span><span class="nt">created_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">created_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-15T11:30:00Z&quot;</span>
+<span class="w">  </span><span class="nt">reason</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Fixed</span><span class="nv"> </span><span class="s">date</span><span class="nv"> </span><span class="s">format</span><span class="nv"> </span><span class="s">errors&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="record">
+<h3>Record<a class="headerlink" href="#record" title="Link to this heading"></a></h3>
+<p>A single data row within a submission.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">record</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">submission_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">version_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">row_number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">47</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Content</span>
+<span class="w">  </span><span class="nt">data</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">sample_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;NRC_0047&quot;</span>
+<span class="w">    </span><span class="nt">age_at_onset</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">67</span>
+<span class="w">    </span><span class="nt">biological_sex</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Female&quot;</span>
+<span class="w">    </span><span class="nt">phenotype</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Parkinson&#39;s</span><span class="nv"> </span><span class="s">Disease&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Validation state</span>
+<span class="w">  </span><span class="nt">valid</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">errors</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+<span class="w">  </span><span class="nt">warnings</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+</pre></div>
+</div>
+</section>
+<section id="validation-rule">
+<h3>Validation Rule<a class="headerlink" href="#validation-rule" title="Link to this heading"></a></h3>
+<p>A check that data must pass.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">rule</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">schema_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Identity</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;control_no_onset&quot;</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Control</span><span class="nv"> </span><span class="s">phenotypes</span><span class="nv"> </span><span class="s">cannot</span><span class="nv"> </span><span class="s">have</span><span class="nv"> </span><span class="s">age_at_onset&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Logic</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;conditional&quot;</span><span class="w">                  </span><span class="c1"># field | row | submission | cross_submission</span>
+<span class="w">  </span><span class="nt">condition</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;phenotype</span><span class="nv"> </span><span class="s">IN</span><span class="nv"> </span><span class="s">(&#39;Control&#39;,</span><span class="nv"> </span><span class="s">&#39;Population</span><span class="nv"> </span><span class="s">Control&#39;)&quot;</span>
+<span class="w">  </span><span class="nt">constraint</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;age_at_onset</span><span class="nv"> </span><span class="s">IS</span><span class="nv"> </span><span class="s">NULL&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="c1"># Behavior</span>
+<span class="w">  </span><span class="nt">severity</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;error&quot;</span><span class="w">                    </span><span class="c1"># error | warning | info</span>
+<span class="w">  </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;flag&quot;</span><span class="w">                       </span><span class="c1"># flag | auto_clear | auto_fix</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</pre></div>
+</div>
+</section>
+<section id="action">
+<h3>Action<a class="headerlink" href="#action" title="Link to this heading"></a></h3>
+<p>An audit log entry.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">action</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">submission_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">version_id</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="nt">action_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;approve&quot;</span><span class="w">               </span><span class="c1"># upload | validate | claim | release | </span>
+<span class="w">                                       </span><span class="c1"># approve | reject | edit | export</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="nt">details</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">comment</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;All</span><span class="nv"> </span><span class="s">errors</span><span class="nv"> </span><span class="s">resolved.</span><span class="nv"> </span><span class="s">Approved.&quot;</span>
+<span class="w">  </span>
+<span class="w">  </span><span class="nt">performed_by</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;uuid&quot;</span>
+<span class="w">  </span><span class="nt">performed_at</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2025-01-15T14:30:00Z&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading"></a></h2>
+<section id="f1-data-ingestion">
+<h3>F1: Data Ingestion<a class="headerlink" href="#f1-data-ingestion" title="Link to this heading"></a></h3>
+<p><strong>F1.1: Upload</strong></p>
+<ul class="simple">
+<li><p>Accept CSV, Excel, JSON, Parquet</p></li>
+<li><p>Parse and validate file structure</p></li>
+<li><p>Create initial version</p></li>
+</ul>
+<p><strong>F1.2: Transform Application</strong></p>
+<ul class="simple">
+<li><p>Apply mappings from SchemaForge Harmonization Engine</p></li>
+<li><p>Execute value transforms</p></li>
+<li><p>Handle unmapped fields</p></li>
+</ul>
+<p><strong>F1.3: Metadata Extraction</strong></p>
+<ul class="simple">
+<li><p>Infer types from values</p></li>
+<li><p>Calculate statistics</p></li>
+<li><p>Detect anomalies</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="f2-validation-engine">
+<h3>F2: Validation Engine<a class="headerlink" href="#f2-validation-engine" title="Link to this heading"></a></h3>
+<p><strong>F2.1: Field-Level Validation</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Check</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Required</p></td>
+<td><p>Field present and non-null</p></td>
+</tr>
+<tr class="row-odd"><td><p>Type</p></td>
+<td><p>Value matches declared type</p></td>
+</tr>
+<tr class="row-even"><td><p>Allowed values</p></td>
+<td><p>Value in enumerated list</p></td>
+</tr>
+<tr class="row-odd"><td><p>Range</p></td>
+<td><p>Numeric within bounds</p></td>
+</tr>
+<tr class="row-even"><td><p>Pattern</p></td>
+<td><p>String matches regex</p></td>
+</tr>
+<tr class="row-odd"><td><p>Unique</p></td>
+<td><p>Value unique within submission</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>F2.2: Row-Level Validation (Conditional Rules)</strong></p>
+<p>Rules spanning multiple fields in a single row:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: If phenotype is Control, age_at_onset must be null</span>
+<span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;phenotype&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;Control&quot;</span><span class="p">,</span> <span class="s2">&quot;Population Control&quot;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;age_at_onset&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;control_no_onset&quot;</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="n">row_num</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s2">&quot;age_at_onset&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>F2.3: Submission-Level Validation</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Check</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Uniqueness</p></td>
+<td><p>No duplicate IDs within submission</p></td>
+</tr>
+<tr class="row-odd"><td><p>Referential integrity</p></td>
+<td><p>Foreign keys resolve</p></td>
+</tr>
+<tr class="row-even"><td><p>Aggregate rules</p></td>
+<td><p>e.g., “≥10% controls”</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>F2.4: Cross-Submission Validation</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Check</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Entity consistency</p></td>
+<td><p>Same ID → same immutable values</p></td>
+</tr>
+<tr class="row-odd"><td><p>No duplicates</p></td>
+<td><p>Same ID not submitted twice</p></td>
+</tr>
+<tr class="row-even"><td><p>Sequential integrity</p></td>
+<td><p>ID sequences maintained</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="f3-qc-workflow">
+<h3>F3: QC Workflow<a class="headerlink" href="#f3-qc-workflow" title="Link to this heading"></a></h3>
+<p><strong>F3.1: Review Queue</strong></p>
+<ul class="simple">
+<li><p>List submissions awaiting review</p></li>
+<li><p>Sort by date, priority, error count</p></li>
+<li><p>Filter by status, submitter</p></li>
+</ul>
+<p><strong>F3.2: Claim/Release</strong></p>
+<ul class="simple">
+<li><p>Reviewer claims submission for exclusive access</p></li>
+<li><p>Release returns to queue</p></li>
+<li><p>Timeout auto-releases stale claims</p></li>
+</ul>
+<p><strong>F3.3: Review Interface</strong></p>
+<ul class="simple">
+<li><p>View all records with errors highlighted</p></li>
+<li><p>Inline editing for corrections</p></li>
+<li><p>Bulk actions for common fixes</p></li>
+</ul>
+<p><strong>F3.4: Approve/Reject</strong></p>
+<ul class="simple">
+<li><p>Approve moves to accepted state</p></li>
+<li><p>Reject returns to submitter with comments</p></li>
+<li><p>Both create audit entries</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="f4-corrections-flow">
+<h3>F4: Corrections Flow<a class="headerlink" href="#f4-corrections-flow" title="Link to this heading"></a></h3>
+<p><strong>F4.1: Submitter Corrections</strong></p>
+<ul class="simple">
+<li><p>Submitter uploads corrected version</p></li>
+<li><p>System shows diff from previous</p></li>
+<li><p>Re-validates automatically</p></li>
+</ul>
+<p><strong>F4.2: Post-Acceptance Corrections</strong></p>
+<ul class="simple">
+<li><p>Accepted data can be corrected</p></li>
+<li><p>Creates new version with audit trail</p></li>
+<li><p>Triggers re-validation</p></li>
+</ul>
+<p><strong>F4.3: Reviewer-Initiated Edits</strong></p>
+<ul class="simple">
+<li><p>Reviewer can fix minor issues directly</p></li>
+<li><p>All changes tracked per-field</p></li>
+<li><p>Original values preserved</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="f5-data-serving">
+<h3>F5: Data Serving<a class="headerlink" href="#f5-data-serving" title="Link to this heading"></a></h3>
+<p><strong>F5.1: Query API</strong></p>
+<ul class="simple">
+<li><p>Filter accepted records</p></li>
+<li><p>Paginate results</p></li>
+<li><p>Select fields</p></li>
+</ul>
+<p><strong>F5.2: Export</strong></p>
+<ul class="simple">
+<li><p>CSV, JSON, Parquet</p></li>
+<li><p>Include/exclude metadata</p></li>
+<li><p>Filter by criteria</p></li>
+</ul>
+<p><strong>F5.3: Downstream Push</strong></p>
+<ul class="simple">
+<li><p>Webhook on acceptance</p></li>
+<li><p>Push to data warehouse</p></li>
+<li><p>Sync to external systems</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="f6-provenance-audit">
+<h3>F6: Provenance &amp; Audit<a class="headerlink" href="#f6-provenance-audit" title="Link to this heading"></a></h3>
+<p><strong>F6.1: Data Lineage</strong></p>
+<ul class="simple">
+<li><p>Source file → submission → version → record</p></li>
+<li><p>Track transforms applied</p></li>
+<li><p>Link to SchemaForge mappings</p></li>
+</ul>
+<p><strong>F6.2: Change History</strong></p>
+<ul class="simple">
+<li><p>Every field change tracked</p></li>
+<li><p>Before/after values</p></li>
+<li><p>Who, when, why</p></li>
+</ul>
+<p><strong>F6.3: Audit Log</strong></p>
+<ul class="simple">
+<li><p>Every action recorded</p></li>
+<li><p>Immutable</p></li>
+<li><p>Exportable for compliance</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="api-design">
+<h2>API Design<a class="headerlink" href="#api-design" title="Link to this heading"></a></h2>
+<section id="submissions">
+<h3>Submissions<a class="headerlink" href="#submissions" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">submissions</span>                    <span class="c1"># Upload new submission</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">submissions</span>                    <span class="c1"># List submissions</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">submissions</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>               <span class="c1"># Get submission</span>
+<span class="n">DELETE</span> <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">submissions</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>               <span class="c1"># Cancel submission</span>
+
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">submissions</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span><span class="o">/</span><span class="n">validate</span>      <span class="c1"># Run validation</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">submissions</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span><span class="o">/</span><span class="n">validation</span>    <span class="c1"># Get validation results</span>
+
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">submissions</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span><span class="o">/</span><span class="n">claim</span>         <span class="c1"># Claim for review</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">submissions</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span><span class="o">/</span><span class="n">release</span>       <span class="c1"># Release claim</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">submissions</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span><span class="o">/</span><span class="n">approve</span>       <span class="c1"># Approve</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">submissions</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span><span class="o">/</span><span class="n">reject</span>        <span class="c1"># Reject</span>
+</pre></div>
+</div>
+</section>
+<section id="versions">
+<h3>Versions<a class="headerlink" href="#versions" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">submissions</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span><span class="o">/</span><span class="n">versions</span>      <span class="c1"># List versions</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">versions</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>                  <span class="c1"># Get version</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">submissions</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span><span class="o">/</span><span class="n">versions</span>      <span class="c1"># Create new version (correction)</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">versions</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span><span class="o">/</span><span class="n">diff</span>             <span class="c1"># Diff with previous version</span>
+</pre></div>
+</div>
+</section>
+<section id="records">
+<h3>Records<a class="headerlink" href="#records" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">submissions</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span><span class="o">/</span><span class="n">records</span>       <span class="c1"># List records (paginated)</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">records</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>                   <span class="c1"># Get record</span>
+<span class="n">PUT</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">records</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>                   <span class="c1"># Edit record (creates version)</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">records</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span><span class="o">/</span><span class="n">history</span>           <span class="c1"># Record change history</span>
+</pre></div>
+</div>
+</section>
+<section id="data-access">
+<h3>Data Access<a class="headerlink" href="#data-access" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">data</span>                           <span class="c1"># Query accepted data</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">export</span>                    <span class="c1"># Export data</span>
+<span class="n">POST</span>   <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">query</span>                     <span class="c1"># Advanced query</span>
+</pre></div>
+</div>
+</section>
+<section id="audit">
+<h3>Audit<a class="headerlink" href="#audit" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">submissions</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span><span class="o">/</span><span class="n">actions</span>       <span class="c1"># Submission audit log</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">records</span><span class="o">/</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span><span class="o">/</span><span class="n">changes</span>           <span class="c1"># Record change log</span>
+<span class="n">GET</span>    <span class="o">/</span><span class="n">api</span><span class="o">/</span><span class="n">v1</span><span class="o">/</span><span class="n">audit</span>                          <span class="c1"># Global audit log</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="integration-with-schemaforge">
+<h2>Integration with SchemaForge<a class="headerlink" href="#integration-with-schemaforge" title="Link to this heading"></a></h2>
+<section id="consuming-schemas">
+<h3>Consuming Schemas<a class="headerlink" href="#consuming-schemas" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pull schema for validation</span>
+<span class="n">schema</span> <span class="o">=</span> <span class="k">await</span> <span class="n">schemaforge</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/api/v1/schemas/</span><span class="si">{</span><span class="n">schema_id</span><span class="si">}</span><span class="s2">/export&quot;</span><span class="p">)</span>
+
+<span class="c1"># Build validators from schema elements</span>
+<span class="n">validators</span> <span class="o">=</span> <span class="n">build_validators</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="consuming-mappings">
+<h3>Consuming Mappings<a class="headerlink" href="#consuming-mappings" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pull mappings for transform</span>
+<span class="n">mappings</span> <span class="o">=</span> <span class="k">await</span> <span class="n">schemaforge</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/api/v1/sources/</span><span class="si">{</span><span class="n">source_id</span><span class="si">}</span><span class="s2">/mappings&quot;</span><span class="p">)</span>
+
+<span class="c1"># Apply transforms during ingest</span>
+<span class="n">transformed</span> <span class="o">=</span> <span class="n">apply_mappings</span><span class="p">(</span><span class="n">raw_data</span><span class="p">,</span> <span class="n">mappings</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="providing-feedback">
+<h3>Providing Feedback<a class="headerlink" href="#providing-feedback" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Report validation failures (informs schema quality)</span>
+<span class="k">await</span> <span class="n">schemaforge</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/api/v1/feedback/validation&quot;</span><span class="p">,</span> <span class="p">{</span>
+    <span class="s2">&quot;element_id&quot;</span><span class="p">:</span> <span class="n">element_id</span><span class="p">,</span>
+    <span class="s2">&quot;failure_type&quot;</span><span class="p">:</span> <span class="s2">&quot;out_of_range&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">47</span><span class="p">,</span>
+    <span class="s2">&quot;sample_values&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;-1&quot;</span><span class="p">,</span> <span class="s2">&quot;999&quot;</span><span class="p">,</span> <span class="s2">&quot;invalid&quot;</span><span class="p">]</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="data-model">
+<h2>Data Model<a class="headerlink" href="#data-model" title="Link to this heading"></a></h2>
+<section id="database-schema-postgresql">
+<h3>Database Schema (PostgreSQL)<a class="headerlink" href="#database-schema-postgresql" title="Link to this heading"></a></h3>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">projects</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">slug</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">UNIQUE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">schema_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">              </span><span class="c1">-- Reference to SchemaForge</span>
+<span class="w">    </span><span class="n">settings</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">submissions</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">project_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">projects</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">external_id</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
+<span class="w">    </span><span class="n">status</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;uploaded&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">record_count</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span>
+<span class="w">    </span><span class="n">current_version_id</span><span class="w"> </span><span class="n">UUID</span><span class="p">,</span>
+<span class="w">    </span><span class="n">claimed_by</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">claimed_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="p">,</span>
+<span class="w">    </span><span class="n">uploaded_by</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">uploaded_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">accepted_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="p">,</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">UNIQUE</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span><span class="w"> </span><span class="n">external_id</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="k">versions</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">submission_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">submissions</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">CASCADE</span><span class="p">,</span>
+<span class="w">    </span><span class="n">version_number</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="k">data</span><span class="w"> </span><span class="n">JSONB</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">record_count</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span>
+<span class="w">    </span><span class="n">validation_result</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">created_by</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">created_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span><span class="n">reason</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">UNIQUE</span><span class="p">(</span><span class="n">submission_id</span><span class="p">,</span><span class="w"> </span><span class="n">version_number</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">validation_rules</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">project_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">projects</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">description</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">rule_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">condition</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">constraint_expr</span><span class="w"> </span><span class="nb">TEXT</span><span class="p">,</span>
+<span class="w">    </span><span class="n">severity</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;error&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">action</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;flag&#39;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">enabled</span><span class="w"> </span><span class="nb">BOOLEAN</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">TRUE</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">actions</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">submission_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">submissions</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">version_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="k">versions</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">action_type</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="n">details</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span>
+<span class="w">    </span><span class="n">performed_by</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">performed_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">()</span>
+<span class="p">);</span>
+
+<span class="c1">-- For cross-submission validation, track accepted entities</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">accepted_entities</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">    </span><span class="n">project_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">projects</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">entity_id</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span><span class="w">      </span><span class="c1">-- e.g., sample_id</span>
+<span class="w">    </span><span class="n">submission_id</span><span class="w"> </span><span class="n">UUID</span><span class="w"> </span><span class="k">REFERENCES</span><span class="w"> </span><span class="n">submissions</span><span class="p">(</span><span class="n">id</span><span class="p">),</span>
+<span class="w">    </span><span class="n">immutable_data</span><span class="w"> </span><span class="n">JSONB</span><span class="p">,</span><span class="w">                 </span><span class="c1">-- Fields that can&#39;t change</span>
+<span class="w">    </span><span class="n">accepted_at</span><span class="w"> </span><span class="k">TIMESTAMP</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="n">NOW</span><span class="p">(),</span>
+<span class="w">    </span>
+<span class="w">    </span><span class="k">UNIQUE</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span><span class="w"> </span><span class="n">entity_id</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">-- Indexes</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_submissions_project</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">submissions</span><span class="p">(</span><span class="n">project_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_submissions_status</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">submissions</span><span class="p">(</span><span class="n">status</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_versions_submission</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">versions</span><span class="p">(</span><span class="n">submission_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_actions_submission</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">actions</span><span class="p">(</span><span class="n">submission_id</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_accepted_entities_lookup</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">accepted_entities</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span><span class="w"> </span><span class="n">entity_id</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="implementation-phases">
+<h2>Implementation Phases<a class="headerlink" href="#implementation-phases" title="Link to this heading"></a></h2>
+<section id="phase-1-mvp">
+<h3>Phase 1: MVP<a class="headerlink" href="#phase-1-mvp" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Basic ingest → validate → approve flow</p>
+<ul class="simple">
+<li><p>[ ] Project and submission management</p></li>
+<li><p>[ ] File upload (CSV, Excel)</p></li>
+<li><p>[ ] Field-level validation</p></li>
+<li><p>[ ] Simple review UI</p></li>
+<li><p>[ ] Approve/reject workflow</p></li>
+<li><p>[ ] Basic audit log</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Replaces spreadsheet-based QC</p>
+</section>
+<section id="phase-2-corrections">
+<h3>Phase 2: Corrections<a class="headerlink" href="#phase-2-corrections" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Handle data corrections properly</p>
+<ul class="simple">
+<li><p>[ ] Version tracking</p></li>
+<li><p>[ ] Diff view between versions</p></li>
+<li><p>[ ] Inline editing</p></li>
+<li><p>[ ] Post-acceptance corrections</p></li>
+<li><p>[ ] Change history per record</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Proper correction workflow</p>
+</section>
+<section id="phase-3-advanced-validation">
+<h3>Phase 3: Advanced Validation<a class="headerlink" href="#phase-3-advanced-validation" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Complex rule support</p>
+<ul class="simple">
+<li><p>[ ] Conditional (row-level) rules</p></li>
+<li><p>[ ] Submission-level rules</p></li>
+<li><p>[ ] Cross-submission validation</p></li>
+<li><p>[ ] Custom rule definitions</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Comprehensive validation</p>
+</section>
+<section id="phase-4-schemaforge-integration">
+<h3>Phase 4: SchemaForge Integration<a class="headerlink" href="#phase-4-schemaforge-integration" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Connect to SchemaForge</p>
+<ul class="simple">
+<li><p>[ ] Pull schemas from Registry Service</p></li>
+<li><p>[ ] Apply mappings from Harmonization Engine</p></li>
+<li><p>[ ] Send feedback to SchemaForge</p></li>
+<li><p>[ ] Webhook notifications</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Full Forge platform integration</p>
+</section>
+<section id="phase-5-scale-serve">
+<h3>Phase 5: Scale &amp; Serve<a class="headerlink" href="#phase-5-scale-serve" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Production data serving</p>
+<ul class="simple">
+<li><p>[ ] Query API for accepted data</p></li>
+<li><p>[ ] Export to multiple formats</p></li>
+<li><p>[ ] Push to downstream systems</p></li>
+<li><p>[ ] Performance optimization</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Production-ready data platform</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="success-metrics">
+<h2>Success Metrics<a class="headerlink" href="#success-metrics" title="Link to this heading"></a></h2>
+<section id="quality">
+<h3>Quality<a class="headerlink" href="#quality" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Validation error catch rate</p></li>
+<li><p>Post-acceptance correction rate (lower is better)</p></li>
+<li><p>Time to identify issues</p></li>
+</ul>
+</section>
+<section id="efficiency">
+<h3>Efficiency<a class="headerlink" href="#efficiency" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Review time per submission</p></li>
+<li><p>Submissions processed per day</p></li>
+<li><p>Correction turnaround time</p></li>
+</ul>
+</section>
+<section id="compliance">
+<h3>Compliance<a class="headerlink" href="#compliance" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Audit completeness (100%)</p></li>
+<li><p>Provenance traceability</p></li>
+<li><p>Change accountability</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="risks-mitigations">
+<h2>Risks &amp; Mitigations<a class="headerlink" href="#risks-mitigations" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Risk</p></th>
+<th class="head"><p>Impact</p></th>
+<th class="head"><p>Mitigation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Validation too strict</p></td>
+<td><p>Submitter frustration</p></td>
+<td><p>Warning vs. error distinction, configurable rules</p></td>
+</tr>
+<tr class="row-odd"><td><p>Large file handling</p></td>
+<td><p>Performance issues</p></td>
+<td><p>Streaming upload, async validation</p></td>
+</tr>
+<tr class="row-even"><td><p>Cross-submission perf</p></td>
+<td><p>Slow validation</p></td>
+<td><p>Materialized entity index, incremental checks</p></td>
+</tr>
+<tr class="row-odd"><td><p>Data loss</p></td>
+<td><p>Trust erosion</p></td>
+<td><p>Immutable versions, soft deletes, backups</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="what-dataforge-does-not-do">
+<h2>What DataForge Does NOT Do<a class="headerlink" href="#what-dataforge-does-not-do" title="Link to this heading"></a></h2>
+<p>To maintain focus, explicitly out of scope:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Capability</p></th>
+<th class="head"><p>Why Not</p></th>
+<th class="head"><p>Where Instead</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Schema creation</p></td>
+<td><p>Different concern</p></td>
+<td><p>SchemaForge Curation Workbench</p></td>
+</tr>
+<tr class="row-odd"><td><p>Field mapping</p></td>
+<td><p>Different concern</p></td>
+<td><p>SchemaForge Harmonization Engine</p></td>
+</tr>
+<tr class="row-even"><td><p>Analytics/BI</p></td>
+<td><p>Specialized tools better</p></td>
+<td><p>Metabase, Looker, Tableau</p></td>
+</tr>
+<tr class="row-odd"><td><p>Data warehousing</p></td>
+<td><p>Scale/cost concerns</p></td>
+<td><p>BigQuery, Snowflake</p></td>
+</tr>
+<tr class="row-even"><td><p>ML model training</p></td>
+<td><p>Specialized infrastructure</p></td>
+<td><p>Vertex AI, SageMaker</p></td>
+</tr>
+<tr class="row-odd"><td><p>Long-term file storage</p></td>
+<td><p>Not core competency</p></td>
+<td><p>GCS, S3</p></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p><em>Document Version: 0.1</em>
+<em>Last Updated: 2025-01-17</em>
+<em>Author: Forge Team</em></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="curation-workbench.html" class="btn btn-neutral float-left" title="SchemaForge: Curation Workbench" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="harmonization-engine.html" class="btn btn-neutral float-right" title="SchemaForge: Harmonization Engine" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

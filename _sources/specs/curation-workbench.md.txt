@@ -1,0 +1,697 @@
+# SchemaForge: Curation Workbench
+
+## Product Specification v1.0
+
+---
+
+## Executive Summary
+
+The **Curation Workbench** is SchemaForge's service for **building canonical schemas from raw CDE lists** through AI-assisted curation. Users upload a variable list (CSV, spreadsheet, etc.), and the system guides them through a semi-automated process to produce a clean, deduplicated, well-typed schema ready for use in harmonization.
+
+Unlike traditional schema management tools that focus on editing existing schemas, the Curation Workbench is designed around the **schema creation workflow**—taking messy, real-world variable lists and transforming them into production-ready canonical schemas.
+
+---
+
+## Problem Statement
+
+Researchers and data managers often have variable lists from studies, grants, or collaborative projects that need to become usable schemas. These lists are typically:
+
+- **Inconsistent**: Mixed naming conventions, abbreviations (e.g., `AOO` vs `age_of_onset`)
+- **Redundant**: Multiple variables representing the same concept
+- **Underspecified**: Missing types, constraints, or clear definitions
+- **Unstructured**: No formal schema definition, just spreadsheets
+
+**Current process is painful:**
+1. Manual review of hundreds of variables
+2. Guessing at duplicates by eyeballing names
+3. Hand-typing data types and constraints
+4. No systematic way to catch semantic duplicates (variables with different names but same meaning)
+5. Starting over when new variables need to be added
+
+**Result:** Schema creation takes weeks of manual effort, errors slip through, and schemas become stale as new requirements emerge.
+
+---
+
+## Solution
+
+The Curation Workbench provides an **AI-assisted schema creation workflow**:
+
+1. **Upload** — User uploads a raw CDE list (CSV with variable names, types, descriptions)
+2. **Analyze** — System detects potential duplicates using TF-IDF + embeddings
+3. **Suggest** — LLM proposes canonical names, types, allowed values, nullability
+4. **Review** — User steps through each suggestion, accepting/modifying/rejecting
+5. **Publish** — Clean schema is saved to Registry as a managed project
+
+Once created, schemas are **living resources** that can be updated when new variables are needed, with the same AI-assisted deduplication ensuring consistency.
+
+---
+
+## Target Users
+
+### Primary: Data Steward / Research Data Manager
+- Has a list of variables from a study or consortium
+- Needs to turn it into a usable schema for data collection/harmonization
+- Wants AI assistance but final approval authority
+
+### Secondary: Schema Manager
+- Maintains schemas for an organization
+- Adds new variables as requirements evolve
+- Ensures schema quality and consistency
+
+### Tertiary: Data Consumer
+- Uses schemas created by others for harmonization
+- May request new variables be added to shared schemas
+
+---
+
+## Core Workflow
+
+### 1. Schema Creation from Raw CDE List
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         CURATION WORKBENCH                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Step 1: Upload                                                             │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  📁 Drop your CDE list here (CSV, Excel, TSV)                       │    │
+│  │                                                                     │    │
+│  │  Expected columns: variable_name, type, description, allowed_values │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+│  Step 2: Duplicate Detection                                                │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  Found 142 variables. Analyzing for duplicates...                   │    │
+│  │                                                                     │    │
+│  │  ⚠ 8 potential duplicate groups detected:                           │    │
+│  │                                                                     │    │
+│  │  Group 1: age_of_onset, AOO, onset_age (94% similar)                │    │
+│  │  Group 2: diagnosis_primary, dx_primary, primary_dx (89% similar)   │    │
+│  │  ...                                                                │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+│  Step 3: AI-Assisted Review                                                 │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  Variable 1 of 142: age_of_onset                                    │    │
+│  │                                                                     │    │
+│  │  🤖 AI Suggestion:                                                  │    │
+│  │  ├── Canonical name: age_at_onset                                   │    │
+│  │  ├── Type: integer                                                  │    │
+│  │  ├── Constraints: min=0, max=120                                    │    │
+│  │  ├── Nullable: true (reason: may not be known)                      │    │
+│  │  ├── Description: "Age in years at symptom onset"                   │    │
+│  │  └── Merge with: AOO, onset_age (mark as aliases)                   │    │
+│  │                                                                     │    │
+│  │  [✓ Accept] [✎ Modify] [✗ Reject] [Skip for now]                    │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+│  Step 4: Publish                                                            │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  Schema: "PATHND Study CDEs"                                        │    │
+│  │  Elements: 127 (15 duplicates merged)                               │    │
+│  │  Quality score: 94%                                                 │    │
+│  │                                                                     │    │
+│  │  Visibility: ○ Private  ● Organization  ○ Public                    │    │
+│  │                                                                     │    │
+│  │  [Save as Draft] [Publish v1.0]                                     │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### 2. Schema as Managed Resource
+
+Once created, schemas become **projects** with:
+
+- **Ownership**: Creator is the schema manager by default
+- **Visibility levels**:
+  - **Private**: Only the creator can view/use
+  - **Organization**: Anyone in the org can use for harmonization
+  - **Public**: Anyone can use (read-only)
+- **Roles**:
+  - **Manager**: Can edit schema, approve additions, manage permissions
+  - **Contributor**: Can request additions (requires approval)
+  - **Viewer**: Can use schema for harmonization (read-only)
+
+### 3. Schema Evolution (Adding New Variables)
+
+When harmonizing a new dataset reveals unmapped variables:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      ADD VARIABLES TO SCHEMA                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Schema: "PATHND Study CDEs" (v1.2)                                         │
+│  Your role: Manager                                                         │
+│                                                                             │
+│  New variables to add:                                                      │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  csf_abeta42                                                        │    │
+│  │  ├── Type: float                                                    │    │
+│  │  ├── Description: "CSF Amyloid-beta 42 level (pg/mL)"               │    │
+│  │  └── Nullable: true                                                 │    │
+│  │                                                                     │    │
+│  │  🔍 Similarity check against existing schema:                       │    │
+│  │  ├── csf_abeta40 (72% similar) - Different isoform, keep separate   │    │
+│  │  ├── amyloid_pet (45% similar) - Different modality                 │    │
+│  │  └── ✓ No semantic duplicates detected                              │    │
+│  │                                                                     │    │
+│  │  [Add to Schema] [Cancel]                                           │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+**For non-managers (request workflow):**
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      REQUEST VARIABLE ADDITION                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  Schema: "Consortium CDEs" (v2.1) - Org: BRAIN-CODE                         │
+│  Your role: Contributor                                                     │
+│                                                                             │
+│  Request to add:                                                            │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │  Variable: tau_pet_suvr                                             │    │
+│  │  Type: float                                                        │    │
+│  │  Description: "Tau PET standardized uptake value ratio"             │    │
+│  │  Justification: "Needed for ADNI cohort harmonization"              │    │
+│  │                                                                     │    │
+│  │  [Submit Request]                                                   │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+│  Pending requests (2):                                                      │
+│  • mri_hippocampal_volume - Submitted 2 days ago                            │
+│  • apoe_genotype - Approved, pending release                                │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Key Features
+
+### F1: Upload & Parse
+
+**F1.1: File Upload**
+- Support CSV, TSV, Excel (.xlsx)
+- Auto-detect column mapping (variable_name, type, description, allowed_values)
+- Preview parsed data before proceeding
+- Handle encoding issues gracefully
+
+**F1.2: Column Mapping**
+- Smart detection of common column names
+- Manual override if auto-detection fails
+- Required: variable_name
+- Optional: type, description, allowed_values, constraints
+
+### F2: Duplicate Detection
+
+**F2.1: Similarity Analysis**
+- TF-IDF + embedding-based similarity (shared with Harmonization Engine)
+- Configurable threshold (default: 80% for flagging)
+- Group duplicates into clusters
+
+**F2.2: Duplicate Groups**
+- Visual grouping of similar variables
+- Show similarity scores and reasons
+- Allow user to confirm/dismiss as duplicates
+
+### F3: AI-Assisted Curation
+
+**F3.1: LLM Suggestions**
+For each variable (or duplicate group), the LLM suggests:
+- **Canonical name**: Clean, snake_case, descriptive
+- **Data type**: string, integer, float, boolean, enum, date, datetime
+- **Allowed values**: For enums, suggest value set
+- **Constraints**: min/max for numerics, pattern for strings
+- **Nullability**: Whether null is allowed and why
+- **Description**: Clear, standardized description
+- **Merge recommendation**: Which variables to consolidate
+
+**F3.2: Batch vs. Individual Review**
+- Option to review one-by-one (careful curation)
+- Option to accept all AI suggestions (fast path)
+- Option to review only flagged items (duplicates, uncertain types)
+
+**F3.3: User Overrides**
+- Accept suggestion as-is
+- Modify any field before accepting
+- Reject suggestion entirely
+- Skip and return later
+
+**F3.5: Provenance Capture**
+- Automatically track transformation decisions (on save changes button click)
+- Track merge operations with source variable details
+
+**F3.4: Type-Specific Constraint Editor**
+Provide intuitive, type-appropriate form fields for constraints instead of generic text input:
+
+- **Integer constraints:**
+  - ☐ Min value: `[____]`
+  - ☐ Max value: `[____]`
+  - ☐ Must be positive
+  - ☐ Allow zero
+
+- **Float constraints:**
+  - ☐ Min value: `[____]`
+  - ☐ Max value: `[____]`
+  - ☐ Decimal places: `[____]`
+  - ☐ Must be positive
+
+- **String constraints:**
+  - ☐ Min length: `[____]`
+  - ☐ Max length: `[____]`
+  - ☐ Pattern (regex): `[____________________]`
+  - ☐ Format preset: [None ▼] [Email, Phone, URL, GUID, etc.]
+
+- **Date constraints:**
+  - ☐ Min date: `[YYYY-MM-DD]`
+  - ☐ Max date: `[YYYY-MM-DD]`
+  - ☐ Format: [ISO 8601 ▼]
+  - ☐ Cannot be in future
+  - ☐ Cannot be in past
+
+- **Enum constraints:**
+  - ☐ Case sensitive matching
+
+**Smart Defaults:**
+AI suggests pre-populated constraints based on variable name patterns:
+- `age*` → `{"min": 0, "max": 120}`
+- `year*` → `{"min": 1900, "max": 2100}`
+- `*percentage*` → `{"min": 0, "max": 100}`
+- `systolic_bp` → `{"min": 50, "max": 250}`
+- `email*` → `{"format": "email", "max_length": 255}`
+
+**Constraint Parsing:**
+For uploaded CSVs with constraint strings like `(x>=0) & (x<=120)`, the AI automatically:
+1. Parses common constraint formats (ranges, patterns, lengths)
+2. Converts to structured JSON format
+3. Suggests as type-appropriate form values
+4. Allows user to review/modify via UI form
+
+### F4: Schema Projects
+
+**F4.1: Create Project**
+- Name, description, version
+- Set visibility (private/org/public)
+- Assign to organization (if applicable)
+
+**F4.2: Permissions**
+- Manager: Full control
+- Contributor: Can request additions
+- Viewer: Read-only access
+
+**F4.3: Versioning**
+- Semantic versioning (major.minor.patch)
+- Version history with diffs
+- Rollback capability
+
+### F5: Schema Evolution
+
+**F5.1: Add Variables (Manager)**
+- Direct addition with similarity check
+- AI-assisted suggestions for new variables
+- Batch import from new CDE list
+
+**F5.2: Request Variables (Contributor)**
+- Submit request with justification
+- Track request status
+- Notification when approved/rejected
+
+**F5.3: Similarity Guardrails**
+- Every addition checked against existing schema
+- Flag potential duplicates before adding
+- Require explicit override if similarity > threshold
+
+### F6: Export & Integration
+
+**F6.1: Export Formats**
+- JSON (full fidelity)
+- CSV (spreadsheet compatible)
+- YAML (human-readable)
+- JSON Schema (for validation)
+
+**F6.2: Registry Integration**
+- Publish directly to Registry Service
+- Schemas available for Harmonization Engine
+- Version management through Registry API
+
+**F6.3: Transformation Rule Export**
+- Export variable mappings as JSON
+
+---
+
+## Data Model
+
+### Schema Project
+
+```yaml
+schema_project:
+  id: "uuid"
+  name: "PATHND Study CDEs"
+  description: "Common Data Elements for PATH-ND neuropathology study"
+  version: "1.2.0"
+  status: "published"  # draft | published | deprecated
+
+  # Ownership
+  owner_id: "user_uuid"
+  organization_id: "org_uuid"  # nullable for personal schemas
+  visibility: "organization"   # private | organization | public
+
+  # Metadata
+  created_at: "2025-01-15T00:00:00Z"
+  updated_at: "2025-01-30T00:00:00Z"
+  published_at: "2025-01-20T00:00:00Z"
+
+  # Stats
+  element_count: 127
+
+  # Source tracking
+  source_file: "pathnd_cdes.csv"
+  source_row_count: 142
+  duplicates_merged: 15
+```
+
+### Element
+
+```yaml
+element:
+  id: "uuid"
+  schema_id: "uuid"
+
+  # Core definition
+  name: "age_at_onset"              # Canonical name (snake_case)
+  display_name: "Age at Onset"      # Human-readable
+  description: "Age in years at first symptom onset"
+  type: "integer"                   # string | integer | float | boolean | enum | date | datetime
+
+  # Constraints
+  nullable: true
+  null_reason: "May not be known for all subjects"
+  constraints:
+    min: 0
+    max: 120
+
+  # For enums
+  allowed_values: null
+  value_labels: null
+
+  # Alternative encodings (for enum types with multiple representation options)
+  encoding_options: null
+  selected_encoding: null
+
+  # Provenance
+  aliases: ["AOO", "onset_age", "age_of_onset"]  # Original names merged into this
+  source_row: 23                                  # Row in original upload
+  ai_suggested: true                              # Whether AI proposed this
+  user_modified: true                             # Whether user changed AI suggestion
+
+  # Audit
+  created_at: "2025-01-15T00:00:00Z"
+  created_by: "user_uuid"
+```
+
+#### Constraint Format Examples
+
+**Integer/Float:**
+```yaml
+constraints:
+  min: 0
+  max: 120
+  must_be_positive: false  # optional
+```
+
+**String:**
+```yaml
+constraints:
+  min_length: 5
+  max_length: 255
+  pattern: "^[A-Z]{2,3}$"  # regex pattern
+  format: "email"          # preset: email | phone | url | guid
+```
+
+**Date:**
+```yaml
+constraints:
+  min_date: "1900-01-01"
+  max_date: "2100-12-31"
+  not_in_future: true
+  not_in_past: false
+  format: "ISO8601"        # YYYY-MM-DD
+```
+
+**Enum:**
+```yaml
+allowed_values: ["male", "female", "intersex", "other", "not_reported"]
+value_labels:
+  male: "Male"
+  female: "Female"
+  intersex: "Intersex"
+  other: "Other"
+  not_reported: "Not Reported"
+constraints:
+  case_sensitive: false
+```
+
+**Encoding Options (for enums with multiple representations):**
+```yaml
+type: "enum"
+allowed_values: ["male", "female", "other", "not_reported"]
+encoding_options:
+  - name: "Lowercase strings (recommended)"
+    data_type: "enum"
+    values: ["male", "female", "other", "not_reported"]
+    is_recommended: true
+
+  - name: "NACC integer codes"
+    data_type: "integer"
+    values: [1, 2, 3, 0]
+    value_mappings:
+      "1": "male"
+      "2": "female"
+      "3": "other"
+      "0": "not_reported"
+    source: "NACC"
+    is_recommended: false
+
+  - name: "Single letter codes"
+    data_type: "enum"
+    values: ["M", "F", "O", "U"]
+    value_mappings:
+      "M": "male"
+      "F": "female"
+      "O": "other"
+      "U": "not_reported"
+    source: "CDISC"
+    is_recommended: false
+
+selected_encoding: "Lowercase strings (recommended)"
+```
+
+### Variable Addition Request
+
+```yaml
+addition_request:
+  id: "uuid"
+  schema_id: "uuid"
+
+  # Requested variable
+  variable_name: "tau_pet_suvr"
+  variable_type: "float"
+  variable_description: "Tau PET standardized uptake value ratio"
+
+  # Request metadata
+  requested_by: "user_uuid"
+  requested_at: "2025-01-28T00:00:00Z"
+  justification: "Needed for ADNI cohort harmonization"
+
+  # Similarity check results
+  similar_elements: [
+    { element_id: "uuid", name: "amyloid_pet_suvr", score: 0.65 }
+  ]
+
+  # Status
+  status: "pending"  # pending | approved | rejected
+  reviewed_by: "user_uuid"
+  reviewed_at: "2025-01-29T00:00:00Z"
+  review_notes: "Approved - distinct from amyloid PET"
+```
+
+---
+
+## Technical Architecture
+
+### Service Components
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         CURATION WORKBENCH                                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐              │
+│  │   Streamlit UI  │  │   FastAPI       │  │   Background    │              │
+│  │                 │  │   Backend       │  │   Workers       │              │
+│  │ • Upload wizard │  │ • REST API      │  │ • Similarity    │              │
+│  │ • Review UI     │  │ • Auth/Authz    │  │   computation   │              │
+│  │ • Project mgmt  │  │ • Validation    │  │ • LLM calls     │              │
+│  └────────┬────────┘  └────────┬────────┘  └────────┬────────┘              │
+│           │                    │                    │                       │
+│           └────────────────────┼────────────────────┘                       │
+│                                ▼                                            │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │                        Shared Services                              │    │
+│  │                                                                     │    │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐                  │    │
+│  │  │ Retrieval   │  │ LLM         │  │ Registry    │                  │    │
+│  │  │ Core        │  │ Service     │  │ Client      │                  │    │
+│  │  │             │  │             │  │             │                  │    │
+│  │  │ TF-IDF +    │  │ Claude API  │  │ Schema      │                  │    │
+│  │  │ Embeddings  │  │ for         │  │ CRUD via    │                  │    │
+│  │  │             │  │ suggestions │  │ Registry    │                  │    │
+│  │  └─────────────┘  └─────────────┘  └─────────────┘                  │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Technology Stack
+
+**Backend:**
+- Python 3.11+
+- FastAPI for API layer
+- Streamlit for UI (Phase 1)
+- PostgreSQL for persistence
+- Redis for caching/sessions
+
+**AI/ML:**
+- `forge-retrieval-core` for similarity (TF-IDF + embeddings)
+- Claude API for LLM suggestions
+- sentence-transformers for embeddings
+
+**Infrastructure:**
+- Docker + Docker Compose
+- Cloud Run for deployment
+- GCS for file storage
+
+---
+
+## Implementation Phases
+
+### Phase 1: Core Curation Workflow (MVP)
+**Goal:** Upload → AI-assisted review → Publish
+
+- [ ] File upload and parsing (CSV, TSV)
+- [ ] Duplicate detection using retrieval core
+- [ ] LLM-powered suggestion engine
+  - [ ] Parse constraint strings from source data
+  - [ ] Suggest structured constraints based on type
+  - [ ] Smart defaults for common field patterns (age, year, etc.)
+- [ ] Interactive review UI (Streamlit)
+  - [ ] Type-specific constraint editor forms
+  - [ ] Encoding options selector for enums
+- [ ] Save to Registry Service
+- [ ] Basic versioning
+
+**Deliverable:** Users can create schemas from CSV files with AI assistance.
+
+### Phase 2: Schema Projects & Permissions
+**Goal:** Schemas as managed resources
+
+- [ ] Project model with ownership
+- [ ] Organization assignment
+- [ ] Visibility levels (private/org/public)
+- [ ] Role-based permissions
+- [ ] Project dashboard
+
+**Deliverable:** Schemas can be shared and managed within organizations.
+
+### Phase 3: Schema Evolution
+**Goal:** Add variables to existing schemas
+
+- [ ] Direct addition (managers)
+- [ ] Request workflow (contributors)
+- [ ] Similarity guardrails
+- [ ] Version management
+- [ ] Audit trail
+
+**Deliverable:** Schemas can evolve safely without duplicates.
+
+### Phase 4: Polish & Scale
+**Goal:** Production readiness
+
+- [ ] Batch operations
+- [ ] Import from multiple sources
+- [ ] Advanced export options
+- [ ] Performance optimization
+- [ ] Comprehensive testing
+
+**Deliverable:** Production-ready schema curation platform.
+
+---
+
+## Success Metrics
+
+### Efficiency
+- Time to create schema from CSV reduced by 70%+
+- Duplicate detection accuracy > 90%
+- LLM suggestion acceptance rate > 60%
+
+### Quality
+- Schemas pass quality checks on first publish
+- Zero duplicate elements in published schemas
+- All elements have descriptions and types
+
+### Adoption
+- Number of schemas created per month
+- Active schema managers
+- Variable addition requests processed
+
+---
+
+## Integration with Forge Ecosystem
+
+### With Registry Service
+- Schemas published to Registry for storage and versioning
+- Registry API used for all CRUD operations
+- Version management through Registry
+
+### With Harmonization Engine
+- Curated schemas available as harmonization targets
+- Unmapped variables can trigger addition requests
+- Shared retrieval core ensures consistent matching
+
+### With DataForge (Future)
+- Schemas used for data validation
+- Validation errors may trigger schema updates
+
+---
+
+## Open Questions
+
+1. **LLM model choice:** Claude vs. GPT-4 vs. local model for suggestions?
+2. **Batch size:** How many variables to process in one LLM call?
+3. **Approval workflow:** Email notifications? In-app only?
+4. **External CDE libraries:** Integration with NIH CDE Repository, CDISC?
+
+---
+
+## Related Documentation
+
+- [forge-production-roadmap.md](../platform/forge-production-roadmap.md) — Platform roadmap and implementation phases
+- [unified-input-schema.md](../archive/unified-input-schema.md) — Unified input schema specification (archived)
+- [encoding-options-ui-design.md](../archive/encoding-options-ui-design.md) — Detailed UI/UX design for encoding options (archived)
+- [registry-service.md](registry-service.md) — Registry Service specification
+- [forge-user-journey.md](../archive/forge-user-journey.md) — End-to-end user workflows (archived)
+- [dataforge.md](dataforge.md) — DataForge specification
+
+---
+
+*Document Version: 1.0*
+*Last Updated: 2025-02-04*
+*Author: Forge Team*
+*Changes: Added type-specific constraints, encoding options, and unified input schema support*

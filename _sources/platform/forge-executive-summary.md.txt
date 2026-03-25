@@ -1,0 +1,199 @@
+# Forge
+
+**AI-powered schema management and data harmonization platform**
+
+---
+
+## The Problem
+
+Organizations harmonizing data from multiple sources face three manual bottlenecks:
+
+1. **Schema maintenance** — Canonical data dictionaries degrade: duplicates, inconsistent naming, poor documentation. Cleanup happens in spreadsheets.
+
+2. **Field mapping** — Each new source requires mapping hundreds of fields to canonical elements. Tedious, inconsistent, untracked.
+
+3. **Data management** — Once mapped, data needs validation, QC review, corrections, and versioning. Often cobbled together with scripts.
+
+---
+
+## The Solution
+
+Forge is a platform with two complementary layers:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                  FORGE                                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                         SCHEMAFORGE                                    │  │
+│  │              "What should my data look like?"                          │  │
+│  │                                                                        │  │
+│  │    Registry          Curation          Harmonization                   │  │
+│  │    Service           Workbench         Engine                          │  │
+│  │    ─────────         ─────────         ─────────────                   │  │
+│  │    Store & version   Clean & audit     Map source fields               │  │
+│  │    canonical         canonical         to canonical                    │  │
+│  │    schemas           schemas           schemas (AI-assisted)           │  │
+│  │                                                                        │  │
+│  └────────────────────────────────┬──────────────────────────────────────┘  │
+│                                   │                                         │
+│                                   │ Schemas + Mappings                      │
+│                                   ▼                                         │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                          DATAFORGE                                     │  │
+│  │                "Here's actual data—validate and manage it"             │  │
+│  │                                                                        │  │
+│  │    Ingest → Validate → Review → Correct → Serve                        │  │
+│  │                                                                        │  │
+│  │    Apply mappings, enforce schemas, QC workflow,                       │  │
+│  │    version data, track provenance, handle corrections                  │  │
+│  │                                                                        │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## SchemaForge
+
+*Define what data should look like. Map sources to that standard.*
+
+### Registry Service
+*Single source of truth for schemas*
+
+Stores canonical schemas and elements with full version history. Provides the API that all services use. Handles versioning, export, and change notifications.
+
+→ One place for schema data, properly versioned.
+
+### Curation Workbench
+*Keep schemas clean*
+
+Automated quality audits find issues. Guided workflows fix them efficiently. Full audit trail.
+
+→ 50%+ faster schema maintenance. No more spreadsheets.
+
+### Harmonization Engine
+*Map fields with AI assistance*
+
+Hybrid retrieval (lexical + semantic) finds candidates. LLM evaluation scores confidence. Humans review. Feedback improves the system.
+
+→ 70% faster field mapping. Consistent quality.
+
+---
+
+## DataForge
+
+*Apply mappings. Validate data. Manage the lifecycle.*
+
+### Why a Separate Layer?
+
+SchemaForge answers: *"What should data look like? How do I map to it?"*
+
+But someone still needs to: apply those mappings to actual data, validate results, handle QC review, manage corrections, and serve production data.
+
+That's DataForge.
+
+### Core Capabilities
+
+| Capability | Description |
+|------------|-------------|
+| **Transform execution** | Apply mappings from SchemaForge to actual data |
+| **Schema validation** | Enforce constraints, types, allowed values, conditional rules |
+| **QC workflow** | Claim, review, approve/reject submissions with audit trail |
+| **Data versioning** | Track every change to every record |
+| **Corrections flow** | Handle updates to accepted data properly |
+| **Cross-submission validation** | Ensure entity consistency across batches |
+| **Provenance tracking** | Full lineage from source to production |
+
+### What DataForge Does NOT Do
+
+- Schema creation/editing (→ SchemaForge Curation Workbench)
+- Field mapping decisions (→ SchemaForge Harmonization Engine)
+- Data warehousing (→ BigQuery, Snowflake)
+- Analytics/BI (→ Metabase, Looker)
+
+---
+
+## The Handoff
+
+```
+Source Data
+    │
+    ▼
+┌─────────────────────────────────┐
+│   SCHEMAFORGE                   │
+│   Harmonization Engine          │
+│                                 │
+│  "Map field_x to CDE_y"         │
+│  "Transform value_a to value_b" │
+│                                 │
+│  Output: Mapping definitions    │
+└─────────────────────────────────┘
+    │
+    │ Export mappings
+    ▼
+┌─────────────────────────────────┐
+│   DATAFORGE                     │
+│                                 │
+│  "Apply mappings to this batch" │
+│  "Validate against schema"      │
+│  "Queue for QC review"          │
+│  "Track corrections"            │
+│                                 │
+│  Output: Production data        │
+└─────────────────────────────────┘
+    │
+    ▼
+Downstream Systems
+(Warehouse, Analytics, APIs)
+```
+
+---
+
+## Target Users
+
+| Role | SchemaForge | DataForge |
+|------|-------------|-----------|
+| Data Architect | Creates/maintains schemas | Defines validation rules |
+| Data Engineer | Maps source fields | Ingests and transforms data |
+| QC Reviewer | Reviews mapping decisions | Reviews data submissions |
+| Domain Expert | Validates schema semantics | Validates data quality |
+| Data Consumer | Queries schema definitions | Queries production data |
+
+---
+
+## Why This Architecture
+
+**Clear separation of concerns:**
+- Schema operations (low volume, high consistency) stay in SchemaForge
+- Data operations (high volume, QC workflows) stay in DataForge
+
+**Independent scaling:**
+- SchemaForge: dozens of schemas, thousands of elements
+- DataForge: millions of records, terabytes of data
+
+**Different compliance needs:**
+- Schema metadata: standard security
+- Actual data: HIPAA, PII handling, audit requirements
+
+**Flexible deployment:**
+- Use SchemaForge alone for schema management
+- Add DataForge when ready for production data workflows
+
+---
+
+## Summary
+
+| Layer | Purpose | Key Value |
+|-------|---------|-----------|
+| **SchemaForge** | Schema lifecycle | Define and map |
+| **DataForge** | Data lifecycle | Validate and manage |
+
+Together: end-to-end data harmonization from raw sources to production-ready datasets.
+
+---
+
+*Initial focus: Clinical research (CDEs, HIPAA compliance)*
+*Expansion: Any domain requiring schema conformance and data quality*

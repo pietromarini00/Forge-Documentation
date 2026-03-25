@@ -1,0 +1,25 @@
+
+Local Developer Workflow
+========================
+
+Use this flow when iterating on Forge App locally.
+
+1. Make code changes in ``services/forge-app``.
+2. Rebuild the Docker image.
+3. Run the container and test the app in your browser.
+
+Commands
+--------
+
+.. code-block:: bash
+
+	docker build -f services/forge-app/Dockerfile -t forge-app .
+	docker run -v ~/.config/gcloud:/root/.config/gcloud -p 8505:8505 forge-app
+
+Open ``http://localhost:8505`` and verify your changes.
+
+Tips
+----
+
+- Stop the running container with ``Ctrl+C``.
+- Re-run both commands after each change to test a fresh image.

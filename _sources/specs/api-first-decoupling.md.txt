@@ -1,0 +1,308 @@
+# API-First Decoupling Spec
+
+## Preparatory Refactors for the API-First Architecture
+
+**Status:** Pre-work — can begin during MVP deployment to initial organizations
+
+**Context:** [forge-api-first-vision.md](../platform/forge-api-first-vision.md) · [forge-production-roadmap.md](../platform/forge-production-roadmap.md)
+
+---
+
+## Purpose
+
+The current architecture has two FastAPI services (Registry, DataForge) that are well-structured, and a Streamlit app (forge-app) that contains significant business logic coupled to Streamlit's session model. The roadmap moves toward React (Phase K) and an API-first architecture where every capability is accessible programmatically.
+
+This spec defines **five targeted refactors** that can be done incrementally — during or immediately after the MVP deployment — to reduce the cost of Phases G through K by roughly half. None of these changes alter user-facing behavior. All are internal.
+
+---
+
+## The Five Refactors
+
+```
+                    Low risk — do during MVP
+                    ────────────────────────
+    R1  Remove st.session_state from core/storage.py
+    R2  Extract client singletons from session state
+    R3  Add user_id / org_id fields to models
+
+                    Higher risk — do after MVP stabilizes
+                    ─────────────────────────────────────
+    R4  Extract wizard orchestration into WorkflowService
+    R5  Document implicit API contracts in pages
+```
+
+---
+
+## R1: Remove `st.session_state` from `core/storage.py`
+
+**Problem:** The storage layer reads `st.session_state["user_email"]` directly to construct file paths. This means `core/storage.py` cannot be called from a FastAPI endpoint, a CLI, a test, or anything that isn't Streamlit.
+
+**Current code:**
+```python
+# core/storage.py
+def _schema_project_dir(project_id: str) -> Path:
+    d = _CACHE_DIR / "schema_projects" / st.session_state["user_email"] / project_id
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+```
+
+**Target:**
+```python
+def _schema_project_dir(project_id: str, user_id: str) -> Path:
+    d = _CACHE_DIR / "schema_projects" / user_id / project_id
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+```
+
+**Changes:**
+
+| File | Change |
+|------|--------|
+| `core/storage.py` | Add `user_id: str` parameter to every public function. Remove all `st.session_state` references. Remove `import streamlit as st`. |
+| `pages/1_Schemas.py` | Pass `st.session_state["user_email"]` at call sites. |
+| `pages/2_Data.py` | Same. |
+| `pages/3_Gold.py` | Same (if applicable). |
+| `tests/` | Update any test mocks — tests should become *simpler* since they no longer need to mock `st.session_state`. |
+
+**Risk:** None. Pure signature change with no behavior change.
+
+**Priority:** Highest-leverage change. Every future phase (G: Supabase migration, H: auth, K: React) needs a storage layer that doesn't depend on Streamlit. Doing it now avoids compounding the coupling.
+
+---
+
+## R2: Extract Client Singletons from Session State
+
+**Problem:** HTTP clients are cached in `st.session_state`, tying them to Streamlit's lifecycle.
+
+**Current code:**
+```python
+# clients/registry_client.py
+def get_registry_client(base_url: Optional[str] = None) -> RegistryClient:
+    if "_registry_client" not in st.session_state:
+        st.session_state["_registry_client"] = RegistryClient(base_url or _default_url())
+    return st.session_state["_registry_client"]
+```
+
+**Target:** Module-level caching with `@lru_cache` or a simple module variable:
+```python
+_registry_client: RegistryClient | None = None
+
+def get_registry_client(base_url: str | None = None) -> RegistryClient:
+    global _registry_client
+    if _registry_client is None:
+        _registry_client = RegistryClient(base_url or _default_url())
+    return _registry_client
+```
+
+**Changes:**
+
+| File | Change |
+|------|--------|
+| `clients/registry_client.py` | Replace `st.session_state` caching with module-level singleton. Remove `import streamlit`. |
+| `clients/dataforge_client.py` | Same. |
+| `clients/gold_client.py` | Same. |
+| Any test that mocks `st.session_state` for clients | Simplify to mock the module variable or use dependency injection. |
+
+**Risk:** None. Clients are stateless HTTP wrappers. Caching strategy doesn't affect behavior.
+
+---
+
+## R3: Add `user_id` / `org_id` Fields to Data Models
+
+**Problem:** When Phase H (auth) and Phase I (authorization) arrive, every model will need user/org ownership. Adding these fields later requires migrations, risks breaking serialization of existing data, and forces simultaneous changes across multiple services.
+
+**Target:** Add nullable fields now. Don't enforce them yet.
+
+**Changes:**
+
+| Model | File | Field(s) to Add |
+|-------|------|-----------------|
+| `SchemaProjectManifest` | `core/storage.py` or wherever defined | `user_id: str \| None = None` |
+| `DataProjectManifest` | same | `user_id: str \| None = None` |
+| `CurationSession` | `core/curation/models.py` | `user_id: str \| None = None` |
+| `CuratedMatchSet` | `core/harmonization/models.py` | `user_id: str \| None = None` |
+| `Submission` | `services/dataforge/src/dataforge/submission/models.py` | `user_id: str \| None = None`, `org_id: str \| None = None` |
+| `GoldDataset` | `services/dataforge/src/dataforge/gold/models.py` | `org_id: str \| None = None` |
+
+**For Registry Service (PostgreSQL):**
+
+| Table | Column | Migration |
+|-------|--------|-----------|
+| `schemas` | `owner_id UUID NULL` | Alembic migration, nullable |
+| `schemas` | `org_id UUID NULL` | Alembic migration, nullable |
+
+**Risk:** Low. All fields are nullable with defaults. Existing data is unaffected. JSON serialization of Pydantic models handles `None` gracefully.
+
+**Priority:** Adding a column to a Pydantic model is trivial. Adding a column to a PostgreSQL table with existing data is still easy but requires coordination. Doing both now means Phase H auth can simply start *populating* these fields instead of adding them.
+
+---
+
+## R4: Extract Wizard Orchestration into `WorkflowService`
+
+**Problem:** The 5-step schema curation wizard and 5-step data pipeline are encoded as conditional blocks in page files (`1_Schemas.py`, `2_Data.py`). Step transitions, validation of "can I move forward," and available actions are all implicit in Streamlit callbacks. This logic cannot be reused by an API endpoint or a React frontend.
+
+**Target:** A `WorkflowService` class that knows:
+- What steps exist for a given workflow type
+- What step a project is currently on
+- What actions are available at the current step
+- Whether a transition to the next step is valid (prerequisites met)
+
+```python
+# core/workflow.py
+
+class WorkflowType(str, Enum):
+    SCHEMA_CURATION = "schema_curation"
+    DATA_PIPELINE = "data_pipeline"
+
+class StepStatus(str, Enum):
+    NOT_STARTED = "not_started"
+    IN_PROGRESS = "in_progress"
+    COMPLETE = "complete"
+
+class WorkflowState(BaseModel):
+    workflow_type: WorkflowType
+    current_step: str
+    steps: dict[str, StepStatus]
+    available_actions: list[str]
+
+class WorkflowService:
+    def get_state(self, project_id: str, user_id: str) -> WorkflowState: ...
+    def can_advance(self, project_id: str, step: str) -> bool: ...
+    def advance(self, project_id: str) -> WorkflowState: ...
+```
+
+**The Streamlit pages become thin renderers:**
+```python
+# Before (in page)
+if st.session_state.get("_wizard_step") == "curate":
+    if session.element_curations and all(...):
+        # show "Next" button
+        if st.button("Continue to Validation Rules"):
+            st.session_state["_wizard_step"] = "rules"
+
+# After (in page)
+state = workflow_service.get_state(project_id, user_id)
+if state.current_step == "curate":
+    render_curate_step(session)
+    if "advance" in state.available_actions:
+        if st.button("Continue to Validation Rules"):
+            workflow_service.advance(project_id)
+```
+
+**Changes:**
+
+| File | Change |
+|------|--------|
+| `core/workflow.py` | **New file.** WorkflowService, WorkflowState, step definitions. |
+| `pages/1_Schemas.py` | Replace inline step logic with WorkflowService calls. Reduce by ~200-400 lines. |
+| `pages/2_Data.py` | Same. Larger reduction (~300-500 lines). |
+| `tests/` | Add unit tests for WorkflowService (step transitions, prerequisites). |
+
+**Risk:** Medium. Touching the page files risks regressions in the wizard flow. Mitigated by existing Journey A/B/C integration tests. Run the full test suite after each page is refactored.
+
+**Why after MVP:** This refactor touches the most code and has the highest regression risk. Better to stabilize the MVP first, get user feedback on the workflows, then extract the now-proven logic.
+
+**Why it matters for Phase K:** When you build the React frontend, you need an API that returns "here's what step you're on, here's what you can do." Without WorkflowService, the React team would be reverse-engineering this from 2,000-line Streamlit files.
+
+---
+
+## R5: Document Implicit API Contracts in Pages
+
+**Problem:** The Streamlit pages contain hidden API design. Every time a page calls client X, transforms the result, and passes it to client Y, that's an integration contract. These contracts are currently buried in UI code and will need to become explicit API endpoints (for the Harmonization API and Curation API that don't exist yet).
+
+**Target:** A markdown file that catalogs every backend interaction the pages perform, grouped by workflow step. Not a full API spec — just enough to inform one later.
+
+**Format:**
+```markdown
+## Schema Curation Wizard
+
+### Step 1: Upload
+- Parse file → `core/curation/parser.parse_uploaded_file(bytes, filename)`
+- Returns: `list[RawElement]`
+- Side effect: Creates `CurationSession`, saves to storage
+
+### Step 2: Configure
+- For each element: read `session.element_curations[var_name]`
+- AI suggestions: `AISuggestionService.get_suggestions(elements, schema_context)`
+- Duplicate detection: `DuplicateDetector.find_duplicates(elements)`
+...
+```
+
+**Changes:**
+
+| File | Change |
+|------|--------|
+| `docs/specs/api-contracts.md` | **New file.** Catalog of every backend call made by each page, per workflow step. |
+
+**Risk:** None. Documentation only.
+
+**Why it matters:** This becomes the requirements doc for the Harmonization API and Curation API. Without it, building those APIs means re-reading thousands of lines of Streamlit code.
+
+---
+
+## Sequencing & Dependencies
+
+```
+        Low risk (during MVP)           Higher risk (after MVP stabilizes)
+        ─────────────────────           ─────────────────────────────────
+
+        ┌─────┐  ┌─────┐
+        │ R1  │  │ R2  │               Independent, can be
+        └──┬──┘  └──┬──┘               done in parallel
+           │        │
+        ┌──▼────────▼──┐
+        │     R3        │               Benefits from R1
+        └───────────────┘               (user_id param exists)
+
+                                        ┌─────────────┐
+                                        │     R5      │    Do first
+                                        └──────┬──────┘
+                                               │
+                                        ┌──────▼──────┐
+                                        │     R4      │    Informed by R5
+                                        └─────────────┘    (contract catalog)
+```
+
+**R1 + R2** are independent, can be done in the same PR or separate. No functional change, trivial review.
+
+**R3** benefits from R1 being done (since `user_id` is already a parameter in storage functions), but isn't strictly blocked by it.
+
+**R5** (documentation) can happen anytime. Best done before R4 so the WorkflowService design is informed by the actual call sequences.
+
+**R4** is the big one. Do it after the MVP is stable and after R5 gives you the contract catalog.
+
+---
+
+## Relationship to Existing Roadmap Phases
+
+| Refactor | Directly reduces cost of |
+|----------|--------------------------|
+| R1 (storage decoupling) | Phase G (Supabase migration — storage layer is already parameterized) |
+| R2 (client singletons) | Phase K (React — clients are reusable outside Streamlit) |
+| R3 (user_id / org_id fields) | Phase H (auth) and Phase I (authorization — fields already exist) |
+| R4 (WorkflowService) | Phase K (React — workflow state is API-exposable) |
+| R5 (contract docs) | New Harmonization API + Curation API (spec already written) |
+
+---
+
+## What This Does NOT Cover
+
+- **Harmonization API design** — a separate spec. R5 produces the input for it.
+- **Curation API design** — same.
+- **Auth implementation** — still Phase H. R3 just pre-stages the model fields.
+- **Supabase migration** — still Phase G. R1 just makes storage swappable.
+- **React frontend** — still Phase K. R4 just ensures the backend is ready for it.
+
+This spec is explicitly about **reducing coupling now** so those future phases are cheaper and less risky.
+
+---
+
+## Acceptance Criteria
+
+| Refactor | Done when |
+|----------|-----------|
+| R1 | `core/storage.py` has zero `streamlit` imports. All tests pass. |
+| R2 | `clients/*.py` have zero `streamlit` imports. All tests pass. |
+| R3 | All listed models have nullable `user_id`/`org_id`. Registry migration applied. All tests pass. |
+| R4 | `core/workflow.py` exists with tests. Pages delegate step logic to it. Journey A/B/C tests pass. |
+| R5 | `docs/specs/api-contracts.md` exists and covers all page workflows. |

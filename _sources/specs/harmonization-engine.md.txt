@@ -1,0 +1,1583 @@
+# SchemaForge: Harmonization Engine
+
+## Product Specification v0.3
+
+---
+
+## Executive Summary
+
+The **Harmonization Engine** is SchemaForge's service for mapping source dataset fields to canonical schema elements. It combines hybrid retrieval (TF-IDF + semantic embeddings), LLM-based evaluation, and human-in-the-loop curation to achieve high-quality schema mappings at scale.
+
+This service directly addresses the "intake" problem: when new data sources arrive, someone must map each source field to the canonical schema. Currently this is manual, inconsistent, and untracked. The Harmonization Engine automates candidate discovery, provides AI-assisted recommendations, and captures curator decisions to improve over time.
+
+---
+
+## Problem Statement
+
+Organizations harmonizing data from multiple sources face a recurring challenge: mapping source fields to canonical elements.
+
+**Current pain points:**
+- Manual matching is tedious (100+ fields per source × multiple sources)
+- Keyword search misses synonyms and abbreviations (e.g., "BP" → "BloodPressure")
+- No standardized process—quality depends on who does the mapping
+- Mappings are lost or poorly documented
+- Same mistakes repeated across similar sources
+- No feedback loop to improve matching over time
+
+**Result:** Data harmonization is a bottleneck. Each new source requires significant manual effort, and mapping quality is inconsistent.
+
+---
+
+## Solution
+
+The Harmonization Engine provides:
+
+1. **Hybrid Retrieval** — Combine lexical (TF-IDF) and semantic (embeddings) matching to surface relevant candidates
+2. **AI Evaluation** — LLM-based assessment of match quality with confidence scores
+3. **Curation Interface** — Human review and correction of AI recommendations
+4. **Feedback Learning** — Capture curator decisions to identify improvement opportunities
+5. **Mapping Management** — Store, version, and export finalized mappings
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    HARMONIZATION WORKFLOW                           │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   Source Dataset                                                    │
+│        │                                                            │
+│        ▼                                                            │
+│   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐           │
+│   │   INGEST    │────▶│  RETRIEVE   │────▶│  EVALUATE   │           │
+│   │             │     │             │     │             │           │
+│   │ Parse fields│     │ TF-IDF +    │     │ LLM scoring │           │
+│   │ Extract meta│     │ Embeddings  │     │ Confidence  │           │
+│   └─────────────┘     └─────────────┘     └─────────────┘           │
+│                                                  │                  │
+│                                                  ▼                  │
+│   ┌─────────────┐     ┌─────────────┐     ┌─────────────┐           │
+│   │   EXPORT    │◀────│   CURATE    │◀────│   REVIEW    │           │
+│   │             │     │             │     │             │           │
+│   │ Mappings    │     │ Accept/Edit │     │ Ranked      │           │
+│   │ Transforms  │     │ Feedback    │     │ candidates  │           │
+│   └─────────────┘     └─────────────┘     └─────────────┘           │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Target Users
+
+### Primary: Data Engineer
+- Responsible for integrating new data sources
+- Needs to map source fields to canonical schema quickly
+- Values accuracy and audit trails
+
+### Secondary: Research Coordinator
+- Oversees data harmonization across studies
+- Needs visibility into mapping decisions
+- Reviews and approves mappings before deployment
+
+### Tertiary: Domain Expert
+- Provides guidance on semantic equivalence
+- Reviews edge cases and ambiguous mappings
+- Not technical but understands the domain
+
+---
+
+## Core Concepts
+
+### Source
+A dataset being mapped to the canonical schema.
+
+```yaml
+source:
+  id: "uuid"
+  name: "NACC UDS3"
+  description: "National Alzheimer's Coordinating Center Uniform Data Set v3"
+  file_type: "csv"                    # csv | xlsx | json | parquet
+  field_count: 847
+  uploaded_at: "2025-01-15T10:00:00Z"
+  uploaded_by: "user_id"
+  status: "in_progress"               # uploaded | in_progress | reviewed | finalized
+  
+  # Progress tracking
+  fields_total: 847
+  fields_matched: 312
+  fields_reviewed: 156
+  fields_finalized: 89
+```
+
+### Source Field
+A single field from the source dataset.
+
+```yaml
+source_field:
+  id: "uuid"
+  source_id: "uuid"
+  name: "NACCBRAA"                     # Original field name
+  description: "Braak stage for neurofibrillary degeneration"
+  inferred_type: "integer"            # Detected from data
+  sample_values: ["0", "1", "2", "3", "4", "5", "6"]
+  null_percentage: 12.5
+  
+  # Matching state
+  status: "reviewed"                  # pending | matched | reviewed | finalized | no_match
+  
+  # AI recommendation
+  ai_match:
+    element_id: "uuid"
+    element_name: "path_braak_nft"
+    confidence: 0.94
+    reasoning: "Direct semantic match. Source field NACCBRAA maps to Braak NFT staging..."
+  
+  # Final decision
+  final_match:
+    element_id: "uuid"
+    element_name: "path_braak_nft"
+    curator_id: "user_id"
+    curated_at: "2025-01-15T14:30:00Z"
+    notes: "Confirmed. Values align exactly."
+```
+
+### Candidate
+A potential match for a source field.
+
+```yaml
+candidate:
+  element_id: "uuid"
+  element_name: "path_braak_nft"
+  element_description: "Neurofibrillary tangle staging per Braak criteria"
+  
+  # Retrieval scores
+  tfidf_score: 0.72
+  embedding_score: 0.89
+  combined_score: 0.82
+  
+  # AI evaluation (if performed)
+  ai_confidence: 0.94
+  ai_reasoning: "Strong semantic alignment..."
+  
+  rank: 1
+```
+
+### Mapping
+The finalized relationship between source field and canonical element.
+
+```yaml
+mapping:
+  id: "uuid"
+  source_id: "uuid"
+  source_field_id: "uuid"
+  element_id: "uuid"
+  
+  # Metadata
+  match_type: "exact"                 # exact | semantic | partial | none
+  confidence: 0.94
+  
+  # Value transform (if needed)
+  transform:
+    type: "direct"                    # direct | remap | formula | conditional | lookup
+    remap: null                       # For value remapping
+    formula: null                     # For computed transforms
+  
+  # Provenance
+  ai_suggested: true
+  curator_id: "user_id"
+  created_at: "2025-01-15T14:30:00Z"
+  notes: "Exact match, no transform needed"
+```
+
+### Feedback Record
+Captures curator decisions for analysis.
+
+```yaml
+feedback:
+  id: "uuid"
+  source_field_id: "uuid"
+  timestamp: "2025-01-15T14:30:00Z"
+  curator_id: "user_id"
+  
+  # AI recommendation
+  ai_top_candidate:
+    element_id: "uuid"
+    confidence: 0.94
+  
+  # Curator action
+  action: "accept"                    # accept | reject | select_alternative | no_match
+  
+  # If alternative selected
+  selected_element_id: null           # Different element if action=select_alternative
+  alternative_rank: null              # Rank of selected alternative in candidate list
+  
+  # Context
+  candidates_shown: 15
+  time_to_decision_ms: 4500
+  notes: null
+```
+
+### Element Proposal *(Phase C)*
+A request to add a new element to the canonical schema.
+
+```yaml
+element_proposal:
+  id: "uuid"
+  schema_id: "uuid"
+  source_field_id: "uuid"             # Source field that triggered proposal
+  
+  # Proposed element definition
+  proposed_name: "moca_total_score"
+  proposed_display_name: "MoCA Total Score"
+  proposed_type: "integer"
+  proposed_description: "Montreal Cognitive Assessment total score (0-30)"
+  proposed_constraints:
+    min: 0
+    max: 30
+  suggested_category: "cognitive_assessments"
+  
+  # Justification
+  justification: "MoCA is a widely-used cognitive screening tool..."
+  
+  # Similar elements (AI-detected)
+  similar_elements:
+    - element_id: "uuid"
+      name: "mmse_total"
+      similarity_score: 0.62
+  
+  # Status
+  status: "pending"                   # draft | pending | under_review | approved | rejected | withdrawn
+  
+  # Resolution
+  registry_proposal_id: "uuid"        # ID in Registry Service
+  created_element_id: "uuid"          # If approved
+  rejection_reason: null
+  
+  # Audit
+  created_by: "user_id"
+  created_at: "2025-01-27T15:00:00Z"
+  resolved_at: null
+```
+
+### Transform *(Phase B)*
+A value transformation definition stored with mappings.
+
+```yaml
+transform:
+  id: "uuid"
+  mapping_id: "uuid"
+  
+  transform_type: "remap"             # direct | remap | formula | conditional | lookup
+  
+  # For remap transforms
+  definition:
+    value_map:
+      "Male": 0
+      "Female": 1
+      "Unknown": 2
+    null_mappings:
+      "Not Reported": "not_reported"
+      "": "missing"
+    default_action: "error"           # error | null | pass_through
+  
+  # For formula transforms
+  # definition:
+  #   expression: "enrollment_year - birth_year"
+  #   variables: ["enrollment_year", "birth_year"]
+  
+  # Testing
+  test_results:
+    passed: 344
+    failed: 3
+    warnings: 12
+  
+  # Pattern reference (if using reusable pattern)
+  pattern_id: null
+  
+  created_at: "2025-01-27T10:00:00Z"
+  created_by: "user_id"
+```
+
+---
+
+## Features
+
+### F1: Source Ingestion
+
+**F1.1: Upload Source**
+- Support CSV, Excel, JSON, Parquet formats
+- Auto-detect field types from data samples
+- Extract field descriptions from headers or metadata
+- Handle large files (100k+ rows) efficiently
+
+**F1.2: Field Extraction**
+- Parse field names and normalize
+- Infer data types from values
+- Calculate statistics (null %, unique values, sample values)
+- Detect potential composite fields
+
+**F1.3: Source Metadata**
+- Name and describe the source
+- Tag with domain/category
+- Link to documentation
+- Track upload history
+
+---
+
+### F2: Hybrid Retrieval
+
+The Harmonization Engine uses the **shared Retrieval Core** (see [Shared Infrastructure](#shared-infrastructure-retrieval-core)) for all similarity matching operations.
+
+**F2.1: Index Management**
+- Build TF-IDF index on canonical schema elements using `TFIDFEngine`
+- Generate embeddings for all elements using `EmbeddingEngine`
+- Cache indices for performance
+- Rebuild on schema updates (via webhook)
+
+**F2.2: TF-IDF Matching**
+- Tokenize and normalize field names + descriptions via `TextProcessor`
+- N-gram matching (unigrams + bigrams)
+- Stop word removal
+- Return cosine similarity scores
+
+**F2.3: Semantic Matching**
+- Encode source field as embedding
+- Cosine similarity against element embeddings
+- Handle synonyms and abbreviations
+- Support domain-specific models (configurable)
+
+**F2.4: Score Combination**
+- Configurable weights via `ScoreCombiner` (default: 40% TF-IDF, 60% embedding)
+- Optional: Reciprocal Rank Fusion mode
+- Return top-k candidates (default: 15)
+- Include component scores for analysis
+
+```python
+# Configuration options
+@dataclass
+class RetrievalConfig:
+    embedding_model: str = "all-MiniLM-L6-v2"
+    tfidf_weight: float = 0.4
+    embedding_weight: float = 0.6
+    top_k: int = 15
+    use_rrf: bool = False
+    include_component_scores: bool = True
+```
+
+---
+
+### F3: AI Evaluation
+
+**F3.1: Candidate Assessment**
+- LLM evaluates each candidate for semantic match
+- Considers: name similarity, description alignment, value compatibility
+- Outputs confidence score (0-1) and reasoning
+
+**F3.2: Batch Processing**
+- Process multiple source fields efficiently
+- Parallel evaluation where possible
+- Progress tracking and resumability
+
+**F3.3: Confidence Calibration**
+- Track confidence vs. curator acceptance
+- Identify systematic over/under-confidence
+- Adjust thresholds based on feedback
+
+**F3.4: Configurable Prompts**
+- Template-based prompt construction
+- Domain-specific instructions
+- A/B testing support for prompt variants
+
+---
+
+### F4: Curation Interface
+
+**F4.1: Match Review**
+- Display source field with context
+- Show ranked candidates with scores
+- AI recommendation highlighted
+- Accept, reject, or select alternative
+
+**F4.2: Bulk Operations**
+- Auto-accept high-confidence matches (threshold configurable)
+- Review queue sorted by confidence (low first)
+- Batch accept/reject similar patterns
+
+**F4.3: No-Match Handling**
+
+When a source field has no acceptable match among existing canonical elements, the curator has three options:
+
+1. **Mark as Intentionally Unmapped**
+   - Field is not relevant to canonical schema
+   - Examples: internal IDs, source-specific metadata
+   - Recorded with reason code: `not_applicable`, `source_specific`, `deprecated`
+
+2. **Propose New Element** *(Phase C)*
+   - Field represents a concept missing from canonical schema
+   - Creates a proposal for schema admin review
+   - See F4.5 for full workflow
+
+3. **Request Guidance**
+   - Curator unsure how to handle field
+   - Creates a review request with question
+   - Routed to domain expert or schema admin
+
+**UI Flow:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   NO MATCH OPTIONS                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Source Field: moca_score                                       │
+│  No candidates above 50% confidence                             │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ ○ Mark as Unmapped                                        │  │
+│  │   This field doesn't belong in the canonical schema       │  │
+│  │                                                           │  │
+│  │   Reason: [Source-specific ▼]                             │  │
+│  │   Notes:  [________________________________]              │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ ○ Propose New Element                                     │  │
+│  │   This concept should be added to the canonical schema    │  │
+│  │                                                           │  │
+│  │   [Open Proposal Form →]                                  │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ ○ Request Guidance                                        │  │
+│  │   I need help deciding how to handle this field           │  │
+│  │                                                           │  │
+│  │   Question: [________________________________]            │  │
+│  │   Assign to: [Select reviewer ▼]                          │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  [Cancel] [Submit Decision]                                     │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**F4.4: Value Mapping** *(Phase B)*
+
+The Value Mapping feature enables curators to define how source values map to canonical element values. This is critical when:
+- Source uses different encoding (e.g., "Male"/"Female" vs. 0/1)
+- Source has additional values not in canonical allowed_values
+- Source uses sentinel values for missing data (e.g., 99, -1)
+
+**Transform Types:**
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `direct` | No transformation needed | age → age |
+| `remap` | Value-to-value mapping | "Male" → 0 |
+| `formula` | Computed transformation | birth_year → 2025 - birth_year |
+| `conditional` | Rule-based transformation | if age < 18: "minor" else "adult" |
+| `lookup` | External lookup table | zip_code → state |
+
+**Remap Transform UI:**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 VALUE TRANSFORM: REMAP                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Source Field: sex                                              │
+│  Target Element: biological_sex (enum: 0, 1, 2)                 │
+│                                                                 │
+│  Source Values          Target Values                           │
+│  ─────────────          ─────────────                           │
+│  "Male"            →    [0 - Male        ▼]                     │
+│  "Female"          →    [1 - Female      ▼]                     │
+│  "Unknown"         →    [2 - Unknown     ▼]                     │
+│  "Not Reported"    →    [null            ▼]                     │
+│  ""                →    [null            ▼]                     │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ Null Handling                                             │  │
+│  │                                                           │  │
+│  │ "Not Reported" → null  Reason: [not_reported     ▼]       │  │
+│  │ ""             → null  Reason: [missing          ▼]       │  │
+│  │ (empty)        → null  Reason: [not_assessed     ▼]       │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ Unmapped Source Values                                    │  │
+│  │                                                           │  │
+│  │ ⚠ Found 2 values in data not in mapping:                  │  │
+│  │   "M" (47 occurrences) → [Map to... ▼]                    │  │
+│  │   "F" (52 occurrences) → [Map to... ▼]                    │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  [Test with Sample Data] [Save Transform]                       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Formula Transform UI:**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 VALUE TRANSFORM: FORMULA                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Source Field: birth_year                                       │
+│  Target Element: age_at_enrollment (integer, 0-120)             │
+│                                                                 │
+│  Formula:                                                       │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ enrollment_year - birth_year                              │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  Available Variables:                                           │
+│  • birth_year (source field)                                    │
+│  • enrollment_year (source field)                               │
+│  • enrollment_date (source field)                               │
+│  • CURRENT_YEAR (constant: 2026)                                │
+│                                                                 │
+│  Test Results:                                                  │
+│  ┌────────────┬─────────────────┬────────────┐                  │
+│  │ birth_year │ enrollment_year │ result     │                  │
+│  ├────────────┼─────────────────┼────────────┤                  │
+│  │ 1955       │ 2023            │ 68 ✓       │                  │
+│  │ 1940       │ 2020            │ 80 ✓       │                  │
+│  │ 2030       │ 2023            │ -7 ⚠       │                  │
+│  └────────────┴─────────────────┴────────────┘                  │
+│                                                                 │
+│  ⚠ 3 values produce out-of-range results                        │
+│                                                                 │
+│  [Save Transform]                                               │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Transform Testing:**
+- Preview transform results against actual source data
+- Highlight out-of-range or invalid outputs
+- Show before/after comparison
+- Detect unmapped source values
+
+**F4.5: Propose New Element** *(Phase C)*
+
+When a curator identifies a source field that should become a new canonical element:
+
+**Proposal Form:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 PROPOSE NEW ELEMENT                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Source Context                                                 │
+│  ──────────────                                                 │
+│  Source: Cohort D Clinical                                      │
+│  Field: moca_score                                              │
+│  Type: integer                                                  │
+│  Values: 28, 24, 19, 30, ...                                    │
+│                                                                 │
+│  Proposed Element                                               │
+│  ────────────────                                               │
+│  Name:         [moca_total_score_________________]              │
+│  Display Name: [MoCA Total Score_________________]              │
+│  Type:         [integer ▼]                                      │
+│  Description:                                                   │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ Montreal Cognitive Assessment total score. Range 0-30,    │  │
+│  │ higher scores indicate better cognitive function.         │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  Constraints:                                                   │
+│  Min: [0___]  Max: [30__]  Pattern: [____________]              │
+│                                                                 │
+│  Category: [cognitive_assessments ▼]                            │
+│                                                                 │
+│  Justification:                                                 │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ MoCA is a widely-used cognitive screening tool. This      │  │
+│  │ element is needed for cross-cohort cognitive analysis.    │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  Similar Existing Elements (AI-detected):                       │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │ ⚠ mmse_total (62% similar) - MMSE Total Score             │  │
+│  │   [View] [Use This Instead]                               │  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                                                                 │
+│  [Save Draft] [Submit Proposal]                                 │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Proposal Workflow:**
+1. Data manager creates proposal with element definition
+2. System detects similar existing elements
+3. Proposal synced to Registry Service
+4. Schema admin reviews in Curation Workbench
+5. On approval: element created, source field auto-mapped
+6. On rejection: proposer notified with reason/alternative
+
+**Proposal States:**
+- `draft` — Being edited by proposer
+- `pending` — Submitted, awaiting review
+- `under_review` — Claimed by reviewer
+- `approved` — Element created
+- `rejected` — Declined with reason
+- `withdrawn` — Cancelled by proposer
+
+---
+
+### F5: Feedback & Learning
+
+**F5.1: Decision Capture**
+- Log every curator action
+- Track time-to-decision
+- Record candidate rankings
+
+**F5.2: Pattern Analysis**
+- Identify common failure modes:
+  - Granularity mismatch (broader/narrower)
+  - Synonym confusion
+  - Domain errors
+  - Value encoding differences
+- Generate reports by source, curator, time period
+
+**F5.3: Improvement Metrics**
+- Precision@k for retrieval
+- AI acceptance rate
+- Curator agreement rate
+- Time savings vs. manual
+
+**F5.4: Model Comparison** (Future)
+- A/B test embedding models
+- Compare general vs. domain-specific
+- Data-driven model selection
+
+---
+
+### F6: Mapping Management
+
+**F6.1: Save Mappings**
+- Persist finalized field mappings
+- Version mappings per source
+- Track mapping history
+
+**F6.2: Export Mappings**
+- JSON mapping file
+- CSV for spreadsheet review
+- Python/SQL transform code generation
+- Integration with ETL tools
+
+**F6.3: Apply Mappings**
+- Generate column rename dictionary
+- Create value transform rules
+- Preview transformed data sample
+
+**F6.4: Mapping Templates**
+- Reuse mappings for similar sources
+- Suggest mappings based on field name patterns
+- Clone and modify existing mappings
+
+**F6.5: Transform Management** *(Phase B)*
+
+**Transform CRUD:**
+- Create transform with mapping
+- Update transform definition
+- Delete transform (revert to direct)
+- View transform history
+
+**Transform Testing:**
+- Test against sample data before saving
+- Show pass/fail/warning counts
+- Highlight problematic values
+- Validate against element constraints
+
+**Transform Patterns (Organic Growth):**
+
+Patterns are built organically from curator behavior:
+
+```python
+async def check_pattern_promotion(transform: Transform) -> Optional[PatternSuggestion]:
+    """
+    Check if a transform should be suggested as a reusable pattern.
+    Triggered after transform is saved.
+    """
+    
+    # Find similar transforms across all sessions
+    similar = await find_similar_transforms(
+        transform_type=transform.transform_type,
+        definition=transform.definition,
+        similarity_threshold=0.9
+    )
+    
+    # If 3+ similar transforms exist, suggest pattern
+    if len(similar) >= 3:
+        # Check if pattern already exists
+        existing = await find_matching_pattern(transform.definition)
+        if existing:
+            # Increment usage count
+            await increment_pattern_usage(existing.id)
+            return None
+        
+        # Suggest new pattern
+        return PatternSuggestion(
+            transform=transform,
+            similar_count=len(similar),
+            suggested_name=generate_pattern_name(transform),
+            suggested_description=generate_pattern_description(transform, similar)
+        )
+    
+    return None
+```
+
+**Pattern Promotion UI:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 PATTERN SUGGESTION                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  This transform has been used 5 times across sessions.          │
+│  Would you like to save it as a reusable pattern?               │
+│                                                                 │
+│  Transform: Male/Female → 0/1                                   │
+│  Used in: Cohort A, Cohort B, Cohort C, Cohort D, Cohort E      │
+│                                                                 │
+│  Suggested Pattern Name:                                        │
+│  [sex_string_to_code_______________________]                    │
+│                                                                 │
+│  Description:                                                   │
+│  [Maps Male/Female string values to 0/1 codes___]               │
+│                                                                 │
+│  [Save as Pattern] [Not Now] [Never for This Transform]         │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## User Interface
+
+### Main Views
+
+**1. Source Dashboard**
+- List of sources with progress metrics
+- Status indicators (uploaded, in progress, finalized)
+- Quick actions (upload, continue, export)
+
+**2. Field Matching Interface**
+- Left panel: Source field details
+  - Field name, description, type
+  - Sample values, statistics
+- Right panel: Candidate list
+  - Ranked by combined score
+  - AI confidence badge
+  - Expand for reasoning
+- Action buttons: Accept, Reject, Skip, No Match
+
+**3. Batch Review**
+- Table view of all fields
+- Filter by status, confidence, curator
+- Bulk actions toolbar
+- Inline accept/reject
+
+**4. Mapping Export**
+- Preview generated mappings
+- Select export format
+- Download or copy
+
+**5. Feedback Dashboard**
+- Acceptance rate over time
+- Common rejection reasons
+- Retrieval performance metrics
+- Curator activity
+
+**6. Proposal Dashboard** *(Phase C)*
+- List of my proposals with status
+- Filter by status, schema, date
+- Quick actions: edit draft, withdraw, view resolution
+- Notifications for status changes
+
+**7. Transform Editor** *(Phase B)*
+- Visual transform builder
+- Code preview (Python/SQL)
+- Test runner with sample data
+- Pattern library browser
+
+---
+
+## API Design
+
+### RESTful Endpoints
+
+```
+# Sources
+GET    /api/sources                    # List sources
+POST   /api/sources                    # Upload new source
+GET    /api/sources/:id                # Get source details
+DELETE /api/sources/:id                # Delete source
+GET    /api/sources/:id/progress       # Get progress stats
+
+# Fields
+GET    /api/sources/:id/fields         # List fields (with filters)
+GET    /api/fields/:id                 # Get field details
+POST   /api/fields/:id/match           # Trigger matching for field
+GET    /api/fields/:id/candidates      # Get candidates for field
+
+# Curation
+POST   /api/fields/:id/accept          # Accept AI recommendation
+POST   /api/fields/:id/select          # Select alternative candidate
+POST   /api/fields/:id/reject          # Reject all / mark no match
+POST   /api/fields/:id/curate          # Custom curation decision
+GET    /api/sources/:id/queue          # Get curation queue
+
+# Mappings
+GET    /api/sources/:id/mappings       # Get all mappings for source
+POST   /api/sources/:id/mappings       # Create manual mapping
+PUT    /api/mappings/:id               # Update mapping
+DELETE /api/mappings/:id               # Delete mapping
+GET    /api/sources/:id/export         # Export mappings (format param)
+
+# Transforms (Phase B)
+GET    /api/mappings/:id/transform     # Get transform for mapping
+POST   /api/mappings/:id/transform     # Create/update transform
+DELETE /api/mappings/:id/transform     # Delete transform
+POST   /api/transforms/test            # Test transform against data
+
+# Transform Patterns (Phase B)
+GET    /api/patterns                   # List available patterns
+GET    /api/patterns/:id               # Get pattern details
+POST   /api/patterns                   # Create pattern from transform
+PUT    /api/patterns/:id               # Update pattern
+DELETE /api/patterns/:id               # Delete pattern
+
+# Proposals (Phase C)
+GET    /api/proposals                  # List my proposals
+POST   /api/proposals                  # Create proposal
+GET    /api/proposals/:id              # Get proposal details
+PUT    /api/proposals/:id              # Update draft proposal
+DELETE /api/proposals/:id              # Withdraw proposal
+POST   /api/proposals/:id/submit       # Submit for review
+
+# Feedback
+GET    /api/feedback                   # List feedback records (with filters)
+GET    /api/feedback/analysis          # Get analysis report
+GET    /api/feedback/metrics           # Get performance metrics
+
+# Configuration
+GET    /api/config/retrieval           # Get retrieval config
+PUT    /api/config/retrieval           # Update retrieval config
+GET    /api/config/models              # List available embedding models
+
+# Webhooks
+POST   /webhooks/schema-changed        # Handle schema change from Registry
+```
+
+---
+
+## Data Model
+
+### Database Schema (PostgreSQL)
+
+```sql
+-- Sources
+CREATE TABLE sources (
+    id UUID PRIMARY KEY,
+    schema_id UUID NOT NULL,              -- Target schema for mapping
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    file_type VARCHAR(20) NOT NULL,
+    file_path VARCHAR(500),
+    field_count INTEGER,
+    uploaded_at TIMESTAMP DEFAULT NOW(),
+    uploaded_by UUID REFERENCES users(id),
+    status VARCHAR(20) DEFAULT 'uploaded',
+    metadata JSONB
+);
+
+-- Source Fields
+CREATE TABLE source_fields (
+    id UUID PRIMARY KEY,
+    source_id UUID REFERENCES sources(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    inferred_type VARCHAR(50),
+    sample_values JSONB,
+    statistics JSONB,
+    status VARCHAR(20) DEFAULT 'pending',
+    
+    -- AI match
+    ai_element_id UUID,                   -- References Registry element
+    ai_confidence DECIMAL(4,3),
+    ai_reasoning TEXT,
+    ai_matched_at TIMESTAMP,
+    
+    -- Final match
+    final_element_id UUID,                -- References Registry element
+    curator_id UUID REFERENCES users(id),
+    curated_at TIMESTAMP,
+    curator_notes TEXT,
+    
+    UNIQUE(source_id, name)
+);
+
+-- Candidates (cached)
+CREATE TABLE candidates (
+    id UUID PRIMARY KEY,
+    source_field_id UUID REFERENCES source_fields(id) ON DELETE CASCADE,
+    element_id UUID NOT NULL,             -- References Registry element
+    rank INTEGER,
+    tfidf_score DECIMAL(5,4),
+    embedding_score DECIMAL(5,4),
+    combined_score DECIMAL(5,4),
+    ai_confidence DECIMAL(4,3),
+    ai_reasoning TEXT,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Mappings
+CREATE TABLE mappings (
+    id UUID PRIMARY KEY,
+    source_id UUID REFERENCES sources(id) ON DELETE CASCADE,
+    source_field_id UUID REFERENCES source_fields(id) ON DELETE CASCADE,
+    element_id UUID NOT NULL,             -- References Registry element
+    match_type VARCHAR(20),
+    confidence DECIMAL(4,3),
+    ai_suggested BOOLEAN DEFAULT FALSE,
+    curator_id UUID REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    notes TEXT,
+    
+    UNIQUE(source_field_id)
+);
+
+-- Transforms (Phase B)
+CREATE TABLE transforms (
+    id UUID PRIMARY KEY,
+    mapping_id UUID REFERENCES mappings(id) ON DELETE CASCADE,
+    transform_type VARCHAR(30) NOT NULL,  -- direct | remap | formula | conditional | lookup
+    definition JSONB NOT NULL,
+    test_results JSONB,
+    pattern_id UUID REFERENCES transform_patterns(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    created_by UUID REFERENCES users(id),
+    
+    UNIQUE(mapping_id)
+);
+
+-- Transform Patterns (Phase B)
+CREATE TABLE transform_patterns (
+    id UUID PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    transform_type VARCHAR(30) NOT NULL,
+    definition JSONB NOT NULL,
+    usage_count INTEGER DEFAULT 1,
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by UUID REFERENCES users(id)
+);
+
+-- Element Proposals (Phase C)
+CREATE TABLE element_proposals (
+    id UUID PRIMARY KEY,
+    schema_id UUID NOT NULL,              -- Target schema
+    source_field_id UUID REFERENCES source_fields(id),
+    
+    -- Proposed element
+    proposed_name VARCHAR(64) NOT NULL,
+    proposed_display_name VARCHAR(255),
+    proposed_type VARCHAR(50) NOT NULL,
+    proposed_description TEXT,
+    proposed_constraints JSONB,
+    suggested_category VARCHAR(100),
+    
+    -- Context
+    justification TEXT,
+    similar_elements JSONB,
+    
+    -- Status
+    status VARCHAR(20) DEFAULT 'draft',
+    registry_proposal_id UUID,            -- ID in Registry Service
+    created_element_id UUID,              -- If approved
+    rejection_reason TEXT,
+    suggested_alternative_id UUID,
+    
+    -- Audit
+    created_by UUID REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    resolved_at TIMESTAMP
+);
+
+-- Feedback
+CREATE TABLE feedback (
+    id UUID PRIMARY KEY,
+    source_field_id UUID REFERENCES source_fields(id),
+    timestamp TIMESTAMP DEFAULT NOW(),
+    curator_id UUID REFERENCES users(id),
+    
+    ai_element_id UUID,
+    ai_confidence DECIMAL(4,3),
+    
+    action VARCHAR(30) NOT NULL,          -- accept | reject | select_alternative | no_match
+    selected_element_id UUID,
+    alternative_rank INTEGER,
+    candidates_shown INTEGER,
+    time_to_decision_ms INTEGER,
+    notes TEXT
+);
+
+-- Retrieval index metadata
+CREATE TABLE retrieval_indices (
+    id UUID PRIMARY KEY,
+    schema_id UUID NOT NULL,
+    embedding_model VARCHAR(255),
+    created_at TIMESTAMP DEFAULT NOW(),
+    element_count INTEGER,
+    index_path VARCHAR(500),              -- Path to cached index files
+    config JSONB
+);
+
+-- Indexes
+CREATE INDEX idx_sources_schema ON sources(schema_id);
+CREATE INDEX idx_source_fields_source ON source_fields(source_id);
+CREATE INDEX idx_source_fields_status ON source_fields(status);
+CREATE INDEX idx_candidates_field ON candidates(source_field_id);
+CREATE INDEX idx_mappings_source ON mappings(source_id);
+CREATE INDEX idx_transforms_mapping ON transforms(mapping_id);
+CREATE INDEX idx_transforms_pattern ON transforms(pattern_id);
+CREATE INDEX idx_patterns_usage ON transform_patterns(usage_count DESC);
+CREATE INDEX idx_proposals_schema ON element_proposals(schema_id);
+CREATE INDEX idx_proposals_status ON element_proposals(status);
+CREATE INDEX idx_feedback_timestamp ON feedback(timestamp);
+CREATE INDEX idx_feedback_curator ON feedback(curator_id);
+CREATE INDEX idx_feedback_action ON feedback(action);
+```
+
+---
+
+## Shared Infrastructure: Retrieval Core
+
+The Harmonization Engine uses shared retrieval infrastructure that is also used by the Curation Workbench (duplicate detection) and Registry Service (proposal similarity). This ensures consistent matching behavior across all Forge services.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         RETRIEVAL CORE MODULE                               │
+│                         (forge-retrieval-core)                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                         TextProcessor                                 │  │
+│  │                                                                       │  │
+│  │  • normalize(text) → cleaned text                                     │  │
+│  │  • tokenize(text) → tokens (handles snake_case, camelCase, etc.)      │  │
+│  │  • build_element_text(element) → combined searchable text             │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                         TFIDFEngine                                   │  │
+│  │                                                                       │  │
+│  │  • fit(texts) → builds vocabulary and IDF weights                     │  │
+│  │  • transform(texts) → sparse TF-IDF matrix                            │  │
+│  │  • similarity_matrix() → pairwise cosine similarities                 │  │
+│  │  • query(text, matrix) → similarity scores against corpus             │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                        EmbeddingEngine                                │  │
+│  │                                                                       │  │
+│  │  • encode(text) → embedding vector                                    │  │
+│  │  • encode_batch(texts) → embedding matrix                             │  │
+│  │  • similarity_matrix(embeddings) → pairwise cosine similarities       │  │
+│  │  • query(embedding, matrix) → similarity scores against corpus        │  │
+│  │                                                                       │  │
+│  │  Config:                                                              │  │
+│  │    model: str = "all-MiniLM-L6-v2"                                    │  │
+│  │    cache_dir: str = ".cache/embeddings"                               │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│  ┌───────────────────────────────────────────────────────────────────────┐  │
+│  │                        ScoreCombiner                                  │  │
+│  │                                                                       │  │
+│  │  • combine(tfidf_scores, embedding_scores, weights) → final scores    │  │
+│  │  • combine_matrices(tfidf_matrix, embedding_matrix) → combined matrix │  │
+│  │                                                                       │  │
+│  │  Config:                                                              │  │
+│  │    tfidf_weight: float = 0.4                                          │  │
+│  │    embedding_weight: float = 0.6                                      │  │
+│  └───────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### TextProcessor
+
+Standardizes how element text is prepared for matching.
+
+```python
+class TextProcessor:
+    """Prepare element text for retrieval."""
+    
+    @staticmethod
+    def normalize(text: str) -> str:
+        """Lowercase, remove special chars, normalize whitespace."""
+        text = text.lower()
+        text = re.sub(r'[_\-]+', ' ', text)  # snake_case → words
+        text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)  # camelCase → words
+        text = re.sub(r'[^a-z0-9\s]', '', text)
+        return ' '.join(text.split())
+    
+    @staticmethod
+    def build_element_text(element: Element) -> str:
+        """
+        Combine element fields into searchable text.
+        
+        Consistent across all services using retrieval.
+        """
+        parts = [
+            element.name,
+            element.display_name or "",
+            element.description or "",
+            " ".join(element.aliases or []),
+        ]
+        if element.allowed_values:
+            # Include enum values for matching
+            parts.append(" ".join(str(v) for v in element.allowed_values[:20]))
+        
+        return " ".join(filter(None, parts))
+```
+
+### TFIDFEngine
+
+Token-level lexical matching.
+
+```python
+class TFIDFEngine:
+    """TF-IDF based text similarity."""
+    
+    def __init__(self):
+        self.vectorizer = TfidfVectorizer(
+            lowercase=True,
+            stop_words='english',
+            ngram_range=(1, 2),
+            max_features=10000
+        )
+        self.matrix = None
+    
+    def fit(self, texts: List[str]) -> None:
+        """Build vocabulary from texts."""
+        normalized = [TextProcessor.normalize(t) for t in texts]
+        self.matrix = self.vectorizer.fit_transform(normalized)
+    
+    def query(self, text: str) -> np.ndarray:
+        """Get similarity scores against fitted corpus."""
+        normalized = TextProcessor.normalize(text)
+        query_vec = self.vectorizer.transform([normalized])
+        return cosine_similarity(query_vec, self.matrix)[0]
+    
+    def similarity_matrix(self) -> np.ndarray:
+        """Get pairwise similarities for all fitted texts."""
+        return cosine_similarity(self.matrix)
+```
+
+### EmbeddingEngine
+
+Semantic similarity via dense embeddings.
+
+```python
+class EmbeddingEngine:
+    """Embedding-based semantic similarity."""
+    
+    def __init__(self, model: str = "all-MiniLM-L6-v2", cache_dir: str = None):
+        self.model = SentenceTransformer(model)
+        self.cache_dir = cache_dir
+        self.embeddings = None
+    
+    def encode_batch(self, texts: List[str]) -> np.ndarray:
+        """Encode texts to embeddings, with caching."""
+        cache_key = self._cache_key(texts)
+        if self.cache_dir and os.path.exists(cache_key):
+            return np.load(cache_key)
+        
+        embeddings = self.model.encode(texts, show_progress_bar=True)
+        
+        if self.cache_dir:
+            np.save(cache_key, embeddings)
+        
+        self.embeddings = embeddings
+        return embeddings
+    
+    def query(self, text: str) -> np.ndarray:
+        """Get similarity scores against encoded corpus."""
+        query_emb = self.model.encode([text])
+        return cosine_similarity(query_emb, self.embeddings)[0]
+    
+    def similarity_matrix(self) -> np.ndarray:
+        """Get pairwise similarities for all encoded texts."""
+        return cosine_similarity(self.embeddings)
+```
+
+### ScoreCombiner
+
+Combines lexical and semantic scores.
+
+```python
+@dataclass
+class RetrievalConfig:
+    tfidf_weight: float = 0.4
+    embedding_weight: float = 0.6
+
+class ScoreCombiner:
+    """Combine TF-IDF and embedding scores."""
+    
+    def __init__(self, config: RetrievalConfig = None):
+        self.config = config or RetrievalConfig()
+    
+    def combine(
+        self, 
+        tfidf_scores: np.ndarray, 
+        embedding_scores: np.ndarray
+    ) -> np.ndarray:
+        """Combine score arrays."""
+        return (
+            self.config.tfidf_weight * tfidf_scores +
+            self.config.embedding_weight * embedding_scores
+        )
+    
+    def combine_matrices(
+        self,
+        tfidf_matrix: np.ndarray,
+        embedding_matrix: np.ndarray
+    ) -> np.ndarray:
+        """Combine pairwise similarity matrices."""
+        return (
+            self.config.tfidf_weight * tfidf_matrix +
+            self.config.embedding_weight * embedding_matrix
+        )
+```
+
+### HybridRetriever Implementation
+
+The Harmonization Engine's `HybridRetriever` uses the shared core:
+
+```python
+class HybridRetriever:
+    """
+    Query-based retrieval for field matching.
+    
+    Use case: Given a source field, find top-k matching canonical elements.
+    """
+    
+    def __init__(self, config: RetrievalConfig = None):
+        self.config = config or RetrievalConfig()
+        self.tfidf = TFIDFEngine()
+        self.embeddings = EmbeddingEngine()
+        self.combiner = ScoreCombiner(self.config)
+        self.elements = []
+    
+    def index_elements(self, elements: List[Element]) -> None:
+        """Build indices from canonical elements."""
+        self.elements = elements
+        texts = [TextProcessor.build_element_text(e) for e in elements]
+        
+        self.tfidf.fit(texts)
+        self.embeddings.encode_batch(texts)
+    
+    def retrieve(self, query: str, top_k: int = 15) -> List[Candidate]:
+        """Find top-k matching elements for a query."""
+        query_text = TextProcessor.normalize(query)
+        
+        tfidf_scores = self.tfidf.query(query_text)
+        embedding_scores = self.embeddings.query(query_text)
+        combined = self.combiner.combine(tfidf_scores, embedding_scores)
+        
+        # Get top-k indices
+        top_indices = np.argsort(combined)[::-1][:top_k]
+        
+        return [
+            Candidate(
+                element=self.elements[i],
+                score=combined[i],
+                tfidf_score=tfidf_scores[i],
+                embedding_score=embedding_scores[i],
+                rank=rank + 1
+            )
+            for rank, i in enumerate(top_indices)
+        ]
+```
+
+### Registry Client
+
+```python
+class RegistryClient:
+    """
+    Client for Registry Service API.
+    """
+    
+    def __init__(self, base_url: str, api_key: str):
+        self.base_url = base_url
+        self.api_key = api_key
+        self.cache = {}
+    
+    async def get_schema_elements(
+        self,
+        schema_id: str,
+        use_cache: bool = True
+    ) -> List[Element]:
+        """Fetch all elements for a schema."""
+        cache_key = f"elements:{schema_id}"
+        if use_cache and cache_key in self.cache:
+            return self.cache[cache_key]
+        
+        response = await self._get(f"/api/v1/schemas/{schema_id}/elements")
+        elements = [Element(**e) for e in response["data"]]
+        
+        self.cache[cache_key] = elements
+        return elements
+    
+    def invalidate_cache(self, schema_id: str):
+        """Invalidate cache for schema (called by webhook)."""
+        cache_key = f"elements:{schema_id}"
+        self.cache.pop(cache_key, None)
+```
+
+---
+
+## Implementation Phases
+
+### Phase 1: Core Retrieval ✅ Complete
+**Goal:** Replace keyword search with hybrid retrieval
+
+- [x] Implement HybridRetriever class
+- [x] TF-IDF indexing and search
+- [x] Embedding indexing and search
+- [x] Score combination (weighted average)
+- [x] Index caching for performance
+- [x] Unit tests for retrieval quality
+
+**Deliverable:** Better candidate surfacing, synonym handling
+
+### Phase 2: Curation MVP ✅ Complete
+**Goal:** Basic review interface with feedback capture
+
+- [x] Source upload and field extraction
+- [x] Match triggering and candidate display
+- [x] Accept/reject actions
+- [x] Feedback logging
+- [x] Simple export (JSON/CSV)
+
+**Deliverable:** Usable end-to-end workflow
+
+### Phase 3: AI Evaluation ✅ Complete
+**Goal:** LLM-powered match recommendations
+
+- [x] Prompt engineering for evaluation
+- [x] Confidence score extraction
+- [x] Reasoning display
+- [x] Batch processing
+- [x] Performance optimization
+
+**Deliverable:** AI-assisted curation with confidence scores
+
+### Phase 4: Feedback Analysis ✅ Complete
+**Goal:** Learn from curator decisions
+
+- [x] Feedback aggregation and reporting
+- [x] Failure mode identification
+- [x] Retrieval precision metrics
+- [x] Confidence calibration analysis
+- [x] Dashboard for insights
+
+**Deliverable:** Data-driven improvement pipeline
+
+### Phase 5: Registry Integration ✅ Complete
+**Goal:** Connect to Registry Service API
+
+- [x] Add RegistryClient for element fetching
+- [x] Replace CSV loading with API calls
+- [x] Implement webhook handler for cache invalidation
+- [x] Add schema selection to session creation
+- [ ] Transform definition UI (F4.4)
+- [ ] Transform testing
+- [ ] Transform patterns (organic growth)
+
+**Deliverable:** Live schema integration, value transforms (partial)
+
+### Phase 6: Proposals & Advanced Features (Phase C)
+**Goal:** Full proposal workflow
+
+- [ ] Proposal creation UI (F4.5)
+- [ ] Proposal sync to Registry Service
+- [ ] Webhook handler for proposal resolution
+- [ ] Proposal dashboard
+- [ ] A/B testing for models/prompts
+
+**Deliverable:** Complete schema evolution workflow
+
+---
+
+## Success Metrics
+
+### Efficiency
+- Matching time per field reduced by 70%+
+- Curator throughput: 50+ fields/hour (vs. 10-15 manual)
+
+### Quality
+- AI acceptance rate > 80% at high confidence
+- Retrieval precision@5 > 90%
+- Curator agreement rate > 95%
+
+### Learning
+- Identified failure patterns documented
+- Model comparison completed
+- Confidence calibration within 5%
+
+### Adoption
+- Sources harmonized per month
+- Fields mapped per week
+- Active curators
+
+---
+
+## Risks & Mitigations
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Poor retrieval quality | Wrong candidates surfaced | Hybrid approach, tunable weights |
+| LLM hallucination | Overconfident bad matches | Human review required, confidence thresholds |
+| Slow performance | User frustration | Caching, batch processing, async queues |
+| Domain mismatch | General model misses medical terms | Configurable models, domain comparison |
+| Feedback not captured | Lost learning opportunity | Required actions, structured logging |
+| Registry unavailable | Can't fetch elements | Cache fallback with stale data warning |
+
+---
+
+## Integration with Forge Ecosystem
+
+### With Registry Service
+- Fetch canonical schema elements for indexing via API
+- Subscribe to schema updates via webhook to rebuild indices
+- Validate element IDs in mappings
+- Submit proposals for new elements (Phase C)
+
+### With Curation Workbench
+- **Shared retrieval core** — Same TF-IDF + embedding algorithms
+- Proposals reviewed and resolved in Curation Workbench
+- Feedback on unmapped fields informs schema gaps
+- Lineage tracking for mapped elements
+
+### With DataForge
+- Export mappings in executable format
+- DataForge applies mappings to actual data
+- Validation errors feed back to mapping quality
+
+---
+
+## Design Decisions
+
+### 1. Cache Invalidation: Webhooks (Not Polling)
+- Harmonization Engine exposes `POST /webhooks/schema-changed`
+- Registry Service sends signed webhooks on element/schema changes
+- Retry policy: 3 retries, exponential backoff (1s, 5s, 30s)
+- Rationale: Immediate invalidation, no wasted polling
+
+### 2. Transform Patterns: Built Organically (No Preloading)
+- No seed data for transform patterns
+- System tracks transform similarity across sessions
+- After 3+ similar transforms, suggest promoting to pattern
+- Rationale: Learn from actual usage rather than guessing
+
+### 3. Proposals: Phase C (With Curation Workbench)
+- Deferred from Phase B to Phase C
+- Rationale: Review workflow requires Curation Workbench UI
+- Proposal tables specified but not implemented until UI ready
+
+### 4. Shared Retrieval Core
+- Same TF-IDF + embedding approach used by Harmonization Engine and Curation Workbench
+- Ensures consistent matching behavior across services
+- `TextProcessor`, `TFIDFEngine`, `EmbeddingEngine`, `ScoreCombiner` are shared primitives
+- Different interfaces for different use cases:
+  - `HybridRetriever.retrieve()` for query → top-k (Harmonization)
+  - `DuplicateDetector.detect()` for set → all pairs (Curation)
+- Rationale: Consistency, proven algorithms, code reuse
+
+---
+
+## Open Questions
+
+1. **Embedding model selection:** Start general-purpose, but when to switch to domain-specific?
+2. **Confidence thresholds:** What threshold for auto-accept? Should vary by domain?
+3. **Feedback volume:** How much feedback data needed before meaningful analysis?
+4. **Multi-schema support:** Can one source map to multiple target schemas?
+5. **Incremental matching:** How to handle source schema updates?
+
+---
+
+## Appendix A: Retrieval Algorithm Details
+
+### TF-IDF Configuration
+```python
+TfidfVectorizer(
+    lowercase=True,
+    stop_words='english',
+    ngram_range=(1, 2),      # Unigrams + bigrams
+    max_features=10000
+)
+```
+
+### Text Preparation
+For each canonical element, concatenate:
+- Element name (normalized)
+- Display name
+- Description
+- Aliases (space-separated)
+- Allowed values (truncated)
+
+### Embedding Models Considered
+| Model | Size | Domain | Latency |
+|-------|------|--------|---------|
+| all-MiniLM-L6-v2 | 80MB | General | Fast |
+| all-mpnet-base-v2 | 420MB | General | Medium |
+| S-PubMedBert-MS-MARCO | 420MB | Medical | Medium |
+| BiomedNLP-PubMedBERT | 420MB | Medical | Medium |
+
+**Strategy:** Start with MiniLM, compare with feedback data.
+
+---
+
+## Appendix B: Evaluation Prompt Template
+
+```
+You are evaluating whether a source field matches a canonical data element.
+
+SOURCE FIELD:
+- Name: {source_name}
+- Description: {source_description}
+- Sample values: {sample_values}
+- Data type: {inferred_type}
+
+CANDIDATE ELEMENT:
+- Name: {element_name}
+- Description: {element_description}
+- Allowed values: {allowed_values}
+- Data type: {element_type}
+
+Evaluate the semantic match between this source field and candidate element.
+Consider:
+1. Name similarity (accounting for abbreviations and conventions)
+2. Description alignment
+3. Value compatibility
+4. Data type compatibility
+
+Respond with:
+- confidence: A score from 0.0 to 1.0
+- reasoning: Brief explanation of match quality
+- concerns: Any issues that might affect mapping quality
+```
+
+---
+
+*Document Version: 0.3*
+*Last Updated: 2025-01-28*
+*Author: Forge Team*
+*Changes in v0.3: Added shared retrieval infrastructure section, clarified relationship with Curation Workbench duplicate detection*

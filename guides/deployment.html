@@ -1,0 +1,718 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Harmonization Engine - Cloud Run Deployment Guide &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Forge — API-First Platform Vision" href="../platform/forge-api-first-vision.html" />
+    <link rel="prev" title="Forge Documentation" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Harmonization Engine - Cloud Run Deployment Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#table-of-contents">Table of Contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start-5-minutes">Quick Start (5 Minutes)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#prerequisites-checklist">Prerequisites Checklist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-run-automated-setup-script">Step 1: Run Automated Setup Script</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-add-github-secrets">Step 2: Add GitHub Secrets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3-deploy">Step 3: Deploy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-4-verify-deployment">Step 4: Verify Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#automated-setup">Automated Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#manual-setup">Manual Setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#enable-required-apis">1. Enable Required APIs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-artifact-registry-repository">2. Create Artifact Registry Repository</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#store-anthropic-api-key-in-secret-manager">3. Store Anthropic API Key in Secret Manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-gcs-bucket-for-persistent-cache">4. Create GCS Bucket for Persistent Cache</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configure-workload-identity-federation">5. Configure Workload Identity Federation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-github-secrets">6. Add GitHub Secrets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manual-deployment-without-github-actions">7. Manual Deployment (Without GitHub Actions)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration-options">Configuration Options</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#authentication">Authentication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scaling-configuration">Scaling Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#custom-domain">Custom Domain</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#monitoring-and-logging">Monitoring and Logging</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#view-logs">View Logs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#set-up-alerts">Set Up Alerts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#view-metrics">View Metrics</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#troubleshooting">Troubleshooting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#authentication-error-in-github-actions">Authentication Error in GitHub Actions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#container-fails-to-start">Container Fails to Start</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#secret-access-error">Secret Access Error</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#image-push-failed">Image Push Failed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#streamlit-websocket-issues">Streamlit WebSocket Issues</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cold-start-performance">Cold Start Performance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#cost-optimization">Cost Optimization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#estimated-monthly-costs">Estimated Monthly Costs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optimization-tips">Optimization Tips</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#security-best-practices">Security Best Practices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ci-cd-pipeline">CI/CD Pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#triggering-deployment">Triggering Deployment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#rollback-procedure">Rollback Procedure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#next-steps-after-deployment">Next Steps After Deployment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#support-and-maintenance">Support and Maintenance</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../specs/api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Harmonization Engine - Cloud Run Deployment Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/guides/deployment.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="harmonization-engine-cloud-run-deployment-guide">
+<h1>Harmonization Engine - Cloud Run Deployment Guide<a class="headerlink" href="#harmonization-engine-cloud-run-deployment-guide" title="Link to this heading"></a></h1>
+<p>Complete guide for deploying the Harmonization Engine to Google Cloud Run.</p>
+<hr class="docutils" />
+<section id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="#quick-start-5-minutes"><span class="std std-ref">Quick Start (5 minutes)</span></a></p></li>
+<li><p><a class="reference internal" href="#prerequisites"><span class="std std-ref">Prerequisites</span></a></p></li>
+<li><p><a class="reference internal" href="#automated-setup"><span class="std std-ref">Automated Setup</span></a></p></li>
+<li><p><a class="reference internal" href="#manual-setup"><span class="std std-ref">Manual Setup</span></a></p></li>
+<li><p><a class="reference internal" href="#configuration-options"><span class="std std-ref">Configuration Options</span></a></p></li>
+<li><p><a class="reference internal" href="#monitoring-and-logging"><span class="std std-ref">Monitoring and Logging</span></a></p></li>
+<li><p><a class="reference internal" href="#troubleshooting"><span class="std std-ref">Troubleshooting</span></a></p></li>
+<li><p><a class="reference internal" href="#cost-optimization"><span class="std std-ref">Cost Optimization</span></a></p></li>
+<li><p><a class="reference internal" href="#security-best-practices"><span class="std std-ref">Security Best Practices</span></a></p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="quick-start-5-minutes">
+<h2>Quick Start (5 Minutes)<a class="headerlink" href="#quick-start-5-minutes" title="Link to this heading"></a></h2>
+<p>Fast-track automated deployment using the setup script.</p>
+<section id="prerequisites-checklist">
+<h3>Prerequisites Checklist<a class="headerlink" href="#prerequisites-checklist" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>[ ] Google Cloud Project with billing enabled</p></li>
+<li><p>[ ] gcloud CLI installed (<a class="reference external" href="https://cloud.google.com/sdk/docs/install">install</a>)</p></li>
+<li><p>[ ] GitHub repository access</p></li>
+<li><p>[ ] Anthropic API key</p></li>
+</ul>
+</section>
+<section id="step-1-run-automated-setup-script">
+<h3>Step 1: Run Automated Setup Script<a class="headerlink" href="#step-1-run-automated-setup-script" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Clone repository and navigate to it</span>
+<span class="nb">cd</span><span class="w"> </span>cde-engine
+
+<span class="c1"># Run GCP setup script</span>
+./scripts/setup-gcp.sh
+</pre></div>
+</div>
+<p>The script will:</p>
+<ul class="simple">
+<li><p>Enable required GCP APIs</p></li>
+<li><p>Create Artifact Registry repository</p></li>
+<li><p>Store Anthropic API key in Secret Manager</p></li>
+<li><p>Create GCS bucket for cache</p></li>
+<li><p>Set up Workload Identity Federation for GitHub Actions</p></li>
+<li><p>Output GitHub secrets for you to add</p></li>
+</ul>
+</section>
+<section id="step-2-add-github-secrets">
+<h3>Step 2: Add GitHub Secrets<a class="headerlink" href="#step-2-add-github-secrets" title="Link to this heading"></a></h3>
+<p>Copy the three secrets output by the script to your GitHub repository:</p>
+<p><strong>GitHub Repository → Settings → Secrets and variables → Actions → New repository secret</strong></p>
+<p>Add these three secrets:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">GCP_PROJECT_ID</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GCP_WORKLOAD_IDENTITY_PROVIDER</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GCP_SERVICE_ACCOUNT</span></code></p></li>
+</ol>
+</section>
+<section id="step-3-deploy">
+<h3>Step 3: Deploy<a class="headerlink" href="#step-3-deploy" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Push to production branch</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>phase-a/production-deployment
+
+<span class="c1"># Or merge PR to main</span>
+</pre></div>
+</div>
+<p>GitHub Actions will automatically:</p>
+<ul class="simple">
+<li><p>Lint and test code</p></li>
+<li><p>Build Docker image</p></li>
+<li><p>Push to Artifact Registry</p></li>
+<li><p>Deploy to Cloud Run</p></li>
+<li><p>Run health check</p></li>
+</ul>
+</section>
+<section id="step-4-verify-deployment">
+<h3>Step 4: Verify Deployment<a class="headerlink" href="#step-4-verify-deployment" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get service URL</span>
+<span class="nv">SERVICE_URL</span><span class="o">=</span><span class="k">$(</span>gcloud<span class="w"> </span>run<span class="w"> </span>services<span class="w"> </span>describe<span class="w"> </span>cde-engine<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--region<span class="w"> </span>us-central1<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--format<span class="w"> </span><span class="s1">&#39;value(status.url)&#39;</span><span class="k">)</span>
+
+<span class="c1"># Test health endpoint</span>
+curl<span class="w"> </span>-f<span class="w"> </span><span class="nv">$SERVICE_URL</span>/_stcore/health
+
+<span class="c1"># Open in browser</span>
+open<span class="w"> </span><span class="nv">$SERVICE_URL</span>
+</pre></div>
+</div>
+<p><strong>Done!</strong> Your Harmonization Engine is now running.</p>
+<p>For advanced configuration, continue reading below.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Google Cloud Project</strong> with billing enabled</p></li>
+<li><p><strong>GitHub repository</strong> with appropriate permissions</p></li>
+<li><p><strong>Anthropic API key</strong> for Claude integration</p></li>
+<li><p><strong>gcloud CLI</strong> installed locally (for setup)</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="automated-setup">
+<h2>Automated Setup<a class="headerlink" href="#automated-setup" title="Link to this heading"></a></h2>
+<p>The automated setup uses the <code class="docutils literal notranslate"><span class="pre">./scripts/setup-gcp.sh</span></code> script (see <a class="reference internal" href="#quick-start-5-minutes"><span class="std std-ref">Quick Start</span></a> above).</p>
+</section>
+<hr class="docutils" />
+<section id="manual-setup">
+<h2>Manual Setup<a class="headerlink" href="#manual-setup" title="Link to this heading"></a></h2>
+<p>If you prefer manual configuration or need more control:</p>
+<section id="enable-required-apis">
+<h3>1. Enable Required APIs<a class="headerlink" href="#enable-required-apis" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gcloud<span class="w"> </span>services<span class="w"> </span><span class="nb">enable</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>run.googleapis.com<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>artifactregistry.googleapis.com<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>secretmanager.googleapis.com<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>storage-api.googleapis.com<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>cloudbuild.googleapis.com<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>iamcredentials.googleapis.com
+</pre></div>
+</div>
+</section>
+<section id="create-artifact-registry-repository">
+<h3>2. Create Artifact Registry Repository<a class="headerlink" href="#create-artifact-registry-repository" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PROJECT_ID</span><span class="o">=</span><span class="k">$(</span>gcloud<span class="w"> </span>config<span class="w"> </span>get-value<span class="w"> </span>project<span class="k">)</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">REGION</span><span class="o">=</span>us-central1
+
+gcloud<span class="w"> </span>artifacts<span class="w"> </span>repositories<span class="w"> </span>create<span class="w"> </span>cde-engine<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--repository-format<span class="o">=</span>docker<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--location<span class="o">=</span><span class="nv">$REGION</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--description<span class="o">=</span><span class="s2">&quot;CDE Engine container images&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="store-anthropic-api-key-in-secret-manager">
+<h3>3. Store Anthropic API Key in Secret Manager<a class="headerlink" href="#store-anthropic-api-key-in-secret-manager" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Store the API key as a secret</span>
+<span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;YOUR_ANTHROPIC_API_KEY&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>gcloud<span class="w"> </span>secrets<span class="w"> </span>create<span class="w"> </span>anthropic-api-key<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data-file<span class="o">=</span>-
+
+<span class="c1"># Grant Cloud Run service account access to the secret</span>
+gcloud<span class="w"> </span>secrets<span class="w"> </span>add-iam-policy-binding<span class="w"> </span>anthropic-api-key<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--member<span class="o">=</span><span class="s2">&quot;serviceAccount:</span><span class="si">${</span><span class="nv">PROJECT_ID</span><span class="si">}</span><span class="s2">-compute@developer.gserviceaccount.com&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--role<span class="o">=</span><span class="s2">&quot;roles/secretmanager.secretAccessor&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="create-gcs-bucket-for-persistent-cache">
+<h3>4. Create GCS Bucket for Persistent Cache<a class="headerlink" href="#create-gcs-bucket-for-persistent-cache" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gsutil<span class="w"> </span>mb<span class="w"> </span>-l<span class="w"> </span><span class="nv">$REGION</span><span class="w"> </span>gs://<span class="si">${</span><span class="nv">PROJECT_ID</span><span class="si">}</span>-cde-cache
+
+<span class="c1"># Set lifecycle policy to delete objects older than 30 days (optional)</span>
+cat<span class="w"> </span>&gt;<span class="w"> </span>lifecycle.json<span class="w"> </span><span class="s">&lt;&lt;EOF</span>
+<span class="s">{</span>
+<span class="s">  &quot;rule&quot;: [</span>
+<span class="s">    {</span>
+<span class="s">      &quot;action&quot;: {&quot;type&quot;: &quot;Delete&quot;},</span>
+<span class="s">      &quot;condition&quot;: {&quot;age&quot;: 30}</span>
+<span class="s">    }</span>
+<span class="s">  ]</span>
+<span class="s">}</span>
+<span class="s">EOF</span>
+
+gsutil<span class="w"> </span>lifecycle<span class="w"> </span><span class="nb">set</span><span class="w"> </span>lifecycle.json<span class="w"> </span>gs://<span class="si">${</span><span class="nv">PROJECT_ID</span><span class="si">}</span>-cde-cache
+rm<span class="w"> </span>lifecycle.json
+</pre></div>
+</div>
+</section>
+<section id="configure-workload-identity-federation">
+<h3>5. Configure Workload Identity Federation<a class="headerlink" href="#configure-workload-identity-federation" title="Link to this heading"></a></h3>
+<p>This allows GitHub Actions to authenticate to GCP without service account keys.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PROJECT_ID</span><span class="o">=</span><span class="k">$(</span>gcloud<span class="w"> </span>config<span class="w"> </span>get-value<span class="w"> </span>project<span class="k">)</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PROJECT_NUMBER</span><span class="o">=</span><span class="k">$(</span>gcloud<span class="w"> </span>projects<span class="w"> </span>describe<span class="w"> </span><span class="nv">$PROJECT_ID</span><span class="w"> </span>--format<span class="o">=</span><span class="s2">&quot;value(projectNumber)&quot;</span><span class="k">)</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GITHUB_REPO</span><span class="o">=</span><span class="s2">&quot;YOUR_GITHUB_ORG/YOUR_REPO_NAME&quot;</span><span class="w">  </span><span class="c1"># e.g., &quot;datatecnica/cde-engine&quot;</span>
+
+<span class="c1"># Create Workload Identity Pool</span>
+gcloud<span class="w"> </span>iam<span class="w"> </span>workload-identity-pools<span class="w"> </span>create<span class="w"> </span><span class="s2">&quot;github-actions-pool&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--location<span class="o">=</span><span class="s2">&quot;global&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--display-name<span class="o">=</span><span class="s2">&quot;GitHub Actions Pool&quot;</span>
+
+<span class="c1"># Create Workload Identity Provider</span>
+gcloud<span class="w"> </span>iam<span class="w"> </span>workload-identity-pools<span class="w"> </span>providers<span class="w"> </span>create-oidc<span class="w"> </span><span class="s2">&quot;github-provider&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--location<span class="o">=</span><span class="s2">&quot;global&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--workload-identity-pool<span class="o">=</span><span class="s2">&quot;github-actions-pool&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--display-name<span class="o">=</span><span class="s2">&quot;GitHub Provider&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--attribute-mapping<span class="o">=</span><span class="s2">&quot;google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--issuer-uri<span class="o">=</span><span class="s2">&quot;https://token.actions.githubusercontent.com&quot;</span>
+
+<span class="c1"># Create Service Account for GitHub Actions</span>
+gcloud<span class="w"> </span>iam<span class="w"> </span>service-accounts<span class="w"> </span>create<span class="w"> </span>github-actions<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--display-name<span class="o">=</span><span class="s2">&quot;GitHub Actions Service Account&quot;</span>
+
+<span class="c1"># Grant necessary roles</span>
+gcloud<span class="w"> </span>projects<span class="w"> </span>add-iam-policy-binding<span class="w"> </span><span class="nv">$PROJECT_ID</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--member<span class="o">=</span><span class="s2">&quot;serviceAccount:github-actions@</span><span class="si">${</span><span class="nv">PROJECT_ID</span><span class="si">}</span><span class="s2">.iam.gserviceaccount.com&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--role<span class="o">=</span><span class="s2">&quot;roles/run.admin&quot;</span>
+
+gcloud<span class="w"> </span>projects<span class="w"> </span>add-iam-policy-binding<span class="w"> </span><span class="nv">$PROJECT_ID</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--member<span class="o">=</span><span class="s2">&quot;serviceAccount:github-actions@</span><span class="si">${</span><span class="nv">PROJECT_ID</span><span class="si">}</span><span class="s2">.iam.gserviceaccount.com&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--role<span class="o">=</span><span class="s2">&quot;roles/artifactregistry.writer&quot;</span>
+
+gcloud<span class="w"> </span>projects<span class="w"> </span>add-iam-policy-binding<span class="w"> </span><span class="nv">$PROJECT_ID</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--member<span class="o">=</span><span class="s2">&quot;serviceAccount:github-actions@</span><span class="si">${</span><span class="nv">PROJECT_ID</span><span class="si">}</span><span class="s2">.iam.gserviceaccount.com&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--role<span class="o">=</span><span class="s2">&quot;roles/iam.serviceAccountUser&quot;</span>
+
+gcloud<span class="w"> </span>projects<span class="w"> </span>add-iam-policy-binding<span class="w"> </span><span class="nv">$PROJECT_ID</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--member<span class="o">=</span><span class="s2">&quot;serviceAccount:github-actions@</span><span class="si">${</span><span class="nv">PROJECT_ID</span><span class="si">}</span><span class="s2">.iam.gserviceaccount.com&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--role<span class="o">=</span><span class="s2">&quot;roles/storage.admin&quot;</span>
+
+<span class="c1"># Allow GitHub Actions to impersonate the service account</span>
+gcloud<span class="w"> </span>iam<span class="w"> </span>service-accounts<span class="w"> </span>add-iam-policy-binding<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="s2">&quot;github-actions@</span><span class="si">${</span><span class="nv">PROJECT_ID</span><span class="si">}</span><span class="s2">.iam.gserviceaccount.com&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--role<span class="o">=</span><span class="s2">&quot;roles/iam.workloadIdentityUser&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--member<span class="o">=</span><span class="s2">&quot;principalSet://iam.googleapis.com/projects/</span><span class="si">${</span><span class="nv">PROJECT_NUMBER</span><span class="si">}</span><span class="s2">/locations/global/workloadIdentityPools/github-actions-pool/attribute.repository/</span><span class="si">${</span><span class="nv">GITHUB_REPO</span><span class="si">}</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="add-github-secrets">
+<h3>6. Add GitHub Secrets<a class="headerlink" href="#add-github-secrets" title="Link to this heading"></a></h3>
+<p>Go to your GitHub repository settings → Secrets and variables → Actions, and add:</p>
+<ul>
+<li><p><strong>GCP_PROJECT_ID</strong>: Your GCP project ID</p></li>
+<li><p><strong>GCP_WORKLOAD_IDENTITY_PROVIDER</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">projects</span><span class="o">/</span><span class="n">PROJECT_NUMBER</span><span class="o">/</span><span class="n">locations</span><span class="o">/</span><span class="k">global</span><span class="o">/</span><span class="n">workloadIdentityPools</span><span class="o">/</span><span class="n">github</span><span class="o">-</span><span class="n">actions</span><span class="o">-</span><span class="n">pool</span><span class="o">/</span><span class="n">providers</span><span class="o">/</span><span class="n">github</span><span class="o">-</span><span class="n">provider</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>GCP_SERVICE_ACCOUNT</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">github</span><span class="o">-</span><span class="n">actions</span><span class="nd">@PROJECT_ID</span><span class="o">.</span><span class="n">iam</span><span class="o">.</span><span class="n">gserviceaccount</span><span class="o">.</span><span class="n">com</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">PROJECT_NUMBER</span></code> and <code class="docutils literal notranslate"><span class="pre">PROJECT_ID</span></code> with your actual values.</p>
+</section>
+<section id="manual-deployment-without-github-actions">
+<h3>7. Manual Deployment (Without GitHub Actions)<a class="headerlink" href="#manual-deployment-without-github-actions" title="Link to this heading"></a></h3>
+<p>If you want to deploy manually:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PROJECT_ID</span><span class="o">=</span><span class="k">$(</span>gcloud<span class="w"> </span>config<span class="w"> </span>get-value<span class="w"> </span>project<span class="k">)</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">REGION</span><span class="o">=</span>us-central1
+
+<span class="c1"># Build image</span>
+docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>us-central1-docker.pkg.dev/<span class="nv">$PROJECT_ID</span>/cde-engine/cde-engine:latest<span class="w"> </span>.
+
+<span class="c1"># Push to Artifact Registry</span>
+docker<span class="w"> </span>push<span class="w"> </span>us-central1-docker.pkg.dev/<span class="nv">$PROJECT_ID</span>/cde-engine/cde-engine:latest
+
+<span class="c1"># Deploy to Cloud Run</span>
+gcloud<span class="w"> </span>run<span class="w"> </span>deploy<span class="w"> </span>cde-engine<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--image<span class="w"> </span>us-central1-docker.pkg.dev/<span class="nv">$PROJECT_ID</span>/cde-engine/cde-engine:latest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--platform<span class="w"> </span>managed<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--region<span class="w"> </span><span class="nv">$REGION</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--allow-unauthenticated<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--set-secrets<span class="w"> </span><span class="s2">&quot;ANTHROPIC_API_KEY=anthropic-api-key:latest&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--memory<span class="w"> </span>2Gi<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cpu<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--min-instances<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--max-instances<span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--timeout<span class="w"> </span><span class="m">300</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--session-affinity<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--port<span class="w"> </span><span class="m">8501</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="configuration-options">
+<h2>Configuration Options<a class="headerlink" href="#configuration-options" title="Link to this heading"></a></h2>
+<section id="authentication">
+<h3>Authentication<a class="headerlink" href="#authentication" title="Link to this heading"></a></h3>
+<p><strong>Current setup:</strong> <code class="docutils literal notranslate"><span class="pre">--allow-unauthenticated</span></code> (public access)</p>
+<p>To restrict access:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Remove public access</span>
+gcloud<span class="w"> </span>run<span class="w"> </span>services<span class="w"> </span>remove-iam-policy-binding<span class="w"> </span>cde-engine<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--region<span class="o">=</span><span class="nv">$REGION</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--member<span class="o">=</span><span class="s2">&quot;allUsers&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--role<span class="o">=</span><span class="s2">&quot;roles/run.invoker&quot;</span>
+
+<span class="c1"># Grant access to specific users/groups</span>
+gcloud<span class="w"> </span>run<span class="w"> </span>services<span class="w"> </span>add-iam-policy-binding<span class="w"> </span>cde-engine<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--region<span class="o">=</span><span class="nv">$REGION</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--member<span class="o">=</span><span class="s2">&quot;user:email@example.com&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--role<span class="o">=</span><span class="s2">&quot;roles/run.invoker&quot;</span>
+
+<span class="c1"># Or use Identity-Aware Proxy (IAP) for Google SSO</span>
+</pre></div>
+</div>
+</section>
+<section id="scaling-configuration">
+<h3>Scaling Configuration<a class="headerlink" href="#scaling-configuration" title="Link to this heading"></a></h3>
+<p>Adjust based on usage patterns:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Cost-optimized (scale to zero)</span>
+--min-instances<span class="w"> </span><span class="m">0</span><span class="w"> </span>--max-instances<span class="w"> </span><span class="m">10</span>
+
+<span class="c1"># Always-ready (avoid cold starts)</span>
+--min-instances<span class="w"> </span><span class="m">1</span><span class="w"> </span>--max-instances<span class="w"> </span><span class="m">10</span>
+
+<span class="c1"># High-traffic</span>
+--min-instances<span class="w"> </span><span class="m">2</span><span class="w"> </span>--max-instances<span class="w"> </span><span class="m">50</span>
+</pre></div>
+</div>
+</section>
+<section id="custom-domain">
+<h3>Custom Domain<a class="headerlink" href="#custom-domain" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Map custom domain</span>
+gcloud<span class="w"> </span>run<span class="w"> </span>domain-mappings<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--service<span class="w"> </span>cde-engine<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--domain<span class="w"> </span>cde.yourdomain.com<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--region<span class="w"> </span><span class="nv">$REGION</span>
+</pre></div>
+</div>
+<p>Follow the DNS instructions provided to complete domain mapping.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="monitoring-and-logging">
+<h2>Monitoring and Logging<a class="headerlink" href="#monitoring-and-logging" title="Link to this heading"></a></h2>
+<section id="view-logs">
+<h3>View Logs<a class="headerlink" href="#view-logs" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gcloud<span class="w"> </span>run<span class="w"> </span>services<span class="w"> </span>logs<span class="w"> </span><span class="nb">read</span><span class="w"> </span>cde-engine<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--region<span class="w"> </span><span class="nv">$REGION</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--limit<span class="w"> </span><span class="m">50</span>
+</pre></div>
+</div>
+</section>
+<section id="set-up-alerts">
+<h3>Set Up Alerts<a class="headerlink" href="#set-up-alerts" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>Go to <strong>Cloud Console → Monitoring → Alerting</strong></p></li>
+<li><p>Create alert policies for:</p>
+<ul class="simple">
+<li><p>High error rates</p></li>
+<li><p>Response time thresholds</p></li>
+<li><p>Request count anomalies</p></li>
+<li><p>Memory/CPU usage</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="view-metrics">
+<h3>View Metrics<a class="headerlink" href="#view-metrics" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get service URL</span>
+gcloud<span class="w"> </span>run<span class="w"> </span>services<span class="w"> </span>describe<span class="w"> </span>cde-engine<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--region<span class="w"> </span><span class="nv">$REGION</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--format<span class="w"> </span><span class="s1">&#39;value(status.url)&#39;</span>
+
+<span class="c1"># View metrics in console</span>
+open<span class="w"> </span><span class="s2">&quot;https://console.cloud.google.com/run/detail/</span><span class="nv">$REGION</span><span class="s2">/cde-engine/metrics&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="troubleshooting">
+<h2>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading"></a></h2>
+<section id="authentication-error-in-github-actions">
+<h3>Authentication Error in GitHub Actions<a class="headerlink" href="#authentication-error-in-github-actions" title="Link to this heading"></a></h3>
+<p><strong>Problem:</strong> <code class="docutils literal notranslate"><span class="pre">Failed</span> <span class="pre">to</span> <span class="pre">authenticate</span> <span class="pre">to</span> <span class="pre">Google</span> <span class="pre">Cloud</span></code></p>
+<p><strong>Solution:</strong> Verify GitHub secrets are correctly set:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get the values again</span>
+./scripts/setup-gcp.sh
+</pre></div>
+</div>
+</section>
+<section id="container-fails-to-start">
+<h3>Container Fails to Start<a class="headerlink" href="#container-fails-to-start" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Check logs</span>
+gcloud<span class="w"> </span>run<span class="w"> </span>services<span class="w"> </span>logs<span class="w"> </span><span class="nb">read</span><span class="w"> </span>cde-engine<span class="w"> </span>--region<span class="w"> </span><span class="nv">$REGION</span><span class="w"> </span>--limit<span class="w"> </span><span class="m">100</span>
+
+<span class="c1"># Common issues:</span>
+<span class="c1"># - Missing ANTHROPIC_API_KEY secret</span>
+<span class="c1"># - Port mismatch (should be 8501)</span>
+<span class="c1"># - Memory/CPU limits too low</span>
+</pre></div>
+</div>
+</section>
+<section id="secret-access-error">
+<h3>Secret Access Error<a class="headerlink" href="#secret-access-error" title="Link to this heading"></a></h3>
+<p><strong>Problem:</strong> <code class="docutils literal notranslate"><span class="pre">Permission</span> <span class="pre">denied</span> <span class="pre">accessing</span> <span class="pre">secret</span></code></p>
+<p><strong>Solution:</strong> Grant access to compute service account:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">PROJECT_ID</span><span class="o">=</span><span class="k">$(</span>gcloud<span class="w"> </span>config<span class="w"> </span>get-value<span class="w"> </span>project<span class="k">)</span>
+<span class="nv">PROJECT_NUMBER</span><span class="o">=</span><span class="k">$(</span>gcloud<span class="w"> </span>projects<span class="w"> </span>describe<span class="w"> </span><span class="nv">$PROJECT_ID</span><span class="w"> </span>--format<span class="o">=</span><span class="s2">&quot;value(projectNumber)&quot;</span><span class="k">)</span>
+
+gcloud<span class="w"> </span>secrets<span class="w"> </span>add-iam-policy-binding<span class="w"> </span>anthropic-api-key<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--member<span class="o">=</span><span class="s2">&quot;serviceAccount:</span><span class="si">${</span><span class="nv">PROJECT_NUMBER</span><span class="si">}</span><span class="s2">-compute@developer.gserviceaccount.com&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--role<span class="o">=</span><span class="s2">&quot;roles/secretmanager.secretAccessor&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="image-push-failed">
+<h3>Image Push Failed<a class="headerlink" href="#image-push-failed" title="Link to this heading"></a></h3>
+<p><strong>Problem:</strong> <code class="docutils literal notranslate"><span class="pre">Permission</span> <span class="pre">denied:</span> <span class="pre">Artifact</span> <span class="pre">Registry</span></code></p>
+<p><strong>Solution:</strong> Authenticate Docker:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gcloud<span class="w"> </span>auth<span class="w"> </span>configure-docker<span class="w"> </span>us-central1-docker.pkg.dev
+</pre></div>
+</div>
+</section>
+<section id="streamlit-websocket-issues">
+<h3>Streamlit WebSocket Issues<a class="headerlink" href="#streamlit-websocket-issues" title="Link to this heading"></a></h3>
+<p>Ensure <code class="docutils literal notranslate"><span class="pre">--session-affinity</span></code> is enabled for proper WebSocket routing.</p>
+</section>
+<section id="cold-start-performance">
+<h3>Cold Start Performance<a class="headerlink" href="#cold-start-performance" title="Link to this heading"></a></h3>
+<p>If cold starts are problematic:</p>
+<ul class="simple">
+<li><p>Increase <code class="docutils literal notranslate"><span class="pre">--min-instances</span></code> to 1 or higher</p></li>
+<li><p>Optimize Docker image size</p></li>
+<li><p>Use startup CPU boost (automatic in Cloud Run)</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="cost-optimization">
+<h2>Cost Optimization<a class="headerlink" href="#cost-optimization" title="Link to this heading"></a></h2>
+<section id="estimated-monthly-costs">
+<h3>Estimated Monthly Costs<a class="headerlink" href="#estimated-monthly-costs" title="Link to this heading"></a></h3>
+<p>For 5-10 test users with minimal traffic:</p>
+<ul class="simple">
+<li><p><strong>Cloud Run</strong>: $5-20/month (mostly idle, pay-per-use)</p></li>
+<li><p><strong>Artifact Registry</strong>: &lt;$1/month</p></li>
+<li><p><strong>Secret Manager</strong>: Free tier</p></li>
+<li><p><strong>GCS Cache</strong>: &lt;$1/month</p></li>
+<li><p><strong>Networking</strong>: Minimal (&lt;$5)</p></li>
+</ul>
+<p><strong>Total: ~$10-30/month</strong></p>
+</section>
+<section id="optimization-tips">
+<h3>Optimization Tips<a class="headerlink" href="#optimization-tips" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">--min-instances</span> <span class="pre">0</span></code> if cold starts are acceptable</p></li>
+<li><p>Set appropriate <code class="docutils literal notranslate"><span class="pre">--max-instances</span></code> to prevent runaway costs</p></li>
+<li><p>Configure GCS lifecycle policies to clean old cache</p></li>
+<li><p>Use budget alerts in GCP console</p></li>
+</ol>
+</section>
+</section>
+<hr class="docutils" />
+<section id="security-best-practices">
+<h2>Security Best Practices<a class="headerlink" href="#security-best-practices" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Never commit secrets</strong> to the repository</p></li>
+<li><p><strong>Use Secret Manager</strong> for all sensitive values</p></li>
+<li><p><strong>Enable audit logging</strong> for compliance</p></li>
+<li><p><strong>Restrict IAM permissions</strong> to minimum necessary</p></li>
+<li><p><strong>Use VPC Service Controls</strong> if handling sensitive data</p></li>
+<li><p><strong>Enable Binary Authorization</strong> for image verification</p></li>
+<li><p><strong>Regular security scans</strong> with Artifact Registry vulnerability scanning</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="ci-cd-pipeline">
+<h2>CI/CD Pipeline<a class="headerlink" href="#ci-cd-pipeline" title="Link to this heading"></a></h2>
+<p>The GitHub Actions workflow (<code class="docutils literal notranslate"><span class="pre">.github/workflows/deploy.yml</span></code>) automatically:</p>
+<ol class="arabic simple">
+<li><p><strong>Lint &amp; Test</strong>: Runs Black, Flake8, MyPy, and pytest</p></li>
+<li><p><strong>Build</strong>: Creates Docker image on push to main/phase-a branches</p></li>
+<li><p><strong>Push</strong>: Uploads image to Artifact Registry</p></li>
+<li><p><strong>Deploy</strong>: Updates Cloud Run service</p></li>
+<li><p><strong>Verify</strong>: Runs health check smoke test</p></li>
+</ol>
+<section id="triggering-deployment">
+<h3>Triggering Deployment<a class="headerlink" href="#triggering-deployment" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Push to main or phase-a/production-deployment branch</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>phase-a/production-deployment
+
+<span class="c1"># Or merge PR to main</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="rollback-procedure">
+<h2>Rollback Procedure<a class="headerlink" href="#rollback-procedure" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># List revisions</span>
+gcloud<span class="w"> </span>run<span class="w"> </span>revisions<span class="w"> </span>list<span class="w"> </span>--service<span class="w"> </span>cde-engine<span class="w"> </span>--region<span class="w"> </span><span class="nv">$REGION</span>
+
+<span class="c1"># Rollback to previous revision</span>
+gcloud<span class="w"> </span>run<span class="w"> </span>services<span class="w"> </span>update-traffic<span class="w"> </span>cde-engine<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--region<span class="w"> </span><span class="nv">$REGION</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--to-revisions<span class="w"> </span><span class="nv">REVISION_NAME</span><span class="o">=</span><span class="m">100</span>
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="next-steps-after-deployment">
+<h2>Next Steps After Deployment<a class="headerlink" href="#next-steps-after-deployment" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Verify deployment</strong>: Access service URL and test key workflows</p></li>
+<li><p><strong>Set up monitoring</strong>: Configure alerts and dashboards</p></li>
+<li><p><strong>User acceptance testing</strong>: Invite test users</p></li>
+<li><p><strong>Add custom domain</strong> (optional): Map to your domain</p></li>
+<li><p><strong>Restrict access</strong> (optional): Remove <code class="docutils literal notranslate"><span class="pre">--allow-unauthenticated</span></code> and add IAM policies</p></li>
+<li><p><strong>Documentation</strong>: Share access instructions with users</p></li>
+<li><p><strong>Backup plan</strong>: Document rollback procedures</p></li>
+<li><p><strong>Cost monitoring</strong>: Set up budget alerts</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="support-and-maintenance">
+<h2>Support and Maintenance<a class="headerlink" href="#support-and-maintenance" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Logs</strong>: Cloud Run automatically captures stdout/stderr</p></li>
+<li><p><strong>Metrics</strong>: Available in Cloud Console</p></li>
+<li><p><strong>Updates</strong>: Deploy by pushing to tracked branches</p></li>
+<li><p><strong>Scaling</strong>: Automatic based on traffic</p></li>
+<li><p><strong>Costs</strong>: Monitor in GCP Billing dashboard</p></li>
+</ul>
+<p>For issues, check the <a class="reference internal" href="#troubleshooting"><span class="std std-ref">troubleshooting section</span></a> or Cloud Run logs.</p>
+<hr class="docutils" />
+<p><strong>Questions or Issues?</strong>
+File an issue at: https://github.com/datatecnica/cde-engine/issues</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Forge Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../platform/forge-api-first-vision.html" class="btn btn-neutral float-right" title="Forge — API-First Platform Vision" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

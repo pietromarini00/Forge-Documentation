@@ -1,0 +1,755 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forge Production Roadmap &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Forge Unified App — MVP Specification" href="forge-unified-app-spec.html" />
+    <link rel="prev" title="Identifier Schemes &amp; Golden IDs — Spec" href="forge-identifier-scheme-spec.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Forge Production Roadmap</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#from-cde-engine-to-forge-platform">From CDE Engine to Forge Platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#how-cde-engine-maps-to-forge">How CDE Engine Maps to Forge</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#current-state">Current State</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-s-built">What’s Built</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#forge-app-architecture-current">forge-app Architecture (Current)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#production-roadmap">Production Roadmap</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#phase-a-ship-harmonization-engine-mvp-complete">Phase A: Ship Harmonization Engine MVP ✅ COMPLETE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-b-registry-service-foundation-complete">Phase B: Registry Service Foundation ✅ COMPLETE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-c-curation-workbench-complete">Phase C: Curation Workbench ✅ COMPLETE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-d-dataforge-foundation-complete">Phase D: DataForge Foundation ✅ COMPLETE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-e-forge-unified-app-complete">Phase E: Forge Unified App ✅ COMPLETE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-f-gold-datasets-complete">Phase F: Gold Datasets ✅ COMPLETE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-f-1-identifier-schemes-golden-ids-complete">Phase F.1: Identifier Schemes &amp; Golden IDs ✅ COMPLETE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-f-2-validation-rules-builder-complete">Phase F.2: Validation Rules Builder ✅ COMPLETE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-g-persistence-migration">Phase G: Persistence Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-h-authentication-planned">Phase H: Authentication ⏳ PLANNED</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-i-authorization-sharing-planned">Phase I: Authorization &amp; Sharing ⏳ PLANNED</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-j-schema-evolution-planned">Phase J: Schema Evolution ⏳ PLANNED</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-k-react-frontend-migration-future">Phase K: React Frontend Migration ⏳ FUTURE</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-l-domain-intelligence-future">Phase L: Domain Intelligence ⏳ FUTURE</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#phased-timeline">Phased Timeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#immediate-priorities">Immediate Priorities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#decision-points">Decision Points</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#naming-branding-resolved">1. Naming &amp; Branding ✅ Resolved</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#database-persistence-strategy-direction-set">2. Database &amp; Persistence Strategy ✅ Direction set</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#authentication-direction-set">3. Authentication ✅ Direction set</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataforge-priority-resolved">4. DataForge Priority ✅ Resolved</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#streamlit-react-frontend-migration">5. Streamlit → React Frontend Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#standalone-service-deprecation">6. Standalone Service Deprecation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#success-metrics">Success Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#phases-af-complete">Phases A–F (Complete) ✅</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-g-persistence">Phase G: Persistence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-h-authentication">Phase H: Authentication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-i-authorization">Phase I: Authorization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#long-term-platform-targets">Long-Term Platform Targets</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../specs/api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Forge Production Roadmap</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/platform/forge-production-roadmap.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="forge-production-roadmap">
+<h1>Forge Production Roadmap<a class="headerlink" href="#forge-production-roadmap" title="Link to this heading"></a></h1>
+<section id="from-cde-engine-to-forge-platform">
+<h2>From CDE Engine to Forge Platform<a class="headerlink" href="#from-cde-engine-to-forge-platform" title="Link to this heading"></a></h2>
+</section>
+<hr class="docutils" />
+<section id="how-cde-engine-maps-to-forge">
+<h2>How CDE Engine Maps to Forge<a class="headerlink" href="#how-cde-engine-maps-to-forge" title="Link to this heading"></a></h2>
+<p>CDE Engine is the <strong>Harmonization Engine MVP</strong>. Here’s the mapping:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌──────────────────────────────────────────────────────────────────────────────┐
+│                              FORGE PLATFORM                                  │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  SCHEMAFORGE                                                                 │
+│  ──────────                                                                  │
+│                                                                              │
+│  ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐            │
+│  │ REGISTRY        │   │ CURATION        │   │ HARMONIZATION   │            │
+│  │ SERVICE         │   │ WORKBENCH       │   │ ENGINE          │            │
+│  │                 │   │                 │   │                 │            │
+│  │ • Schema CRUD   │   │ • Upload CDE    │   │ • Hybrid        │ ◄─── CDE   │
+│  │ • Versioning    │   │   lists         │   │   retrieval     │      Engine │
+│  │ • API access    │   │ • AI-assisted   │   │ • AI eval       │      IS     │
+│  │ • Exports       │   │   curation      │   │ • Curation UI   │      THIS   │
+│  │                 │   │ • Schema        │   │ • Feedback      │            │
+│  │ ✅ Complete     │   │   projects      │   │ ✅ In Prod      │            │
+│  └─────────────────┘   └─────────────────┘   └─────────────────┘            │
+│          ▲                     │                     │                      │
+│          │                     │                     │                      │
+│          └─────────────────────┴─────────────────────┘                      │
+│                         Schemas stored in Registry                          │
+│                                                                              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  DATAFORGE                                                                   │
+│  ─────────                                                                   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────┐        │
+│  │ Ingest → Validate → Review → Correct → Serve                     │        │
+│  │                                                                  │        │
+│  │ ✅ Built — integrated into forge-app                             │        │
+│  └──────────────────────────────────────────────────────────────────┘        │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────┐        │
+│  │ FORGE (Unified App — port 8505)                                  │        │
+│  │                                                                  │        │
+│  │  Schemas · Harmonize · Data — all in one Streamlit app           │        │
+│  │                                                                  │        │
+│  │ ✅ Built — all four workflows unified, end-to-end                │        │
+│  └──────────────────────────────────────────────────────────────────┘        │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="current-state">
+<h2>Current State<a class="headerlink" href="#current-state" title="Link to this heading"></a></h2>
+<section id="what-s-built">
+<h3>What’s Built<a class="headerlink" href="#what-s-built" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Status</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Hybrid retrieval (TF-IDF + embeddings)</p></td>
+<td><p>✅ Done</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">forge-retrieval-core</span></code> lib</p></td>
+</tr>
+<tr class="row-odd"><td><p>AI-powered match evaluation</p></td>
+<td><p>✅ Done</p></td>
+<td><p>Claude API via <code class="docutils literal notranslate"><span class="pre">ComprehensiveMatcher</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Schema curation wizard (4 steps)</p></td>
+<td><p>✅ Done</p></td>
+<td><p>Upload → Configure → Curate → Publish (rules step planned)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Registry Service (FastAPI + PostgreSQL)</p></td>
+<td><p>✅ Done</p></td>
+<td><p>Schema CRUD, versioning, exports</p></td>
+</tr>
+<tr class="row-even"><td><p>Registry publish integration</p></td>
+<td><p>✅ Done</p></td>
+<td><p>Live API call from curation Step 4</p></td>
+</tr>
+<tr class="row-odd"><td><p>Harmonization wizard (3 steps)</p></td>
+<td><p>✅ Done</p></td>
+<td><p>Setup → Match → Curate</p></td>
+</tr>
+<tr class="row-even"><td><p>DataForge API (FastAPI)</p></td>
+<td><p>✅ Done</p></td>
+<td><p>Submission, validation, review, corrections</p></td>
+</tr>
+<tr class="row-odd"><td><p>DataForge Registry integration</p></td>
+<td><p>✅ Done</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">RegistrySchemaLoader</span></code> in DataForge API</p></td>
+</tr>
+<tr class="row-even"><td><p>Unified app — forge-app (port 8505)</p></td>
+<td><p>✅ Done</p></td>
+<td><p>All workflows in one Streamlit app</p></td>
+</tr>
+<tr class="row-odd"><td><p>Contextual handoffs</p></td>
+<td><p>✅ Done</p></td>
+<td><p>Curation → Harmonize → Data → Review</p></td>
+</tr>
+<tr class="row-even"><td><p>Manifest-based project persistence</p></td>
+<td><p>✅ Done</p></td>
+<td><p>Local <code class="docutils literal notranslate"><span class="pre">.cache/forge-app/</span></code> filesystem</p></td>
+</tr>
+<tr class="row-odd"><td><p>CI/CD pipeline</p></td>
+<td><p>✅ Done</p></td>
+<td><p>GitHub Actions</p></td>
+</tr>
+<tr class="row-even"><td><p>Cloud Run deployment</p></td>
+<td><p>✅ Done</p></td>
+<td><p>Harmonization Engine standalone</p></td>
+</tr>
+<tr class="row-odd"><td><p>Gold Datasets (DataForge API + forge-app)</p></td>
+<td><p>✅ Done</p></td>
+<td><p>CRUD, provenance, CSV storage, Gold page</p></td>
+</tr>
+<tr class="row-even"><td><p>Validation rules pipeline</p></td>
+<td><p>✅ Done</p></td>
+<td><p>Registry → DataForge end-to-end; seed script for existing schemas</p></td>
+</tr>
+<tr class="row-odd"><td><p>Identifier Schemes &amp; Golden IDs</p></td>
+<td><p>✅ Done</p></td>
+<td><p>IdentifierScheme, id_engine, multi-key dedup, accept flow</p></td>
+</tr>
+<tr class="row-even"><td><p>Validation Rules Builder</p></td>
+<td><p>✅ Done</p></td>
+<td><p>5-step curation wizard, template + custom rule authoring</p></td>
+</tr>
+<tr class="row-odd"><td><p>Test suite</p></td>
+<td><p>✅ Done</p></td>
+<td><p>11 test files, ~3,000 lines, Journeys A/B/C</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="forge-app-architecture-current">
+<h3>forge-app Architecture (Current)<a class="headerlink" href="#forge-app-architecture-current" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>services/forge-app/          Port 8505
+├── app.py                   Home dashboard (recent projects, quick actions)
+├── pages/
+│   ├── 1_Schemas.py         Browse schemas + 4-step curation wizard
+│   ├── 2_Data.py            Unified 5-step pipeline (schema → match → curate → validate → review)
+│   ├── 3_Gold.py            Gold datasets dashboard + detail view
+│   └── 4_Settings.py        Identity (display name, email)
+├── core/
+│   ├── curation/            Parser, duplicate detector, AI suggestions, publisher
+│   └── harmonization/       ComprehensiveMatcher, HybridRetriever, match engine, curation service
+├── clients/
+│   ├── registry_client.py   Registry Service API client
+│   ├── dataforge_client.py  DataForge API client
+│   └── gold_client.py       Gold Dataset API client
+└── tests/                   Integration tests (Journeys A, B, C) + unit tests
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="production-roadmap">
+<h2>Production Roadmap<a class="headerlink" href="#production-roadmap" title="Link to this heading"></a></h2>
+<section id="phase-a-ship-harmonization-engine-mvp-complete">
+<h3>Phase A: Ship Harmonization Engine MVP ✅ COMPLETE<a class="headerlink" href="#phase-a-ship-harmonization-engine-mvp-complete" title="Link to this heading"></a></h3>
+<p><em>CDE Engine → Production as “Forge Harmonization Engine”</em></p>
+<ul class="simple">
+<li><p>CI/CD pipeline (GitHub Actions, Artifact Registry)</p></li>
+<li><p>GCP Secret Manager integration</p></li>
+<li><p>Cloud Run deployment with session affinity</p></li>
+<li><p>User acceptance testing</p></li>
+<li><p>Go-live</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Harmonization Engine running on Cloud Run. ✅</p>
+</section>
+<hr class="docutils" />
+<section id="phase-b-registry-service-foundation-complete">
+<h3>Phase B: Registry Service Foundation ✅ COMPLETE<a class="headerlink" href="#phase-b-registry-service-foundation-complete" title="Link to this heading"></a></h3>
+<p><em>Central schema storage and API</em></p>
+<ul class="simple">
+<li><p>PostgreSQL schema design, CRUD API, versioning</p></li>
+<li><p>Export engine (JSON, YAML, CSV, TSV)</p></li>
+<li><p>Harmonization Engine integration</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Central schema storage with API access, integrated with Harmonization Engine. ✅</p>
+</section>
+<hr class="docutils" />
+<section id="phase-c-curation-workbench-complete">
+<h3>Phase C: Curation Workbench ✅ COMPLETE<a class="headerlink" href="#phase-c-curation-workbench-complete" title="Link to this heading"></a></h3>
+<p><em>AI-assisted schema creation from CDE lists, integrated into forge-app</em></p>
+<ul class="simple">
+<li><p>File upload and parsing (CSV, TSV, Excel)</p></li>
+<li><p>Duplicate detection (TF-IDF + embeddings)</p></li>
+<li><p>LLM suggestion engine (names, types, constraints, merges)</p></li>
+<li><p>Interactive review UI — 4-step wizard</p></li>
+<li><p>Project-based caching (local filesystem)</p></li>
+<li><p>Registry Service publish integration (live API, not stubbed)</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Users can create high-quality schemas from raw CDE lists with AI assistance, publish to Registry. ✅</p>
+</section>
+<hr class="docutils" />
+<section id="phase-d-dataforge-foundation-complete">
+<h3>Phase D: DataForge Foundation ✅ COMPLETE<a class="headerlink" href="#phase-d-dataforge-foundation-complete" title="Link to this heading"></a></h3>
+<p><em>Data validation and QC workflows, integrated into forge-app</em></p>
+<ul class="simple">
+<li><p>Submission ingestion (CSV upload)</p></li>
+<li><p>Schema validation engine (against Registry schemas via <code class="docutils literal notranslate"><span class="pre">RegistrySchemaLoader</span></code>)</p></li>
+<li><p>QC review queue (claim, inspect, accept/reject)</p></li>
+<li><p>Corrections flow (re-upload, re-validate, audit history)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">schema_id</span></code> support (Registry schema fetched by DataForge API at validation time)</p></li>
+</ul>
+<p><strong>Deliverable:</strong> End-to-end data lifecycle: upload → validate → review → accept/reject → corrections. ✅</p>
+</section>
+<hr class="docutils" />
+<section id="phase-e-forge-unified-app-complete">
+<h3>Phase E: Forge Unified App ✅ COMPLETE<a class="headerlink" href="#phase-e-forge-unified-app-complete" title="Link to this heading"></a></h3>
+<p><em>Single entry point for all workflows</em></p>
+<ul class="simple">
+<li><p>Single Streamlit multi-page app replacing four separate services</p></li>
+<li><p>Shared sidebar, identity, schema selector, service health indicators</p></li>
+<li><p>Contextual handoffs: Curation → Harmonize → Data → Review</p></li>
+<li><p>Home dashboard with recent projects and quick actions</p></li>
+<li><p>End-to-end integration tests (Journeys A, B, C)</p></li>
+<li><p>Manifest-based project persistence (local cache)</p></li>
+</ul>
+<p><strong>Deliverable:</strong> One URL, one coherent workflow from CDE list to validated dataset. ✅</p>
+</section>
+<hr class="docutils" />
+<section id="phase-f-gold-datasets-complete">
+<h3>Phase F: Gold Datasets ✅ COMPLETE<a class="headerlink" href="#phase-f-gold-datasets-complete" title="Link to this heading"></a></h3>
+<p><em>Named, schema-bound collections of accepted submission data</em></p>
+<ul class="simple">
+<li><p>Gold Dataset CRUD (create, list, get, delete, download)</p></li>
+<li><p>Multiple gold datasets per schema (e.g. ‘pilot_cohort’, ‘full_study’)</p></li>
+<li><p>Submissions linked to a gold dataset at upload time (1:1)</p></li>
+<li><p>Accept flow appends data with provenance columns (<code class="docutils literal notranslate"><span class="pre">_submission_id</span></code>, <code class="docutils literal notranslate"><span class="pre">_version</span></code>, <code class="docutils literal notranslate"><span class="pre">_source_row</span></code>, <code class="docutils literal notranslate"><span class="pre">_accepted_at</span></code>, <code class="docutils literal notranslate"><span class="pre">_accepted_by</span></code>)</p></li>
+<li><p>CSV-based storage (one file per dataset, with per-dataset duplicate key detection)</p></li>
+<li><p>Gold page (<code class="docutils literal notranslate"><span class="pre">3_Gold.py</span></code>) in forge-app: dashboard, detail view, data preview, CSV download</p></li>
+<li><p>Inline gold dataset creation during Data page upload step</p></li>
+<li><p>Legacy master data backend preserved for backward compatibility</p></li>
+</ul>
+<p><strong>Deliverable:</strong> Accepted data flows into named gold datasets with full provenance. Users can browse, export, and manage gold datasets. ✅</p>
+<p><strong>Deferred:</strong></p>
+<ul class="simple">
+<li><p>Retraction / correction propagation (gold datasets are append-only for now)</p></li>
+<li><p>Query API with filtering/pagination</p></li>
+<li><p>In-app analytics (charts, value distributions)</p></li>
+<li><p>Many-to-many submission → dataset relationships</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="phase-f-1-identifier-schemes-golden-ids-complete">
+<h3>Phase F.1: Identifier Schemes &amp; Golden IDs ✅ COMPLETE<a class="headerlink" href="#phase-f-1-identifier-schemes-golden-ids-complete" title="Link to this heading"></a></h3>
+<p><em>Configurable identifier management for Gold Datasets</em></p>
+<p><strong>Current state:</strong> Gold datasets have a single <code class="docutils literal notranslate"><span class="pre">key_column</span></code> for dedup. No concept of source vs golden IDs, no ID generation, no hierarchy, no naming conventions. Works for simple cases but breaks down when projects need platform-assigned IDs (like GP2’s <code class="docutils literal notranslate"><span class="pre">gp2id</span></code>/<code class="docutils literal notranslate"><span class="pre">gp2sampleid</span></code>) or multi-key deduplication (like HRIS migrations with multiple auxiliary identifiers).</p>
+<p><strong>Target:</strong> Data managers configure an <strong>Identifier Scheme</strong> on each gold dataset that defines source IDs (from submitters), golden IDs (generated by the platform), generation strategies (UUID, template with sequences, composite from columns), and dedup behavior (which keys to match, what to do on duplicate).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>F.1.1: Core data model
+├── IdentifierDef (name, id_class, scope, generation, parent, mutability)
+├── IdGeneration (method: uuid | template | composite, seq_scope: group | global)
+├── DedupStrategy (match_keys, on_duplicate: reject | update | flag)
+├── AssignmentTiming (on_upload | on_review | on_accept)
+├── IdentifierScheme (identifiers, dedup, assignment)
+└── Replace GoldDataset.key_column with identifier_scheme
+
+F.1.2: ID generation engine
+├── Template resolution ({site}, {seq:05d}, {parent_id})
+├── Sequence tracking (group-scoped and global-scoped)
+├── Parent-child ordering (topological sort)
+├── UUID and composite generation
+└── Column mutability (submitter / manager / system)
+
+F.1.3: Updated dedup and accept flow
+├── Multi-key dedup (OR across match keys)
+├── Configurable duplicate action (reject / update / flag)
+├── Generate golden IDs at configured assignment timing
+├── Append golden ID columns alongside data + provenance
+└── Migration path from key_column → identifier_scheme
+
+F.1.4: API changes
+├── Create gold dataset accepts identifier_scheme
+├── Accept response includes ids_generated summary
+└── Backward compatible (identifier_scheme is optional)
+</pre></div>
+</div>
+<p><strong>Deliverable:</strong> Gold datasets support configurable source/golden identifiers with automatic ID generation, hierarchical IDs, and multi-key deduplication. Replaces the single <code class="docutils literal notranslate"><span class="pre">key_column</span></code> with a general-purpose system. ✅</p>
+<p><strong>Spec:</strong> <a class="reference internal" href="forge-identifier-scheme-spec.html"><span class="std std-doc">forge-identifier-scheme-spec.md</span></a></p>
+</section>
+<hr class="docutils" />
+<section id="phase-f-2-validation-rules-builder-complete">
+<h3>Phase F.2: Validation Rules Builder ✅ COMPLETE<a class="headerlink" href="#phase-f-2-validation-rules-builder-complete" title="Link to this heading"></a></h3>
+<p><em>Interactive rule authoring in the Schema Curation Wizard</em></p>
+<p><strong>Current state:</strong> Validation rules pipeline is wired end-to-end (Registry metadata → DataForge RegistrySchemaLoader → ValidationEngine). Rules can be attached at schema publish time via JSON file upload or seeded via <code class="docutils literal notranslate"><span class="pre">scripts/seed_validation_rules.py</span></code>. But there is no interactive UI for building rules — users must author JSON externally.</p>
+<p><strong>Target:</strong> A dedicated Step 4 (Validation Rules) in the curation wizard, between Curate Elements and Publish. Users build cross-field rules using templates or custom Python expressions, with all curated variable names available in dropdowns.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>F.2.1: Model &amp; wizard step changes
+├── Add validation_rules field to CurationSession
+├── Expand wizard from 4 steps to 5
+└── Update step references and navigation
+
+F.2.2: Rule builder UI (Step 4)
+├── Template-based rule creation (5 common patterns)
+│   ├── Require field when...
+│   ├── Forbid field when...
+│   ├── Field A ≤ Field B
+│   ├── Fields must match
+│   └── Must be unique (submission-level)
+├── Custom expression mode (raw condition + constraint)
+├── Rules table with delete
+└── Field dropdowns from curated variable names
+
+F.2.3: Publish step updates
+├── Remove JSON file uploader from Step 5
+├── Show read-only rules summary
+└── Pass session rules to publish_to_registry()
+</pre></div>
+</div>
+<p><strong>Deliverable:</strong> Users can define validation rules interactively during schema creation, without authoring JSON externally. Rules are published to the Registry and enforced by DataForge. ✅</p>
+<p><strong>Spec:</strong> <a class="reference internal" href="forge-validation-rules-spec.html"><span class="std std-doc">forge-validation-rules-spec.md</span></a></p>
+</section>
+<hr class="docutils" />
+<section id="phase-g-persistence-migration">
+<h3>Phase G: Persistence Migration<a class="headerlink" href="#phase-g-persistence-migration" title="Link to this heading"></a></h3>
+<p><em>Replace local filesystem cache with hosted database</em></p>
+<p><strong>Current state:</strong> All project data (manifests, curation sessions, harmonization artifacts, gold datasets) is stored on the container filesystem. This means data is lost on container restart and cannot be shared across instances.</p>
+<p><strong>Target:</strong> Supabase (hosted PostgreSQL) as the unified data layer.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>G.1: Supabase setup
+├── Provision Supabase project
+├── Schema design (projects, sessions, artifacts, gold datasets)
+├── Migrate manifest storage from JSON files → Supabase tables
+│   ├── SchemaProjectManifest → schema_projects table
+│   ├── DataProjectManifest → data_projects table
+│   └── GoldDataset → gold_datasets table
+├── Migrate harmonization artifacts (data dict, results, curated set)
+│   └── Store as JSONB columns or GCS references for large files
+├── Migrate gold dataset CSVs → Supabase tables or GCS
+└── Remove dependency on local filesystem cache
+
+G.2: Multi-instance Cloud Run readiness
+├── Verify forge-app stateless (no session-local file writes)
+├── Enable min-instances: 1 on Cloud Run (Streamlit session affinity)
+└── Test concurrent users across instances
+</pre></div>
+</div>
+<p><strong>Why this is critical:</strong> Without this, deploying forge-app to Cloud Run with multiple instances or restarting the container loses all project data. Authentication (Phase H) also requires Supabase to be in place.</p>
+<p><strong>Deliverable:</strong> Project data persists across restarts and deployments. forge-app is safe to deploy to Cloud Run.</p>
+</section>
+<hr class="docutils" />
+<section id="phase-h-authentication-planned">
+<h3>Phase H: Authentication ⏳ PLANNED<a class="headerlink" href="#phase-h-authentication-planned" title="Link to this heading"></a></h3>
+<p><em>Gated on Phase G (Supabase)</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>H.1: Supabase Auth integration
+├── Google OAuth / SSO for organizational accounts
+├── User identity replaces current session_id / display name trust model
+├── Session management in Streamlit
+└── Protect forge-app routes (no unauthenticated access)
+
+H.2: User-scoped project data
+├── Migrate project ownership from display name → Supabase user_id
+├── Users see only their own projects (or shared ones)
+└── Audit trail tied to authenticated user
+</pre></div>
+</div>
+<p><strong>Deliverable:</strong> forge-app requires login. Projects are owned by authenticated users.</p>
+</section>
+<hr class="docutils" />
+<section id="phase-i-authorization-sharing-planned">
+<h3>Phase I: Authorization &amp; Sharing ⏳ PLANNED<a class="headerlink" href="#phase-i-authorization-sharing-planned" title="Link to this heading"></a></h3>
+<p><em>Gated on Phase H (Auth)</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>I.1: Schema project ownership
+├── Creator = schema manager (full control)
+├── Org-level visibility (private / org / public)
+└── Role-based access (manager / contributor / viewer)
+
+I.2: Collaborative schema management
+├── Contributors can request variable additions (approval workflow)
+├── Managers can directly add variables (with similarity guardrail)
+└── Version management (semver) + audit trail
+
+I.3: Data project sharing
+├── Data projects shareable within org
+└── Reviewer role for DataForge QC queue
+</pre></div>
+</div>
+<p><strong>Deliverable:</strong> Multi-user organizations can collaborate on schemas and review data.</p>
+</section>
+<hr class="docutils" />
+<section id="phase-j-schema-evolution-planned">
+<h3>Phase J: Schema Evolution ⏳ PLANNED<a class="headerlink" href="#phase-j-schema-evolution-planned" title="Link to this heading"></a></h3>
+<p><em>Gated on Phase I (Authorization)</em></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── Add variables to published schemas
+│   ├── Direct addition (managers) with duplicate check
+│   └── Request workflow (contributors → approval)
+├── Semantic versioning (semver) on schemas
+├── Data projects can track schema version upgrades
+└── Audit history on all schema changes
+</pre></div>
+</div>
+<p><strong>Deliverable:</strong> Published schemas can evolve without breaking existing data projects.</p>
+</section>
+<hr class="docutils" />
+<section id="phase-k-react-frontend-migration-future">
+<h3>Phase K: React Frontend Migration ⏳ FUTURE<a class="headerlink" href="#phase-k-react-frontend-migration-future" title="Link to this heading"></a></h3>
+<p><em>Trigger: MVP validated by internal users + Auth live</em></p>
+<p>All trigger conditions must be met before starting:</p>
+<ul class="simple">
+<li><p>[ ] forge-app validated by internal users (ongoing)</p></li>
+<li><p>[ ] Supabase persistence live (Phase G)</p></li>
+<li><p>[ ] Authentication live (Phase H)</p></li>
+<li><p>[ ] Authorization + org model live (Phase I)</p></li>
+</ul>
+<p><strong>Approach:</strong></p>
+<ul class="simple">
+<li><p>Build React frontend against existing FastAPI backends (Registry, DataForge)</p></li>
+<li><p>Streamlit services remain running during migration (no big-bang cutover)</p></li>
+<li><p>Migrate one module at a time: Schemas first (most complex), then Harmonize, then Data</p></li>
+<li><p>FastAPI backend becomes the universal API layer</p></li>
+</ul>
+<p><strong>Why not sooner:</strong> Streamlit is fast to iterate during MVP. Migrating before workflows are proven wastes effort on UI that may change.</p>
+<p><strong>Why not later:</strong> Streamlit hits a ceiling on RBAC views, real-time updates, and complex interactions needed for Phase I+.</p>
+</section>
+<hr class="docutils" />
+<section id="phase-l-domain-intelligence-future">
+<h3>Phase L: Domain Intelligence ⏳ FUTURE<a class="headerlink" href="#phase-l-domain-intelligence-future" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── Domain-specific corpora from published schemas
+│   ├── Extract abbreviation patterns per domain
+│   └── Learn naming conventions from user feedback
+├── Schema context for AI suggestions
+│   ├── Query Registry for existing CDEs before suggesting new ones
+│   └── Avoid creating duplicates of already-defined elements
+├── External CDE library integration
+│   ├── NIH CDE Repository
+│   └── CDISC standards
+└── Custom domain embedding models (long-term)
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="phased-timeline">
+<h2>Phased Timeline<a class="headerlink" href="#phased-timeline" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Phase A: Harmonization Engine to Production ✅ COMPLETE
+Phase B: Registry Service                   ✅ COMPLETE
+Phase C: Curation Workbench                 ✅ COMPLETE
+Phase D: DataForge Foundation               ✅ COMPLETE
+Phase E: Forge Unified App                  ✅ COMPLETE
+Phase F: Gold Datasets                      ✅ COMPLETE
+Phase F.1: Identifier Schemes &amp; Golden IDs  ✅ COMPLETE
+Phase F.2: Validation Rules Builder         ✅ COMPLETE
+
+Phase G: Persistence Migration              ⏳ NEXT       ◄─── YOU ARE HERE
+├── G.1: Supabase setup + manifest migration
+└── G.2: Multi-instance Cloud Run readiness
+
+Phase H: Authentication                     ⏳ PLANNED (gated on G)
+├── H.1: Supabase Auth + Google OAuth
+└── H.2: User-scoped project data
+
+Phase I: Authorization &amp; Sharing            ⏳ PLANNED (gated on H)
+├── I.1: Schema project ownership + RBAC
+├── I.2: Collaborative schema management
+└── I.3: Data project sharing
+
+Phase J: Schema Evolution                   ⏳ PLANNED (gated on I)
+Phase K: React Frontend Migration           ⏳ FUTURE (gated on H + user validation)
+Phase L: Domain Intelligence                ⏳ FUTURE
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="immediate-priorities">
+<h2>Immediate Priorities<a class="headerlink" href="#immediate-priorities" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Internal user testing</strong> — Exercise Journeys A, B, C in forge-app including gold dataset, identifier scheme, and validation rule workflows. Surface rough edges before investing in infrastructure.</p></li>
+<li><p><strong>Persistence migration (Phase G)</strong> — Critical before deploying forge-app to Cloud Run. Container restarts currently destroy all project data (including gold datasets). Start with G.1 (Supabase setup + manifest migration).</p></li>
+<li><p><strong>Deploy forge-app to Cloud Run</strong> — Once G.1 is complete. Same pattern as Harmonization Engine deployment.</p></li>
+<li><p><strong>Authentication (Phase H)</strong> — Supabase Auth with Google OAuth/SSO. Gated on Phase G.</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="decision-points">
+<h2>Decision Points<a class="headerlink" href="#decision-points" title="Link to this heading"></a></h2>
+<section id="naming-branding-resolved">
+<h3>1. Naming &amp; Branding ✅ Resolved<a class="headerlink" href="#naming-branding-resolved" title="Link to this heading"></a></h3>
+<p>Rebranded as <strong>Forge</strong> platform. forge-app is the primary entry point.</p>
+</section>
+<section id="database-persistence-strategy-direction-set">
+<h3>2. Database &amp; Persistence Strategy ✅ Direction set<a class="headerlink" href="#database-persistence-strategy-direction-set" title="Link to this heading"></a></h3>
+<p><strong>Current:</strong> Local <code class="docutils literal notranslate"><span class="pre">.cache/forge-app/</span></code> filesystem (JSON manifests).
+<strong>Target:</strong> Supabase (hosted PostgreSQL) as unified data layer.
+<strong>Migration:</strong> Phase G — migrate manifests → Supabase tables; harmonization artifacts → JSONB or GCS references.</p>
+</section>
+<section id="authentication-direction-set">
+<h3>3. Authentication ✅ Direction set<a class="headerlink" href="#authentication-direction-set" title="Link to this heading"></a></h3>
+<p><strong>Target:</strong> Supabase Auth with Google OAuth / SSO.
+<strong>Rollout:</strong> Phase H, gated on Phase G (Supabase persistence must exist first).</p>
+</section>
+<section id="dataforge-priority-resolved">
+<h3>4. DataForge Priority ✅ Resolved<a class="headerlink" href="#dataforge-priority-resolved" title="Link to this heading"></a></h3>
+<p>DataForge is built and integrated. It shipped as part of forge-app Phase D/E, not as a separate future phase.</p>
+</section>
+<section id="streamlit-react-frontend-migration">
+<h3>5. Streamlit → React Frontend Migration<a class="headerlink" href="#streamlit-react-frontend-migration" title="Link to this heading"></a></h3>
+<p><strong>Status:</strong> Trigger conditions not yet met.
+<strong>Blockers:</strong> Internal user validation, Supabase persistence, and authentication must all be live first.
+<strong>See Phase K.</strong></p>
+</section>
+<section id="standalone-service-deprecation">
+<h3>6. Standalone Service Deprecation<a class="headerlink" href="#standalone-service-deprecation" title="Link to this heading"></a></h3>
+<p>The standalone Streamlit apps (<code class="docutils literal notranslate"><span class="pre">:8501</span></code>, <code class="docutils literal notranslate"><span class="pre">:8502</span></code>, <code class="docutils literal notranslate"><span class="pre">:8503</span></code>) remain deployable as fallbacks and for isolated service testing. No further UI investment — forge-app (<code class="docutils literal notranslate"><span class="pre">:8505</span></code>) is the primary interface.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="success-metrics">
+<h2>Success Metrics<a class="headerlink" href="#success-metrics" title="Link to this heading"></a></h2>
+<section id="phases-af-complete">
+<h3>Phases A–F (Complete) ✅<a class="headerlink" href="#phases-af-complete" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Single entry point for full data lifecycle (Create schema → Map → Validate → Review → Gold)</p></li>
+<li><p>End-to-end Journey A/B/C completable without switching apps</p></li>
+<li><p>Accepted data flows into named gold datasets with provenance</p></li>
+<li><p>Zero regression in individual service functionality</p></li>
+<li><p>All existing tests pass</p></li>
+</ul>
+</section>
+<section id="phase-g-persistence">
+<h3>Phase G: Persistence<a class="headerlink" href="#phase-g-persistence" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Project data survives container restart</p></li>
+<li><p>forge-app deployable to Cloud Run with min-instances ≥ 1</p></li>
+</ul>
+</section>
+<section id="phase-h-authentication">
+<h3>Phase H: Authentication<a class="headerlink" href="#phase-h-authentication" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>No unauthenticated access to forge-app</p></li>
+<li><p>Projects owned and isolated by user</p></li>
+</ul>
+</section>
+<section id="phase-i-authorization">
+<h3>Phase I: Authorization<a class="headerlink" href="#phase-i-authorization" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Org-level schema sharing working</p></li>
+<li><p>Reviewer role for DataForge QC queue</p></li>
+</ul>
+</section>
+<section id="long-term-platform-targets">
+<h3>Long-Term Platform Targets<a class="headerlink" href="#long-term-platform-targets" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Time to create schema from CSV reduced by 70%+ vs. manual</p></li>
+<li><p>LLM suggestion acceptance rate &gt; 60%</p></li>
+<li><p>Duplicate detection accuracy &gt; 90%</p></li>
+<li><p>10k+ records validated/month through DataForge</p></li>
+<li><p>&lt;48hr submission-to-acceptance turnaround</p></li>
+</ul>
+<hr class="docutils" />
+<p><strong>Related Documentation:</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="forge-executive-summary.html"><span class="std std-doc">forge-executive-summary.md</span></a> — Platform overview</p></li>
+<li><p><a class="reference internal" href="forge-unified-app-spec.html"><span class="std std-doc">forge-unified-app-spec.md</span></a> — Unified app specification (Phases C–E)</p></li>
+<li><p><a class="reference internal" href="#forge-user-journey.md"><span class="xref myst">forge-user-journey.md</span></a> — End-to-end user workflows</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="forge-identifier-scheme-spec.html" class="btn btn-neutral float-left" title="Identifier Schemes &amp; Golden IDs — Spec" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="forge-unified-app-spec.html" class="btn btn-neutral float-right" title="Forge Unified App — MVP Specification" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

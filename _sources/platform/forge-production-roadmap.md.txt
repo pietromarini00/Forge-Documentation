@@ -1,0 +1,503 @@
+# Forge Production Roadmap
+
+## From CDE Engine to Forge Platform
+
+---
+
+## How CDE Engine Maps to Forge
+
+CDE Engine is the **Harmonization Engine MVP**. Here's the mapping:
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                              FORGE PLATFORM                                  │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  SCHEMAFORGE                                                                 │
+│  ──────────                                                                  │
+│                                                                              │
+│  ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐            │
+│  │ REGISTRY        │   │ CURATION        │   │ HARMONIZATION   │            │
+│  │ SERVICE         │   │ WORKBENCH       │   │ ENGINE          │            │
+│  │                 │   │                 │   │                 │            │
+│  │ • Schema CRUD   │   │ • Upload CDE    │   │ • Hybrid        │ ◄─── CDE   │
+│  │ • Versioning    │   │   lists         │   │   retrieval     │      Engine │
+│  │ • API access    │   │ • AI-assisted   │   │ • AI eval       │      IS     │
+│  │ • Exports       │   │   curation      │   │ • Curation UI   │      THIS   │
+│  │                 │   │ • Schema        │   │ • Feedback      │            │
+│  │ ✅ Complete     │   │   projects      │   │ ✅ In Prod      │            │
+│  └─────────────────┘   └─────────────────┘   └─────────────────┘            │
+│          ▲                     │                     │                      │
+│          │                     │                     │                      │
+│          └─────────────────────┴─────────────────────┘                      │
+│                         Schemas stored in Registry                          │
+│                                                                              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  DATAFORGE                                                                   │
+│  ─────────                                                                   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────┐        │
+│  │ Ingest → Validate → Review → Correct → Serve                     │        │
+│  │                                                                  │        │
+│  │ ✅ Built — integrated into forge-app                             │        │
+│  └──────────────────────────────────────────────────────────────────┘        │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────┐        │
+│  │ FORGE (Unified App — port 8505)                                  │        │
+│  │                                                                  │        │
+│  │  Schemas · Harmonize · Data — all in one Streamlit app           │        │
+│  │                                                                  │        │
+│  │ ✅ Built — all four workflows unified, end-to-end                │        │
+│  └──────────────────────────────────────────────────────────────────┘        │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Current State
+
+### What's Built
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Hybrid retrieval (TF-IDF + embeddings) | ✅ Done | `forge-retrieval-core` lib |
+| AI-powered match evaluation | ✅ Done | Claude API via `ComprehensiveMatcher` |
+| Schema curation wizard (4 steps) | ✅ Done | Upload → Configure → Curate → Publish (rules step planned) |
+| Registry Service (FastAPI + PostgreSQL) | ✅ Done | Schema CRUD, versioning, exports |
+| Registry publish integration | ✅ Done | Live API call from curation Step 4 |
+| Harmonization wizard (3 steps) | ✅ Done | Setup → Match → Curate |
+| DataForge API (FastAPI) | ✅ Done | Submission, validation, review, corrections |
+| DataForge Registry integration | ✅ Done | `RegistrySchemaLoader` in DataForge API |
+| Unified app — forge-app (port 8505) | ✅ Done | All workflows in one Streamlit app |
+| Contextual handoffs | ✅ Done | Curation → Harmonize → Data → Review |
+| Manifest-based project persistence | ✅ Done | Local `.cache/forge-app/` filesystem |
+| CI/CD pipeline | ✅ Done | GitHub Actions |
+| Cloud Run deployment | ✅ Done | Harmonization Engine standalone |
+| Gold Datasets (DataForge API + forge-app) | ✅ Done | CRUD, provenance, CSV storage, Gold page |
+| Validation rules pipeline | ✅ Done | Registry → DataForge end-to-end; seed script for existing schemas |
+| Identifier Schemes & Golden IDs | ✅ Done | IdentifierScheme, id_engine, multi-key dedup, accept flow |
+| Validation Rules Builder | ✅ Done | 5-step curation wizard, template + custom rule authoring |
+| Test suite | ✅ Done | 11 test files, ~3,000 lines, Journeys A/B/C |
+
+### forge-app Architecture (Current)
+
+```
+services/forge-app/          Port 8505
+├── app.py                   Home dashboard (recent projects, quick actions)
+├── pages/
+│   ├── 1_Schemas.py         Browse schemas + 4-step curation wizard
+│   ├── 2_Data.py            Unified 5-step pipeline (schema → match → curate → validate → review)
+│   ├── 3_Gold.py            Gold datasets dashboard + detail view
+│   └── 4_Settings.py        Identity (display name, email)
+├── core/
+│   ├── curation/            Parser, duplicate detector, AI suggestions, publisher
+│   └── harmonization/       ComprehensiveMatcher, HybridRetriever, match engine, curation service
+├── clients/
+│   ├── registry_client.py   Registry Service API client
+│   ├── dataforge_client.py  DataForge API client
+│   └── gold_client.py       Gold Dataset API client
+└── tests/                   Integration tests (Journeys A, B, C) + unit tests
+```
+
+---
+
+## Production Roadmap
+
+### Phase A: Ship Harmonization Engine MVP ✅ COMPLETE
+*CDE Engine → Production as "Forge Harmonization Engine"*
+
+- CI/CD pipeline (GitHub Actions, Artifact Registry)
+- GCP Secret Manager integration
+- Cloud Run deployment with session affinity
+- User acceptance testing
+- Go-live
+
+**Deliverable:** Harmonization Engine running on Cloud Run. ✅
+
+---
+
+### Phase B: Registry Service Foundation ✅ COMPLETE
+*Central schema storage and API*
+
+- PostgreSQL schema design, CRUD API, versioning
+- Export engine (JSON, YAML, CSV, TSV)
+- Harmonization Engine integration
+
+**Deliverable:** Central schema storage with API access, integrated with Harmonization Engine. ✅
+
+---
+
+### Phase C: Curation Workbench ✅ COMPLETE
+*AI-assisted schema creation from CDE lists, integrated into forge-app*
+
+- File upload and parsing (CSV, TSV, Excel)
+- Duplicate detection (TF-IDF + embeddings)
+- LLM suggestion engine (names, types, constraints, merges)
+- Interactive review UI — 4-step wizard
+- Project-based caching (local filesystem)
+- Registry Service publish integration (live API, not stubbed)
+
+**Deliverable:** Users can create high-quality schemas from raw CDE lists with AI assistance, publish to Registry. ✅
+
+---
+
+### Phase D: DataForge Foundation ✅ COMPLETE
+*Data validation and QC workflows, integrated into forge-app*
+
+- Submission ingestion (CSV upload)
+- Schema validation engine (against Registry schemas via `RegistrySchemaLoader`)
+- QC review queue (claim, inspect, accept/reject)
+- Corrections flow (re-upload, re-validate, audit history)
+- `schema_id` support (Registry schema fetched by DataForge API at validation time)
+
+**Deliverable:** End-to-end data lifecycle: upload → validate → review → accept/reject → corrections. ✅
+
+---
+
+### Phase E: Forge Unified App ✅ COMPLETE
+*Single entry point for all workflows*
+
+- Single Streamlit multi-page app replacing four separate services
+- Shared sidebar, identity, schema selector, service health indicators
+- Contextual handoffs: Curation → Harmonize → Data → Review
+- Home dashboard with recent projects and quick actions
+- End-to-end integration tests (Journeys A, B, C)
+- Manifest-based project persistence (local cache)
+
+**Deliverable:** One URL, one coherent workflow from CDE list to validated dataset. ✅
+
+---
+
+### Phase F: Gold Datasets ✅ COMPLETE
+*Named, schema-bound collections of accepted submission data*
+
+- Gold Dataset CRUD (create, list, get, delete, download)
+- Multiple gold datasets per schema (e.g. 'pilot_cohort', 'full_study')
+- Submissions linked to a gold dataset at upload time (1:1)
+- Accept flow appends data with provenance columns (`_submission_id`, `_version`, `_source_row`, `_accepted_at`, `_accepted_by`)
+- CSV-based storage (one file per dataset, with per-dataset duplicate key detection)
+- Gold page (`3_Gold.py`) in forge-app: dashboard, detail view, data preview, CSV download
+- Inline gold dataset creation during Data page upload step
+- Legacy master data backend preserved for backward compatibility
+
+**Deliverable:** Accepted data flows into named gold datasets with full provenance. Users can browse, export, and manage gold datasets. ✅
+
+**Deferred:**
+- Retraction / correction propagation (gold datasets are append-only for now)
+- Query API with filtering/pagination
+- In-app analytics (charts, value distributions)
+- Many-to-many submission → dataset relationships
+
+---
+
+### Phase F.1: Identifier Schemes & Golden IDs ✅ COMPLETE
+*Configurable identifier management for Gold Datasets*
+
+**Current state:** Gold datasets have a single `key_column` for dedup. No concept of source vs golden IDs, no ID generation, no hierarchy, no naming conventions. Works for simple cases but breaks down when projects need platform-assigned IDs (like GP2's `gp2id`/`gp2sampleid`) or multi-key deduplication (like HRIS migrations with multiple auxiliary identifiers).
+
+**Target:** Data managers configure an **Identifier Scheme** on each gold dataset that defines source IDs (from submitters), golden IDs (generated by the platform), generation strategies (UUID, template with sequences, composite from columns), and dedup behavior (which keys to match, what to do on duplicate).
+
+```
+F.1.1: Core data model
+├── IdentifierDef (name, id_class, scope, generation, parent, mutability)
+├── IdGeneration (method: uuid | template | composite, seq_scope: group | global)
+├── DedupStrategy (match_keys, on_duplicate: reject | update | flag)
+├── AssignmentTiming (on_upload | on_review | on_accept)
+├── IdentifierScheme (identifiers, dedup, assignment)
+└── Replace GoldDataset.key_column with identifier_scheme
+
+F.1.2: ID generation engine
+├── Template resolution ({site}, {seq:05d}, {parent_id})
+├── Sequence tracking (group-scoped and global-scoped)
+├── Parent-child ordering (topological sort)
+├── UUID and composite generation
+└── Column mutability (submitter / manager / system)
+
+F.1.3: Updated dedup and accept flow
+├── Multi-key dedup (OR across match keys)
+├── Configurable duplicate action (reject / update / flag)
+├── Generate golden IDs at configured assignment timing
+├── Append golden ID columns alongside data + provenance
+└── Migration path from key_column → identifier_scheme
+
+F.1.4: API changes
+├── Create gold dataset accepts identifier_scheme
+├── Accept response includes ids_generated summary
+└── Backward compatible (identifier_scheme is optional)
+```
+
+**Deliverable:** Gold datasets support configurable source/golden identifiers with automatic ID generation, hierarchical IDs, and multi-key deduplication. Replaces the single `key_column` with a general-purpose system. ✅
+
+**Spec:** [forge-identifier-scheme-spec.md](forge-identifier-scheme-spec.md)
+
+---
+
+### Phase F.2: Validation Rules Builder ✅ COMPLETE
+*Interactive rule authoring in the Schema Curation Wizard*
+
+**Current state:** Validation rules pipeline is wired end-to-end (Registry metadata → DataForge RegistrySchemaLoader → ValidationEngine). Rules can be attached at schema publish time via JSON file upload or seeded via `scripts/seed_validation_rules.py`. But there is no interactive UI for building rules — users must author JSON externally.
+
+**Target:** A dedicated Step 4 (Validation Rules) in the curation wizard, between Curate Elements and Publish. Users build cross-field rules using templates or custom Python expressions, with all curated variable names available in dropdowns.
+
+```
+F.2.1: Model & wizard step changes
+├── Add validation_rules field to CurationSession
+├── Expand wizard from 4 steps to 5
+└── Update step references and navigation
+
+F.2.2: Rule builder UI (Step 4)
+├── Template-based rule creation (5 common patterns)
+│   ├── Require field when...
+│   ├── Forbid field when...
+│   ├── Field A ≤ Field B
+│   ├── Fields must match
+│   └── Must be unique (submission-level)
+├── Custom expression mode (raw condition + constraint)
+├── Rules table with delete
+└── Field dropdowns from curated variable names
+
+F.2.3: Publish step updates
+├── Remove JSON file uploader from Step 5
+├── Show read-only rules summary
+└── Pass session rules to publish_to_registry()
+```
+
+**Deliverable:** Users can define validation rules interactively during schema creation, without authoring JSON externally. Rules are published to the Registry and enforced by DataForge. ✅
+
+**Spec:** [forge-validation-rules-spec.md](forge-validation-rules-spec.md)
+
+---
+
+### Phase G: Persistence Migration
+*Replace local filesystem cache with hosted database*
+
+**Current state:** All project data (manifests, curation sessions, harmonization artifacts, gold datasets) is stored on the container filesystem. This means data is lost on container restart and cannot be shared across instances.
+
+**Target:** Supabase (hosted PostgreSQL) as the unified data layer.
+
+```
+G.1: Supabase setup
+├── Provision Supabase project
+├── Schema design (projects, sessions, artifacts, gold datasets)
+├── Migrate manifest storage from JSON files → Supabase tables
+│   ├── SchemaProjectManifest → schema_projects table
+│   ├── DataProjectManifest → data_projects table
+│   └── GoldDataset → gold_datasets table
+├── Migrate harmonization artifacts (data dict, results, curated set)
+│   └── Store as JSONB columns or GCS references for large files
+├── Migrate gold dataset CSVs → Supabase tables or GCS
+└── Remove dependency on local filesystem cache
+
+G.2: Multi-instance Cloud Run readiness
+├── Verify forge-app stateless (no session-local file writes)
+├── Enable min-instances: 1 on Cloud Run (Streamlit session affinity)
+└── Test concurrent users across instances
+```
+
+**Why this is critical:** Without this, deploying forge-app to Cloud Run with multiple instances or restarting the container loses all project data. Authentication (Phase H) also requires Supabase to be in place.
+
+**Deliverable:** Project data persists across restarts and deployments. forge-app is safe to deploy to Cloud Run.
+
+---
+
+### Phase H: Authentication ⏳ PLANNED
+*Gated on Phase G (Supabase)*
+
+```
+H.1: Supabase Auth integration
+├── Google OAuth / SSO for organizational accounts
+├── User identity replaces current session_id / display name trust model
+├── Session management in Streamlit
+└── Protect forge-app routes (no unauthenticated access)
+
+H.2: User-scoped project data
+├── Migrate project ownership from display name → Supabase user_id
+├── Users see only their own projects (or shared ones)
+└── Audit trail tied to authenticated user
+```
+
+**Deliverable:** forge-app requires login. Projects are owned by authenticated users.
+
+---
+
+### Phase I: Authorization & Sharing ⏳ PLANNED
+*Gated on Phase H (Auth)*
+
+```
+I.1: Schema project ownership
+├── Creator = schema manager (full control)
+├── Org-level visibility (private / org / public)
+└── Role-based access (manager / contributor / viewer)
+
+I.2: Collaborative schema management
+├── Contributors can request variable additions (approval workflow)
+├── Managers can directly add variables (with similarity guardrail)
+└── Version management (semver) + audit trail
+
+I.3: Data project sharing
+├── Data projects shareable within org
+└── Reviewer role for DataForge QC queue
+```
+
+**Deliverable:** Multi-user organizations can collaborate on schemas and review data.
+
+---
+
+### Phase J: Schema Evolution ⏳ PLANNED
+*Gated on Phase I (Authorization)*
+
+```
+├── Add variables to published schemas
+│   ├── Direct addition (managers) with duplicate check
+│   └── Request workflow (contributors → approval)
+├── Semantic versioning (semver) on schemas
+├── Data projects can track schema version upgrades
+└── Audit history on all schema changes
+```
+
+**Deliverable:** Published schemas can evolve without breaking existing data projects.
+
+---
+
+### Phase K: React Frontend Migration ⏳ FUTURE
+*Trigger: MVP validated by internal users + Auth live*
+
+All trigger conditions must be met before starting:
+- [ ] forge-app validated by internal users (ongoing)
+- [ ] Supabase persistence live (Phase G)
+- [ ] Authentication live (Phase H)
+- [ ] Authorization + org model live (Phase I)
+
+**Approach:**
+- Build React frontend against existing FastAPI backends (Registry, DataForge)
+- Streamlit services remain running during migration (no big-bang cutover)
+- Migrate one module at a time: Schemas first (most complex), then Harmonize, then Data
+- FastAPI backend becomes the universal API layer
+
+**Why not sooner:** Streamlit is fast to iterate during MVP. Migrating before workflows are proven wastes effort on UI that may change.
+
+**Why not later:** Streamlit hits a ceiling on RBAC views, real-time updates, and complex interactions needed for Phase I+.
+
+---
+
+### Phase L: Domain Intelligence ⏳ FUTURE
+
+```
+├── Domain-specific corpora from published schemas
+│   ├── Extract abbreviation patterns per domain
+│   └── Learn naming conventions from user feedback
+├── Schema context for AI suggestions
+│   ├── Query Registry for existing CDEs before suggesting new ones
+│   └── Avoid creating duplicates of already-defined elements
+├── External CDE library integration
+│   ├── NIH CDE Repository
+│   └── CDISC standards
+└── Custom domain embedding models (long-term)
+```
+
+---
+
+## Phased Timeline
+
+```
+Phase A: Harmonization Engine to Production ✅ COMPLETE
+Phase B: Registry Service                   ✅ COMPLETE
+Phase C: Curation Workbench                 ✅ COMPLETE
+Phase D: DataForge Foundation               ✅ COMPLETE
+Phase E: Forge Unified App                  ✅ COMPLETE
+Phase F: Gold Datasets                      ✅ COMPLETE
+Phase F.1: Identifier Schemes & Golden IDs  ✅ COMPLETE
+Phase F.2: Validation Rules Builder         ✅ COMPLETE
+
+Phase G: Persistence Migration              ⏳ NEXT       ◄─── YOU ARE HERE
+├── G.1: Supabase setup + manifest migration
+└── G.2: Multi-instance Cloud Run readiness
+
+Phase H: Authentication                     ⏳ PLANNED (gated on G)
+├── H.1: Supabase Auth + Google OAuth
+└── H.2: User-scoped project data
+
+Phase I: Authorization & Sharing            ⏳ PLANNED (gated on H)
+├── I.1: Schema project ownership + RBAC
+├── I.2: Collaborative schema management
+└── I.3: Data project sharing
+
+Phase J: Schema Evolution                   ⏳ PLANNED (gated on I)
+Phase K: React Frontend Migration           ⏳ FUTURE (gated on H + user validation)
+Phase L: Domain Intelligence                ⏳ FUTURE
+```
+
+---
+
+## Immediate Priorities
+
+1. **Internal user testing** — Exercise Journeys A, B, C in forge-app including gold dataset, identifier scheme, and validation rule workflows. Surface rough edges before investing in infrastructure.
+2. **Persistence migration (Phase G)** — Critical before deploying forge-app to Cloud Run. Container restarts currently destroy all project data (including gold datasets). Start with G.1 (Supabase setup + manifest migration).
+3. **Deploy forge-app to Cloud Run** — Once G.1 is complete. Same pattern as Harmonization Engine deployment.
+4. **Authentication (Phase H)** — Supabase Auth with Google OAuth/SSO. Gated on Phase G.
+
+---
+
+## Decision Points
+
+### 1. Naming & Branding ✅ Resolved
+Rebranded as **Forge** platform. forge-app is the primary entry point.
+
+### 2. Database & Persistence Strategy ✅ Direction set
+**Current:** Local `.cache/forge-app/` filesystem (JSON manifests).
+**Target:** Supabase (hosted PostgreSQL) as unified data layer.
+**Migration:** Phase G — migrate manifests → Supabase tables; harmonization artifacts → JSONB or GCS references.
+
+### 3. Authentication ✅ Direction set
+**Target:** Supabase Auth with Google OAuth / SSO.
+**Rollout:** Phase H, gated on Phase G (Supabase persistence must exist first).
+
+### 4. DataForge Priority ✅ Resolved
+DataForge is built and integrated. It shipped as part of forge-app Phase D/E, not as a separate future phase.
+
+### 5. Streamlit → React Frontend Migration
+**Status:** Trigger conditions not yet met.
+**Blockers:** Internal user validation, Supabase persistence, and authentication must all be live first.
+**See Phase K.**
+
+### 6. Standalone Service Deprecation
+The standalone Streamlit apps (`:8501`, `:8502`, `:8503`) remain deployable as fallbacks and for isolated service testing. No further UI investment — forge-app (`:8505`) is the primary interface.
+
+---
+
+## Success Metrics
+
+### Phases A–F (Complete) ✅
+- Single entry point for full data lifecycle (Create schema → Map → Validate → Review → Gold)
+- End-to-end Journey A/B/C completable without switching apps
+- Accepted data flows into named gold datasets with provenance
+- Zero regression in individual service functionality
+- All existing tests pass
+
+### Phase G: Persistence
+- Project data survives container restart
+- forge-app deployable to Cloud Run with min-instances ≥ 1
+
+### Phase H: Authentication
+- No unauthenticated access to forge-app
+- Projects owned and isolated by user
+
+### Phase I: Authorization
+- Org-level schema sharing working
+- Reviewer role for DataForge QC queue
+
+### Long-Term Platform Targets
+- Time to create schema from CSV reduced by 70%+ vs. manual
+- LLM suggestion acceptance rate > 60%
+- Duplicate detection accuracy > 90%
+- 10k+ records validated/month through DataForge
+- <48hr submission-to-acceptance turnaround
+
+---
+
+**Related Documentation:**
+- [forge-executive-summary.md](forge-executive-summary.md) — Platform overview
+- [forge-unified-app-spec.md](forge-unified-app-spec.md) — Unified app specification (Phases C–E)
+- [forge-user-journey.md](forge-user-journey.md) — End-to-end user workflows

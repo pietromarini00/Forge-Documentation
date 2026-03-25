@@ -1,0 +1,644 @@
+# DataForge
+
+## Product Specification v0.1
+
+---
+
+## Executive Summary
+
+**DataForge** is the data lifecycle layer of the Forge platform. It receives harmonized data, validates it against canonical schemas, manages QC workflows, handles corrections, and serves production-ready data.
+
+While SchemaForge handles "what should data look like," DataForge handles "here's actual data—make sure it conforms."
+
+---
+
+## Problem Statement
+
+After mapping source fields to a canonical schema, organizations still face:
+
+- **No automated validation** — Manual checks or custom scripts
+- **No QC workflow** — Email chains, spreadsheets, ad-hoc review
+- **No correction handling** — Errors discovered post-acceptance require manual remediation
+- **No versioning** — Changes overwrite history
+- **No provenance** — Can't trace data lineage
+
+**Result:** Data quality issues slip through. Corrections are painful. Audit requirements aren't met.
+
+---
+
+## Solution
+
+DataForge provides a structured data lifecycle:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                          DATAFORGE                                   │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│   INGEST          VALIDATE         REVIEW           SERVE          │
+│   ──────          ────────         ──────           ─────          │
+│                                                                     │
+│   Upload data     Schema checks    QC queue         Query API      │
+│   Apply mappings  Rule evaluation  Claim/release    Export         │
+│   Parse & store   Cross-ref        Approve/reject   Push to        │
+│                   validation       Corrections      downstream     │
+│                                                                     │
+│   ─────────────────────────────────────────────────────────────    │
+│                                                                     │
+│   VERSIONING              PROVENANCE              AUDIT            │
+│   ──────────              ──────────              ─────            │
+│   Every change tracked    Full data lineage      Every action     │
+│                                                   logged           │
+│                                                                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Target Users
+
+### Primary: Data Submitter
+- Uploads harmonized data batches
+- Reviews validation errors
+- Submits corrections
+
+### Secondary: QC Reviewer
+- Reviews flagged submissions
+- Approves or rejects with comments
+- Manages review queue
+
+### Tertiary: Data Consumer
+- Queries accepted data via API
+- Exports for downstream use
+- Trusts data quality
+
+---
+
+## Core Concepts
+
+### Project
+A tenant container for schemas, submissions, and users.
+
+```yaml
+project:
+  id: "uuid"
+  name: "Neurodegenerative Research Consortium"
+  slug: "nrc"
+  schema_id: "uuid"                    # From SchemaForge Registry
+  settings:
+    require_review: true
+    auto_accept_threshold: null        # Confidence score for auto-accept
+    retention_days: 365
+  created_at: "2025-01-01T00:00:00Z"
+```
+
+### Submission
+A batch of data going through the validation pipeline.
+
+```yaml
+submission:
+  id: "uuid"
+  project_id: "uuid"
+  external_id: "STUDY_A_batch_47"      # User-provided identifier
+  
+  # Status
+  status: "pending_review"             # uploaded | validating | pending_review | 
+                                       # accepted | rejected | correcting
+  
+  # Content
+  record_count: 847
+  current_version_id: "uuid"
+  
+  # Workflow
+  claimed_by: "uuid"                   # Reviewer who claimed it
+  claimed_at: "2025-01-15T10:00:00Z"
+  
+  # Timestamps
+  uploaded_by: "uuid"
+  uploaded_at: "2025-01-15T09:00:00Z"
+  accepted_at: null
+```
+
+### Version
+An immutable snapshot of submission data.
+
+```yaml
+version:
+  id: "uuid"
+  submission_id: "uuid"
+  version_number: 3
+  
+  # Content
+  data: [...]                          # Array of records (JSONB)
+  record_count: 847
+  
+  # Validation
+  validation_result:
+    valid: false
+    error_count: 12
+    warning_count: 34
+    errors: [...]
+  
+  # Metadata
+  created_by: "uuid"
+  created_at: "2025-01-15T11:30:00Z"
+  reason: "Fixed date format errors"
+```
+
+### Record
+A single data row within a submission.
+
+```yaml
+record:
+  id: "uuid"
+  submission_id: "uuid"
+  version_id: "uuid"
+  row_number: 47
+  
+  # Content
+  data:
+    sample_id: "NRC_0047"
+    age_at_onset: 67
+    biological_sex: "Female"
+    phenotype: "Parkinson's Disease"
+  
+  # Validation state
+  valid: true
+  errors: []
+  warnings: []
+```
+
+### Validation Rule
+A check that data must pass.
+
+```yaml
+rule:
+  id: "uuid"
+  schema_id: "uuid"
+  
+  # Identity
+  name: "control_no_onset"
+  description: "Control phenotypes cannot have age_at_onset"
+  
+  # Logic
+  type: "conditional"                  # field | row | submission | cross_submission
+  condition: "phenotype IN ('Control', 'Population Control')"
+  constraint: "age_at_onset IS NULL"
+  
+  # Behavior
+  severity: "error"                    # error | warning | info
+  action: "flag"                       # flag | auto_clear | auto_fix
+  
+  enabled: true
+```
+
+### Action
+An audit log entry.
+
+```yaml
+action:
+  id: "uuid"
+  submission_id: "uuid"
+  version_id: "uuid"
+  
+  action_type: "approve"               # upload | validate | claim | release | 
+                                       # approve | reject | edit | export
+  
+  details:
+    comment: "All errors resolved. Approved."
+  
+  performed_by: "uuid"
+  performed_at: "2025-01-15T14:30:00Z"
+```
+
+---
+
+## Features
+
+### F1: Data Ingestion
+
+**F1.1: Upload**
+- Accept CSV, Excel, JSON, Parquet
+- Parse and validate file structure
+- Create initial version
+
+**F1.2: Transform Application**
+- Apply mappings from SchemaForge Harmonization Engine
+- Execute value transforms
+- Handle unmapped fields
+
+**F1.3: Metadata Extraction**
+- Infer types from values
+- Calculate statistics
+- Detect anomalies
+
+---
+
+### F2: Validation Engine
+
+**F2.1: Field-Level Validation**
+
+| Check | Description |
+|-------|-------------|
+| Required | Field present and non-null |
+| Type | Value matches declared type |
+| Allowed values | Value in enumerated list |
+| Range | Numeric within bounds |
+| Pattern | String matches regex |
+| Unique | Value unique within submission |
+
+**F2.2: Row-Level Validation (Conditional Rules)**
+
+Rules spanning multiple fields in a single row:
+
+```python
+# Example: If phenotype is Control, age_at_onset must be null
+if row["phenotype"] in ["Control", "Population Control"]:
+    if row["age_at_onset"] is not None:
+        yield Error("control_no_onset", row=row_num, field="age_at_onset")
+```
+
+**F2.3: Submission-Level Validation**
+
+| Check | Description |
+|-------|-------------|
+| Uniqueness | No duplicate IDs within submission |
+| Referential integrity | Foreign keys resolve |
+| Aggregate rules | e.g., "≥10% controls" |
+
+**F2.4: Cross-Submission Validation**
+
+| Check | Description |
+|-------|-------------|
+| Entity consistency | Same ID → same immutable values |
+| No duplicates | Same ID not submitted twice |
+| Sequential integrity | ID sequences maintained |
+
+---
+
+### F3: QC Workflow
+
+**F3.1: Review Queue**
+- List submissions awaiting review
+- Sort by date, priority, error count
+- Filter by status, submitter
+
+**F3.2: Claim/Release**
+- Reviewer claims submission for exclusive access
+- Release returns to queue
+- Timeout auto-releases stale claims
+
+**F3.3: Review Interface**
+- View all records with errors highlighted
+- Inline editing for corrections
+- Bulk actions for common fixes
+
+**F3.4: Approve/Reject**
+- Approve moves to accepted state
+- Reject returns to submitter with comments
+- Both create audit entries
+
+---
+
+### F4: Corrections Flow
+
+**F4.1: Submitter Corrections**
+- Submitter uploads corrected version
+- System shows diff from previous
+- Re-validates automatically
+
+**F4.2: Post-Acceptance Corrections**
+- Accepted data can be corrected
+- Creates new version with audit trail
+- Triggers re-validation
+
+**F4.3: Reviewer-Initiated Edits**
+- Reviewer can fix minor issues directly
+- All changes tracked per-field
+- Original values preserved
+
+---
+
+### F5: Data Serving
+
+**F5.1: Query API**
+- Filter accepted records
+- Paginate results
+- Select fields
+
+**F5.2: Export**
+- CSV, JSON, Parquet
+- Include/exclude metadata
+- Filter by criteria
+
+**F5.3: Downstream Push**
+- Webhook on acceptance
+- Push to data warehouse
+- Sync to external systems
+
+---
+
+### F6: Provenance & Audit
+
+**F6.1: Data Lineage**
+- Source file → submission → version → record
+- Track transforms applied
+- Link to SchemaForge mappings
+
+**F6.2: Change History**
+- Every field change tracked
+- Before/after values
+- Who, when, why
+
+**F6.3: Audit Log**
+- Every action recorded
+- Immutable
+- Exportable for compliance
+
+---
+
+## API Design
+
+### Submissions
+
+```
+POST   /api/v1/submissions                    # Upload new submission
+GET    /api/v1/submissions                    # List submissions
+GET    /api/v1/submissions/{id}               # Get submission
+DELETE /api/v1/submissions/{id}               # Cancel submission
+
+POST   /api/v1/submissions/{id}/validate      # Run validation
+GET    /api/v1/submissions/{id}/validation    # Get validation results
+
+POST   /api/v1/submissions/{id}/claim         # Claim for review
+POST   /api/v1/submissions/{id}/release       # Release claim
+POST   /api/v1/submissions/{id}/approve       # Approve
+POST   /api/v1/submissions/{id}/reject        # Reject
+```
+
+### Versions
+
+```
+GET    /api/v1/submissions/{id}/versions      # List versions
+GET    /api/v1/versions/{id}                  # Get version
+POST   /api/v1/submissions/{id}/versions      # Create new version (correction)
+GET    /api/v1/versions/{id}/diff             # Diff with previous version
+```
+
+### Records
+
+```
+GET    /api/v1/submissions/{id}/records       # List records (paginated)
+GET    /api/v1/records/{id}                   # Get record
+PUT    /api/v1/records/{id}                   # Edit record (creates version)
+GET    /api/v1/records/{id}/history           # Record change history
+```
+
+### Data Access
+
+```
+GET    /api/v1/data                           # Query accepted data
+GET    /api/v1/data/export                    # Export data
+POST   /api/v1/data/query                     # Advanced query
+```
+
+### Audit
+
+```
+GET    /api/v1/submissions/{id}/actions       # Submission audit log
+GET    /api/v1/records/{id}/changes           # Record change log
+GET    /api/v1/audit                          # Global audit log
+```
+
+---
+
+## Integration with SchemaForge
+
+### Consuming Schemas
+
+```python
+# Pull schema for validation
+schema = await schemaforge.get(f"/api/v1/schemas/{schema_id}/export")
+
+# Build validators from schema elements
+validators = build_validators(schema)
+```
+
+### Consuming Mappings
+
+```python
+# Pull mappings for transform
+mappings = await schemaforge.get(f"/api/v1/sources/{source_id}/mappings")
+
+# Apply transforms during ingest
+transformed = apply_mappings(raw_data, mappings)
+```
+
+### Providing Feedback
+
+```python
+# Report validation failures (informs schema quality)
+await schemaforge.post(f"/api/v1/feedback/validation", {
+    "element_id": element_id,
+    "failure_type": "out_of_range",
+    "count": 47,
+    "sample_values": ["-1", "999", "invalid"]
+})
+```
+
+---
+
+## Data Model
+
+### Database Schema (PostgreSQL)
+
+```sql
+CREATE TABLE projects (
+    id UUID PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    slug VARCHAR(100) UNIQUE NOT NULL,
+    schema_id UUID NOT NULL,              -- Reference to SchemaForge
+    settings JSONB,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE submissions (
+    id UUID PRIMARY KEY,
+    project_id UUID REFERENCES projects(id),
+    external_id VARCHAR(255),
+    status VARCHAR(30) NOT NULL DEFAULT 'uploaded',
+    record_count INTEGER,
+    current_version_id UUID,
+    claimed_by UUID REFERENCES users(id),
+    claimed_at TIMESTAMP,
+    uploaded_by UUID REFERENCES users(id),
+    uploaded_at TIMESTAMP DEFAULT NOW(),
+    accepted_at TIMESTAMP,
+    
+    UNIQUE(project_id, external_id)
+);
+
+CREATE TABLE versions (
+    id UUID PRIMARY KEY,
+    submission_id UUID REFERENCES submissions(id) ON DELETE CASCADE,
+    version_number INTEGER NOT NULL,
+    data JSONB NOT NULL,
+    record_count INTEGER,
+    validation_result JSONB,
+    created_by UUID REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    reason TEXT,
+    
+    UNIQUE(submission_id, version_number)
+);
+
+CREATE TABLE validation_rules (
+    id UUID PRIMARY KEY,
+    project_id UUID REFERENCES projects(id),
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    rule_type VARCHAR(30) NOT NULL,
+    condition TEXT,
+    constraint_expr TEXT,
+    severity VARCHAR(20) DEFAULT 'error',
+    action VARCHAR(20) DEFAULT 'flag',
+    enabled BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE actions (
+    id UUID PRIMARY KEY,
+    submission_id UUID REFERENCES submissions(id),
+    version_id UUID REFERENCES versions(id),
+    action_type VARCHAR(30) NOT NULL,
+    details JSONB,
+    performed_by UUID REFERENCES users(id),
+    performed_at TIMESTAMP DEFAULT NOW()
+);
+
+-- For cross-submission validation, track accepted entities
+CREATE TABLE accepted_entities (
+    id UUID PRIMARY KEY,
+    project_id UUID REFERENCES projects(id),
+    entity_id VARCHAR(255) NOT NULL,      -- e.g., sample_id
+    submission_id UUID REFERENCES submissions(id),
+    immutable_data JSONB,                 -- Fields that can't change
+    accepted_at TIMESTAMP DEFAULT NOW(),
+    
+    UNIQUE(project_id, entity_id)
+);
+
+-- Indexes
+CREATE INDEX idx_submissions_project ON submissions(project_id);
+CREATE INDEX idx_submissions_status ON submissions(status);
+CREATE INDEX idx_versions_submission ON versions(submission_id);
+CREATE INDEX idx_actions_submission ON actions(submission_id);
+CREATE INDEX idx_accepted_entities_lookup ON accepted_entities(project_id, entity_id);
+```
+
+---
+
+## Implementation Phases
+
+### Phase 1: MVP
+**Goal:** Basic ingest → validate → approve flow
+
+- [ ] Project and submission management
+- [ ] File upload (CSV, Excel)
+- [ ] Field-level validation
+- [ ] Simple review UI
+- [ ] Approve/reject workflow
+- [ ] Basic audit log
+
+**Deliverable:** Replaces spreadsheet-based QC
+
+### Phase 2: Corrections
+**Goal:** Handle data corrections properly
+
+- [ ] Version tracking
+- [ ] Diff view between versions
+- [ ] Inline editing
+- [ ] Post-acceptance corrections
+- [ ] Change history per record
+
+**Deliverable:** Proper correction workflow
+
+### Phase 3: Advanced Validation
+**Goal:** Complex rule support
+
+- [ ] Conditional (row-level) rules
+- [ ] Submission-level rules
+- [ ] Cross-submission validation
+- [ ] Custom rule definitions
+
+**Deliverable:** Comprehensive validation
+
+### Phase 4: SchemaForge Integration
+**Goal:** Connect to SchemaForge
+
+- [ ] Pull schemas from Registry Service
+- [ ] Apply mappings from Harmonization Engine
+- [ ] Send feedback to SchemaForge
+- [ ] Webhook notifications
+
+**Deliverable:** Full Forge platform integration
+
+### Phase 5: Scale & Serve
+**Goal:** Production data serving
+
+- [ ] Query API for accepted data
+- [ ] Export to multiple formats
+- [ ] Push to downstream systems
+- [ ] Performance optimization
+
+**Deliverable:** Production-ready data platform
+
+---
+
+## Success Metrics
+
+### Quality
+- Validation error catch rate
+- Post-acceptance correction rate (lower is better)
+- Time to identify issues
+
+### Efficiency
+- Review time per submission
+- Submissions processed per day
+- Correction turnaround time
+
+### Compliance
+- Audit completeness (100%)
+- Provenance traceability
+- Change accountability
+
+---
+
+## Risks & Mitigations
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Validation too strict | Submitter frustration | Warning vs. error distinction, configurable rules |
+| Large file handling | Performance issues | Streaming upload, async validation |
+| Cross-submission perf | Slow validation | Materialized entity index, incremental checks |
+| Data loss | Trust erosion | Immutable versions, soft deletes, backups |
+
+---
+
+## What DataForge Does NOT Do
+
+To maintain focus, explicitly out of scope:
+
+| Capability | Why Not | Where Instead |
+|------------|---------|---------------|
+| Schema creation | Different concern | SchemaForge Curation Workbench |
+| Field mapping | Different concern | SchemaForge Harmonization Engine |
+| Analytics/BI | Specialized tools better | Metabase, Looker, Tableau |
+| Data warehousing | Scale/cost concerns | BigQuery, Snowflake |
+| ML model training | Specialized infrastructure | Vertex AI, SageMaker |
+| Long-term file storage | Not core competency | GCS, S3 |
+
+---
+
+*Document Version: 0.1*
+*Last Updated: 2025-01-17*
+*Author: Forge Team*

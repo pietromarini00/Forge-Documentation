@@ -1,0 +1,393 @@
+# Data Model Reference
+
+Every Pydantic model and ORM model in the platform, grouped by service.
+
+---
+
+## Registry Service (PostgreSQL ORM)
+
+### `Schema`
+> `services/registry-service/app/models/schema.py`
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | UUID | PK |
+| `name` | str | Unique slug, indexed. Must match `^[a-z0-9_-]+$`. |
+| `display_name` | str | Human-readable name |
+| `description` | str? | |
+| `version` | int | Auto-incremented on update |
+| `is_active` | bool | Soft-delete flag |
+| `is_published` | bool | |
+| `metadata_` | JSONB? | Stores `validation_rules` and other extensible data |
+| `created_at` | datetime | |
+| `updated_at` | datetime | |
+
+**Relationships:** `elements` (1:many → Element), `versions` (1:many → SchemaVersion)
+
+### `Element`
+> `services/registry-service/app/models/element.py`
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | UUID | PK |
+| `schema_id` | UUID | FK → Schema, indexed |
+| `item` | str | Element name, indexed. Unique within schema. |
+| `description` | str | |
+| `collection` | str? | Grouping category |
+| `item_type` | str? | STRING, NUMERIC, ENUM, DATE, BINARY |
+| `values` | str? | Pipe-separated allowed values |
+| `alternate_names` | str? | Pipe-separated aliases |
+| `priority` | str? | REQUIRED or OPTIONAL |
+| `sort_order` | int | Display ordering |
+| `is_active` | bool | Soft-delete flag |
+| `metadata_` | JSONB? | |
+
+**Constraints:** Unique(schema_id, item), Index(schema_id, collection)
+
+### `SchemaVersion`
+> `services/registry-service/app/models/schema_version.py`
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | UUID | PK |
+| `schema_id` | UUID | FK → Schema |
+| `version` | int | |
+| `snapshot` | JSONB | Full schema state at this version |
+| `change_summary` | str? | |
+| `changed_by` | str? | |
+| `created_at` | datetime | |
+
+### `ValueSet`
+> `services/registry-service/app/models/value_set.py`
+
+| Column | Type | Notes |
+|--------|------|-------|
+| `id` | UUID | PK |
+| `name` | str | Unique slug |
+| `display_name` | str | |
+| `description` | str? | |
+| `value_set_type` | str | "flat" or "hierarchical" |
+| `version` | int | |
+| `is_active` | bool | |
+| `is_published` | bool | |
+| `entries` | JSONB | List of row dicts |
+| `columns` | JSONB | Column definitions |
+| `code_column` | str | Which column is the code |
+| `display_column` | str | Which column is the display label |
+| `parent_column` | str? | For hierarchical sets |
+| `metadata_` | JSONB? | |
+
+**Relationships:** `versions` (1:many → ValueSetVersion)
+
+---
+
+## DataForge (Pydantic, persisted as JSON files)
+
+### `Submission`
+> `services/dataforge/src/dataforge/submission/models.py`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | UUID | |
+| `project` | str | Project name |
+| `study` | str | Study name |
+| `schema_name` | str | |
+| `schema_id` | str? | Registry schema UUID. Persisted for resubmit. |
+| `gold_dataset_id` | UUID? | Target gold dataset |
+| `submitter` | str | Unvalidated string (no auth yet) |
+| `status` | SubmissionStatus | See state machine in API Reference |
+| `versions` | list[SubmissionVersion] | Append-only version history |
+| `claimed_by` | str? | Reviewer who holds the claim |
+| `claimed_at` | datetime? | Claim expiry tracked from this |
+| `created_at` | datetime | |
+| `updated_at` | datetime | |
+
+### `SubmissionVersion`
+> Same file
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `version` | int | 1-indexed |
+| `file_hash` | str | SHA-256 of uploaded file |
+| `file_name` | str | |
+| `row_count` | int | |
+| `column_count` | int | |
+| `uploaded_at` | datetime | |
+| `validation_result_id` | str? | |
+
+### `ValidationResult`
+> `services/dataforge/src/dataforge/validation/models.py`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `schema_name` | str | |
+| `schema_version` | int | |
+| `record_count` | int | |
+| `column_count` | int | |
+| `issues` | list[ValidationIssue] | |
+| `columns_mapped` | dict[str, str] | Source → canonical column mapping |
+| `is_valid` | bool | Computed: no ERROR-severity issues |
+| `error_count` | int | Computed |
+| `warning_count` | int | Computed |
+
+### `ValidationIssue`
+> Same file
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `issue_type` | IssueType | MISSING_REQUIRED, TYPE_ERROR, INVALID_ENUM, OUT_OF_RANGE, RULE_VIOLATION, SUBMISSION_VIOLATION |
+| `severity` | Severity | ERROR, WARNING, INFO |
+| `field` | str? | Column name |
+| `row` | int? | 1-indexed row number |
+| `rule_name` | str? | For RULE_VIOLATION type |
+| `message` | str | Human-readable description |
+| `value` | str? | The offending value |
+| `context` | dict | Additional context |
+
+### `Schema` (DataForge's internal copy)
+> `services/dataforge/src/dataforge/schema/models.py`
+
+Loaded at validation time via `RegistrySchemaLoader` from the Registry API.
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `name` | str | |
+| `display_name` | str | |
+| `version` | int | |
+| `elements` | list[FieldConfig] | |
+| `validation_rules` | list[RuleConfig] | From Registry `metadata_.validation_rules` |
+
+### `FieldConfig`
+> Same file
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `item` | str | Field name |
+| `description` | str | |
+| `collection` | str? | |
+| `item_type` | ItemType | STRING, NUMERIC, ENUM, DATE, BINARY |
+| `values` | str? | Pipe-separated allowed values |
+| `alternate_names` | str? | Pipe-separated |
+| `priority` | Priority | REQUIRED or OPTIONAL |
+
+### `RuleConfig`
+> Same file
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `name` | str | |
+| `description` | str? | |
+| `rule_type` | RuleType | CONDITIONAL or SUBMISSION |
+| `condition` | str? | Python expression (e.g., `row['status'] == 'affected'`) |
+| `constraint` | str | Python expression that must evaluate to True |
+| `severity` | Severity | ERROR or WARNING |
+| `enabled` | bool | |
+
+### `GoldDataset`
+> `services/dataforge/src/dataforge/gold/models.py`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | UUID | |
+| `name` | str | |
+| `description` | str | |
+| `schema_id` | str | Registry schema UUID |
+| `schema_name` | str | |
+| `identifier_scheme` | IdentifierScheme? | Dedup + ID generation config |
+| `created_by` | str | |
+| `created_at` | datetime | |
+| `updated_at` | datetime | |
+| `record_count` | int | |
+| `submission_count` | int | |
+
+### `IdentifierScheme`
+> Same file
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `identifiers` | list[IdentifierDef] | Source and golden ID definitions |
+| `dedup` | DedupStrategy | Match keys + duplicate action |
+| `assignment` | AssignmentTiming | ON_UPLOAD, ON_REVIEW, or ON_ACCEPT |
+
+### `IdentifierDef`
+> Same file
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `name` | str | Column name for this ID |
+| `id_class` | IdClass | SOURCE or GOLDEN |
+| `scope` | IdScope | ENTITY or RECORD |
+| `source_columns` | list[str] | Columns to read from submitted data |
+| `generation` | IdGeneration? | How to generate (UUID, template, composite) |
+| `parent` | str? | Parent ID name for hierarchical IDs |
+| `mutability` | ColumnMutability | SUBMITTER, MANAGER, or SYSTEM |
+
+### `AuditEntry`
+> `services/dataforge/src/dataforge/audit/models.py`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `action` | AuditAction | SUBMISSION_CREATED, STATUS_CHANGED, FILE_UPLOADED, VALIDATION_RUN, REVIEW_CLAIMED, REVIEW_RELEASED, REVIEW_ACCEPTED, REVIEW_REJECTED, REVIEW_GOLD_ASSIGNED |
+| `actor` | str | Who performed the action |
+| `timestamp` | datetime | UTC |
+| `details` | dict | Action-specific context |
+
+Stored as append-only JSONL at `{storage_root}/submissions/{submission_id}/audit.jsonl`.
+
+---
+
+## forge-app (Pydantic, persisted as local JSON/CSV files)
+
+### `SchemaProjectManifest`
+> `services/forge-app/schemas/manifest.py`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `project_id` | str | |
+| `project_name` | str | |
+| `user_id` | str | Currently set to user email |
+| `current_step` | int | Wizard step (1-5) |
+| `created_at` | datetime | |
+| `modified_at` | datetime | |
+| `source_filename` | str | Uploaded CDE file name |
+| `source_row_count` | int | |
+| `variable_count` | int | |
+| `completed_variables` | int | |
+| `published_schema_id` | str? | Set after successful publish to Registry |
+| `published_schema_name` | str? | |
+| `steps` | dict[str, StepMetadata] | Per-step completion tracking |
+
+### `DataProjectManifest`
+> Same file
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `project_id` | str | |
+| `project_name` | str | |
+| `user_id` | str | |
+| `schema_id` | str | Registry schema UUID |
+| `schema_name` | str | |
+| `schema_version` | int | |
+| `harmonization_enabled` | bool | |
+| `harmonization_step` | int? | |
+| `harmonization_complete` | bool | |
+| `pipeline_step` | int | Current wizard step (1-5) |
+| `study` | str | |
+| `validation_complete` | bool | |
+| `has_data_file` | bool | Whether a data file was uploaded alongside the data dict |
+| `data_file_name` | str? | |
+| `gold_dataset_id` | str? | |
+| `gold_dataset_name` | str? | |
+| `submission_ids` | list[str] | All submission UUIDs created from this project |
+| `active_submission_id` | str? | Current/latest submission |
+| `steps` | dict[str, StepMetadata] | |
+
+### `CurationSession`
+> `services/forge-app/core/curation/models.py`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `project_id` | str | |
+| `source_filename` | str | |
+| `source_row_count` | int | |
+| `current_step` | int | |
+| `config` | CurationConfig | Naming, AI, and retrieval settings |
+| `column_mapping` | dict[str, str] | Source column → canonical column mapping |
+| `duplicate_groups` | list[DuplicateGroup] | Detected duplicates |
+| `variable_similarities` | dict[str, dict[str, float]] | Pairwise similarity scores |
+| `suggestions_complete` | bool | |
+| `element_curations` | dict[str, ElementCuration] | **Keyed by variable name** |
+| `curated_elements` | list[CuratedElement] | Final curated output |
+| `validation_rules` | list[dict] | Rules built in Step 4 |
+
+### `ElementCuration`
+> Same file
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `source_variable` | str | Original variable name |
+| `source_row` | int | |
+| `decision` | CurationDecision | PENDING, ACCEPTED, MODIFIED, REJECTED, SKIPPED, MERGED |
+| `curated_element` | CuratedElement? | The curated result (if accepted/modified) |
+| `curation_notes` | str | |
+| `curated_at` | datetime? | |
+
+### `CuratedElement`
+> Same file
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `name` | str | Cleaned variable name |
+| `display_name` | str | |
+| `description` | str | |
+| `type` | ElementType | STRING, INTEGER, FLOAT, BOOLEAN, ENUM, DATE, DATETIME |
+| `nullable` | bool | |
+| `constraints` | dict? | e.g., `{"min": 0, "max": 120}` |
+| `allowed_values` | list[str]? | For ENUM type |
+| `collection` | str? | |
+| `aliases` | list[str] | |
+| `ai_suggested` | bool | |
+| `user_modified` | bool | |
+
+### `CuratedMatchSet`
+> `services/forge-app/core/harmonization/models.py`
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `metadata` | CuratedMatchSetMetadata | Name, description, source file, schema, timestamps |
+| `field_curations` | list[FieldMatchCuration] | One per source field |
+
+### `FieldMatchCuration`
+> Same file
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `source_name` | str | Source field name |
+| `source_form` | str | |
+| `source_description` | str | |
+| `source_values` | str | |
+| `ai_matched_cde` | str | AI's best match |
+| `ai_matched_description` | str | |
+| `ai_matched_collection` | str | |
+| `ai_match_confidence` | float | 0.0 - 1.0 |
+| `ai_match_status` | str | HIGH_QUALITY_MATCH, MEDIUM_QUALITY_MATCH, etc. |
+| `ai_rationale` | str | AI's explanation |
+| `ai_concerns` | str | |
+| `ai_alternative_matches` | list[str] | |
+| `ai_needs_new_cde` | bool | True if no good match exists |
+| `curation_decision` | CurationDecision | PENDING, ACCEPTED, REJECTED, MODIFIED |
+| `curated_cde` | str? | Override CDE (if MODIFIED) |
+| `curation_notes` | str | |
+| `curated_at` | datetime? | |
+| `curated_by` | str | |
+
+---
+
+## Cross-Service Relationships
+
+```
+SchemaProjectManifest.published_schema_id ──→ Registry Schema.id
+DataProjectManifest.schema_id ─────────────→ Registry Schema.id
+DataProjectManifest.gold_dataset_id ───────→ GoldDataset.id
+DataProjectManifest.active_submission_id ──→ Submission.id
+Submission.schema_id ──────────────────────→ Registry Schema.id
+Submission.gold_dataset_id ────────────────→ GoldDataset.id
+GoldDataset.schema_id ────────────────────→ Registry Schema.id
+```
+
+---
+
+## Storage Locations
+
+| Data | Where | Format |
+|------|-------|--------|
+| Schemas, elements, versions | PostgreSQL (Registry) | SQLAlchemy ORM |
+| Value sets | PostgreSQL (Registry) | SQLAlchemy ORM |
+| Schema project manifests | `.cache/forge-app/schema_projects/{user}/{id}/` | JSON |
+| Curation sessions | `.cache/forge-app/schema_projects/{user}/{id}/` | JSON |
+| Data project manifests | `.cache/forge-app/data_projects/{user}/` | JSON |
+| Harmonization artifacts | `.cache/forge-app/harmonization/{project}/{user}/` | CSV + JSON |
+| Submissions + versions | `data/storage/submissions/{id}/` | JSON + CSV |
+| Validation results | `data/storage/submissions/{id}/v{n}/` | JSON |
+| Audit logs | `data/storage/submissions/{id}/` | JSONL (append-only) |
+| Gold datasets | `data/gold/{id}/` | JSON metadata + CSV data |

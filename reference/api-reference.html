@@ -1,0 +1,550 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Data Model Reference" href="data-models.html" />
+    <link rel="prev" title="Forge Platform — Roles, Permissions &amp; Governance" href="../specs/roles-and-governance.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../specs/api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#registry-service-8000">Registry Service — <code class="docutils literal notranslate"><span class="pre">:8000</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#schemas">Schemas</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schema-elements">Schema Elements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#value-sets">Value Sets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#health">Health</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#dataforge-api-8001">DataForge API — <code class="docutils literal notranslate"><span class="pre">:8001</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submissions">Submissions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#review-workflow">Review Workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gold-datasets">Gold Datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#submission-state-machine">Submission State Machine</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Health</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#key-conventions">Key Conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-doesn-t-have-an-api-yet">What Doesn’t Have an API Yet</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/api-reference.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-reference">
+<h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h1>
+<p>Two FastAPI services. No authentication currently.</p>
+<hr class="docutils" />
+<section id="registry-service-8000">
+<h2>Registry Service — <code class="docutils literal notranslate"><span class="pre">:8000</span></code><a class="headerlink" href="#registry-service-8000" title="Link to this heading"></a></h2>
+<p>Schema storage, versioning, and export.</p>
+<section id="schemas">
+<h3>Schemas<a class="headerlink" href="#schemas" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Path</p></th>
+<th class="head"><p>What it does</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/schemas/</span></code></p></td>
+<td><p>List schemas. Query: <code class="docutils literal notranslate"><span class="pre">skip</span></code>, <code class="docutils literal notranslate"><span class="pre">limit</span></code>, <code class="docutils literal notranslate"><span class="pre">include_inactive</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/schemas/</span></code></p></td>
+<td><p>Create schema (optionally with elements inline). Body: <code class="docutils literal notranslate"><span class="pre">SchemaCreate</span></code>. Returns 201.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/schemas/{id}</span></code></p></td>
+<td><p>Get schema + all active elements.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/schemas/name/{name}</span></code></p></td>
+<td><p>Get schema by slug name.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PUT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/schemas/{id}</span></code></p></td>
+<td><p>Update schema. Auto-increments version, creates snapshot. Query: <code class="docutils literal notranslate"><span class="pre">change_summary</span></code>. Body: <code class="docutils literal notranslate"><span class="pre">SchemaUpdate</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DELETE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/schemas/{id}</span></code></p></td>
+<td><p>Soft-delete (default) or hard-delete. Query: <code class="docutils literal notranslate"><span class="pre">hard_delete</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/schemas/{id}/publish</span></code></p></td>
+<td><p>Mark schema as published.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/schemas/{id}/versions</span></code></p></td>
+<td><p>List version history.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/schemas/{id}/versions/{v}/restore</span></code></p></td>
+<td><p>Restore to a previous version.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/schemas/{id}/export</span></code></p></td>
+<td><p>Export as JSON, YAML, CSV, or TSV. Query: <code class="docutils literal notranslate"><span class="pre">format</span></code>, <code class="docutils literal notranslate"><span class="pre">include_metadata</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="schema-elements">
+<h3>Schema Elements<a class="headerlink" href="#schema-elements" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Path</p></th>
+<th class="head"><p>What it does</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/schemas/{id}/elements</span></code></p></td>
+<td><p>List elements. Query: <code class="docutils literal notranslate"><span class="pre">collection</span></code>, <code class="docutils literal notranslate"><span class="pre">skip</span></code>, <code class="docutils literal notranslate"><span class="pre">limit</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/schemas/{id}/elements</span></code></p></td>
+<td><p>Add one element. Body: <code class="docutils literal notranslate"><span class="pre">ElementCreate</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/schemas/{id}/elements/bulk</span></code></p></td>
+<td><p>Add many elements. Body: <code class="docutils literal notranslate"><span class="pre">list[ElementCreate]</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/elements/</span></code></p></td>
+<td><p>List all elements across schemas. Query: <code class="docutils literal notranslate"><span class="pre">schema_id</span></code>, <code class="docutils literal notranslate"><span class="pre">collection</span></code>, <code class="docutils literal notranslate"><span class="pre">skip</span></code>, <code class="docutils literal notranslate"><span class="pre">limit</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/elements/search</span></code></p></td>
+<td><p>Search by name/description/aliases. Query: <code class="docutils literal notranslate"><span class="pre">q</span></code> (required), <code class="docutils literal notranslate"><span class="pre">schema_id</span></code>, <code class="docutils literal notranslate"><span class="pre">limit</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/elements/</span></code></p></td>
+<td><p>Create element. Query: <code class="docutils literal notranslate"><span class="pre">schema_id</span></code> (required).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/elements/{id}</span></code></p></td>
+<td><p>Get element by ID.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PUT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/elements/{id}</span></code></p></td>
+<td><p>Update element.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DELETE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/elements/{id}</span></code></p></td>
+<td><p>Soft or hard delete.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/elements/{id}/history</span></code></p></td>
+<td><p>Change history (derived from schema version snapshots).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="value-sets">
+<h3>Value Sets<a class="headerlink" href="#value-sets" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Path</p></th>
+<th class="head"><p>What it does</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/value-sets/</span></code></p></td>
+<td><p>List value sets. Query: <code class="docutils literal notranslate"><span class="pre">published_only</span></code>, <code class="docutils literal notranslate"><span class="pre">value_set_type</span></code>, <code class="docutils literal notranslate"><span class="pre">skip</span></code>, <code class="docutils literal notranslate"><span class="pre">limit</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/value-sets/</span></code></p></td>
+<td><p>Create value set. Body: <code class="docutils literal notranslate"><span class="pre">ValueSetCreate</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/value-sets/upload</span></code></p></td>
+<td><p>Create from CSV/TSV file upload. Form: <code class="docutils literal notranslate"><span class="pre">file</span></code>, <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">display_name</span></code>, <code class="docutils literal notranslate"><span class="pre">code_column</span></code>, <code class="docutils literal notranslate"><span class="pre">display_column</span></code>, etc.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/value-sets/{id}</span></code></p></td>
+<td><p>Get value set + entries. Query: <code class="docutils literal notranslate"><span class="pre">version</span></code> (optional, for historical).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/value-sets/name/{name}</span></code></p></td>
+<td><p>Get by slug name.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">PUT</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/value-sets/{id}</span></code></p></td>
+<td><p>Update. Auto-increments version.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DELETE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/value-sets/{id}</span></code></p></td>
+<td><p>Soft or hard delete.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/value-sets/{id}/publish</span></code></p></td>
+<td><p>Mark as published.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/value-sets/{id}/versions</span></code></p></td>
+<td><p>Version history.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/value-sets/{id}/versions/{v}/restore</span></code></p></td>
+<td><p>Restore to previous version.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/value-sets/{id}/codes</span></code></p></td>
+<td><p>Flat list of code values (lightweight, for validation).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="health">
+<h3>Health<a class="headerlink" href="#health" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Path</p></th>
+<th class="head"><p>What it does</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/health</span></code></p></td>
+<td><p>Returns status + database connectivity.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/</span></code></p></td>
+<td><p>Service info (name, version).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<hr class="docutils" />
+<section id="dataforge-api-8001">
+<h2>DataForge API — <code class="docutils literal notranslate"><span class="pre">:8001</span></code><a class="headerlink" href="#dataforge-api-8001" title="Link to this heading"></a></h2>
+<p>Data validation, review workflows, and gold datasets.</p>
+<section id="submissions">
+<h3>Submissions<a class="headerlink" href="#submissions" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Path</p></th>
+<th class="head"><p>What it does</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/submissions/</span></code></p></td>
+<td><p>Upload CSV + run validation. Form: <code class="docutils literal notranslate"><span class="pre">file</span></code>, <code class="docutils literal notranslate"><span class="pre">project</span></code>, <code class="docutils literal notranslate"><span class="pre">study</span></code>, <code class="docutils literal notranslate"><span class="pre">submitter</span></code>, <code class="docutils literal notranslate"><span class="pre">schema_id</span></code> (required), <code class="docutils literal notranslate"><span class="pre">gold_dataset_id</span></code> (optional). Returns 201.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/submissions/</span></code></p></td>
+<td><p>List submissions. Query: <code class="docutils literal notranslate"><span class="pre">status</span></code>, <code class="docutils literal notranslate"><span class="pre">project</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/submissions/{id}</span></code></p></td>
+<td><p>Get submission detail.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/submissions/{id}/resubmit</span></code></p></td>
+<td><p>Upload corrected file. Only valid when status is <code class="docutils literal notranslate"><span class="pre">CORRECTIONS_NEEDED</span></code>. Form: <code class="docutils literal notranslate"><span class="pre">file</span></code>, <code class="docutils literal notranslate"><span class="pre">submitter</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/submissions/{id}/report</span></code></p></td>
+<td><p>Download validation report. Query: <code class="docutils literal notranslate"><span class="pre">format</span></code> (json or csv).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="review-workflow">
+<h3>Review Workflow<a class="headerlink" href="#review-workflow" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Path</p></th>
+<th class="head"><p>What it does</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/submissions/{id}/claim</span></code></p></td>
+<td><p>Claim for review. Body: <code class="docutils literal notranslate"><span class="pre">{reviewer,</span> <span class="pre">notes?}</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/submissions/{id}/release</span></code></p></td>
+<td><p>Release claim. Body: <code class="docutils literal notranslate"><span class="pre">{reviewer}</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/submissions/{id}/accept</span></code></p></td>
+<td><p>Accept submission. Appends data to gold dataset (if assigned). Body: <code class="docutils literal notranslate"><span class="pre">{reviewer,</span> <span class="pre">notes?}</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/submissions/{id}/reject</span></code></p></td>
+<td><p>Reject with feedback. Body: <code class="docutils literal notranslate"><span class="pre">{reviewer,</span> <span class="pre">notes?}</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">PATCH</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/submissions/{id}/gold-dataset</span></code></p></td>
+<td><p>Assign/clear gold dataset. Reviewer must hold claim. Body: <code class="docutils literal notranslate"><span class="pre">{reviewer,</span> <span class="pre">gold_dataset_id?}</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="gold-datasets">
+<h3>Gold Datasets<a class="headerlink" href="#gold-datasets" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Path</p></th>
+<th class="head"><p>What it does</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">POST</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/gold/</span></code></p></td>
+<td><p>Create gold dataset. Body: <code class="docutils literal notranslate"><span class="pre">{name,</span> <span class="pre">schema_id,</span> <span class="pre">schema_name?,</span> <span class="pre">description?,</span> <span class="pre">identifier_scheme?,</span> <span class="pre">created_by}</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/gold/</span></code></p></td>
+<td><p>List gold datasets. Query: <code class="docutils literal notranslate"><span class="pre">schema_id</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/gold/{id}</span></code></p></td>
+<td><p>Get gold dataset metadata.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DELETE</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/gold/{id}</span></code></p></td>
+<td><p>Delete gold dataset.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/v1/gold/{id}/download</span></code></p></td>
+<td><p>Download as CSV (includes provenance columns).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="submission-state-machine">
+<h3>Submission State Machine<a class="headerlink" href="#submission-state-machine" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>UPLOADED → VALIDATING → PENDING_REVIEW → ACCEPTED
+                                       → REJECTED
+                                       → CORRECTIONS_NEEDED → (resubmit) → UPLOADED
+</pre></div>
+</div>
+</section>
+<section id="id1">
+<h3>Health<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Path</p></th>
+<th class="head"><p>What it does</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/health</span></code></p></td>
+<td><p>Returns <code class="docutils literal notranslate"><span class="pre">{status:</span> <span class="pre">&quot;healthy&quot;}</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/</span></code></p></td>
+<td><p>Service info.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<hr class="docutils" />
+<section id="key-conventions">
+<h2>Key Conventions<a class="headerlink" href="#key-conventions" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>IDs</strong> are UUIDs everywhere.</p></li>
+<li><p><strong>Schema names</strong> must match <code class="docutils literal notranslate"><span class="pre">^[a-z0-9_-]+$</span></code> (lowercase slug). 409 if name already exists.</p></li>
+<li><p><strong>Pagination</strong> uses <code class="docutils literal notranslate"><span class="pre">skip</span></code> / <code class="docutils literal notranslate"><span class="pre">limit</span></code> (not page/page_size).</p></li>
+<li><p><strong>Soft delete</strong> is the default. Pass <code class="docutils literal notranslate"><span class="pre">hard_delete=true</span></code> to permanently remove.</p></li>
+<li><p><strong>Versioning</strong> is automatic — updating a schema or value set increments the version and saves a snapshot.</p></li>
+<li><p><strong>Validation</strong> happens at upload time. <code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/submissions/</span></code> returns the submission object with validation results inline.</p></li>
+<li><p><strong>Review claims</strong> expire after 1 hour of inactivity.</p></li>
+<li><p><strong>Gold dataset provenance columns</strong>: <code class="docutils literal notranslate"><span class="pre">_submission_id</span></code>, <code class="docutils literal notranslate"><span class="pre">_version</span></code>, <code class="docutils literal notranslate"><span class="pre">_source_row</span></code>, <code class="docutils literal notranslate"><span class="pre">_accepted_at</span></code>, <code class="docutils literal notranslate"><span class="pre">_accepted_by</span></code>.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="what-doesn-t-have-an-api-yet">
+<h2>What Doesn’t Have an API Yet<a class="headerlink" href="#what-doesn-t-have-an-api-yet" title="Link to this heading"></a></h2>
+<p>These capabilities exist in <code class="docutils literal notranslate"><span class="pre">forge-app/core/</span></code> but are only accessible through the Streamlit UI:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Capability</p></th>
+<th class="head"><p>Module</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CDE file parsing</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">core/curation/parser.py</span></code></p></td>
+<td><p>CSV/TSV/Excel parsing with column auto-detection</p></td>
+</tr>
+<tr class="row-odd"><td><p>AI suggestions</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">core/curation/suggestion_service.py</span></code></p></td>
+<td><p>Claude-powered name/type/constraint suggestions</p></td>
+</tr>
+<tr class="row-even"><td><p>Duplicate detection</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">core/curation/duplicate_detector.py</span></code></p></td>
+<td><p>TF-IDF + embedding similarity</p></td>
+</tr>
+<tr class="row-odd"><td><p>Schema publish orchestration</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">core/curation/publisher.py</span></code></p></td>
+<td><p>Coordinates Registry API calls</p></td>
+</tr>
+<tr class="row-even"><td><p>Harmonization matching</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">core/harmonization/matcher.py</span></code></p></td>
+<td><p>2-tier exact + AI matching</p></td>
+</tr>
+<tr class="row-odd"><td><p>Hybrid retrieval</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">core/harmonization/retrieval.py</span></code></p></td>
+<td><p>TF-IDF + embedding candidate retrieval</p></td>
+</tr>
+<tr class="row-even"><td><p>Match curation</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">core/harmonization/curation.py</span></code></p></td>
+<td><p>Accept/reject/modify match decisions</p></td>
+</tr>
+<tr class="row-odd"><td><p>Project/workflow state</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">core/storage.py</span></code></p></td>
+<td><p>Manifest CRUD, session persistence</p></td>
+</tr>
+</tbody>
+</table>
+<p>These are the future Harmonization API and Curation API surfaces. See <a class="reference internal" href="../specs/api-first-decoupling.html"><span class="std std-doc">api-first-decoupling.md</span></a> R5 for the extraction plan.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../specs/roles-and-governance.html" class="btn btn-neutral float-left" title="Forge Platform — Roles, Permissions &amp; Governance" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="data-models.html" class="btn btn-neutral float-right" title="Data Model Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

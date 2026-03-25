@@ -1,0 +1,515 @@
+# Harmonization Engine - Cloud Run Deployment Guide
+
+Complete guide for deploying the Harmonization Engine to Google Cloud Run.
+
+---
+
+## Table of Contents
+
+- [Quick Start (5 minutes)](#quick-start-5-minutes)
+- [Prerequisites](#prerequisites)
+- [Automated Setup](#automated-setup)
+- [Manual Setup](#manual-setup)
+- [Configuration Options](#configuration-options)
+- [Monitoring and Logging](#monitoring-and-logging)
+- [Troubleshooting](#troubleshooting)
+- [Cost Optimization](#cost-optimization)
+- [Security Best Practices](#security-best-practices)
+
+---
+
+## Quick Start (5 Minutes)
+
+Fast-track automated deployment using the setup script.
+
+### Prerequisites Checklist
+
+- [ ] Google Cloud Project with billing enabled
+- [ ] gcloud CLI installed ([install](https://cloud.google.com/sdk/docs/install))
+- [ ] GitHub repository access
+- [ ] Anthropic API key
+
+### Step 1: Run Automated Setup Script
+
+```bash
+# Clone repository and navigate to it
+cd cde-engine
+
+# Run GCP setup script
+./scripts/setup-gcp.sh
+```
+
+The script will:
+- Enable required GCP APIs
+- Create Artifact Registry repository
+- Store Anthropic API key in Secret Manager
+- Create GCS bucket for cache
+- Set up Workload Identity Federation for GitHub Actions
+- Output GitHub secrets for you to add
+
+### Step 2: Add GitHub Secrets
+
+Copy the three secrets output by the script to your GitHub repository:
+
+**GitHub Repository → Settings → Secrets and variables → Actions → New repository secret**
+
+Add these three secrets:
+1. `GCP_PROJECT_ID`
+2. `GCP_WORKLOAD_IDENTITY_PROVIDER`
+3. `GCP_SERVICE_ACCOUNT`
+
+### Step 3: Deploy
+
+```bash
+# Push to production branch
+git push origin phase-a/production-deployment
+
+# Or merge PR to main
+```
+
+GitHub Actions will automatically:
+- Lint and test code
+- Build Docker image
+- Push to Artifact Registry
+- Deploy to Cloud Run
+- Run health check
+
+### Step 4: Verify Deployment
+
+```bash
+# Get service URL
+SERVICE_URL=$(gcloud run services describe cde-engine \
+  --region us-central1 \
+  --format 'value(status.url)')
+
+# Test health endpoint
+curl -f $SERVICE_URL/_stcore/health
+
+# Open in browser
+open $SERVICE_URL
+```
+
+**Done!** Your Harmonization Engine is now running.
+
+For advanced configuration, continue reading below.
+
+---
+
+## Prerequisites
+
+1. **Google Cloud Project** with billing enabled
+2. **GitHub repository** with appropriate permissions
+3. **Anthropic API key** for Claude integration
+4. **gcloud CLI** installed locally (for setup)
+
+---
+
+## Automated Setup
+
+The automated setup uses the `./scripts/setup-gcp.sh` script (see [Quick Start](#quick-start-5-minutes) above).
+
+---
+
+## Manual Setup
+
+If you prefer manual configuration or need more control:
+
+### 1. Enable Required APIs
+
+```bash
+gcloud services enable \
+  run.googleapis.com \
+  artifactregistry.googleapis.com \
+  secretmanager.googleapis.com \
+  storage-api.googleapis.com \
+  cloudbuild.googleapis.com \
+  iamcredentials.googleapis.com
+```
+
+### 2. Create Artifact Registry Repository
+
+```bash
+export PROJECT_ID=$(gcloud config get-value project)
+export REGION=us-central1
+
+gcloud artifacts repositories create cde-engine \
+  --repository-format=docker \
+  --location=$REGION \
+  --description="CDE Engine container images"
+```
+
+### 3. Store Anthropic API Key in Secret Manager
+
+```bash
+# Store the API key as a secret
+echo -n "YOUR_ANTHROPIC_API_KEY" | gcloud secrets create anthropic-api-key \
+  --data-file=-
+
+# Grant Cloud Run service account access to the secret
+gcloud secrets add-iam-policy-binding anthropic-api-key \
+  --member="serviceAccount:${PROJECT_ID}-compute@developer.gserviceaccount.com" \
+  --role="roles/secretmanager.secretAccessor"
+```
+
+### 4. Create GCS Bucket for Persistent Cache
+
+```bash
+gsutil mb -l $REGION gs://${PROJECT_ID}-cde-cache
+
+# Set lifecycle policy to delete objects older than 30 days (optional)
+cat > lifecycle.json <<EOF
+{
+  "rule": [
+    {
+      "action": {"type": "Delete"},
+      "condition": {"age": 30}
+    }
+  ]
+}
+EOF
+
+gsutil lifecycle set lifecycle.json gs://${PROJECT_ID}-cde-cache
+rm lifecycle.json
+```
+
+### 5. Configure Workload Identity Federation
+
+This allows GitHub Actions to authenticate to GCP without service account keys.
+
+```bash
+export PROJECT_ID=$(gcloud config get-value project)
+export PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")
+export GITHUB_REPO="YOUR_GITHUB_ORG/YOUR_REPO_NAME"  # e.g., "datatecnica/cde-engine"
+
+# Create Workload Identity Pool
+gcloud iam workload-identity-pools create "github-actions-pool" \
+  --location="global" \
+  --display-name="GitHub Actions Pool"
+
+# Create Workload Identity Provider
+gcloud iam workload-identity-pools providers create-oidc "github-provider" \
+  --location="global" \
+  --workload-identity-pool="github-actions-pool" \
+  --display-name="GitHub Provider" \
+  --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository" \
+  --issuer-uri="https://token.actions.githubusercontent.com"
+
+# Create Service Account for GitHub Actions
+gcloud iam service-accounts create github-actions \
+  --display-name="GitHub Actions Service Account"
+
+# Grant necessary roles
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:github-actions@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/run.admin"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:github-actions@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/artifactregistry.writer"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:github-actions@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/iam.serviceAccountUser"
+
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --member="serviceAccount:github-actions@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/storage.admin"
+
+# Allow GitHub Actions to impersonate the service account
+gcloud iam service-accounts add-iam-policy-binding \
+  "github-actions@${PROJECT_ID}.iam.gserviceaccount.com" \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/github-actions-pool/attribute.repository/${GITHUB_REPO}"
+```
+
+### 6. Add GitHub Secrets
+
+Go to your GitHub repository settings → Secrets and variables → Actions, and add:
+
+- **GCP_PROJECT_ID**: Your GCP project ID
+- **GCP_WORKLOAD_IDENTITY_PROVIDER**:
+  ```
+  projects/PROJECT_NUMBER/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider
+  ```
+- **GCP_SERVICE_ACCOUNT**:
+  ```
+  github-actions@PROJECT_ID.iam.gserviceaccount.com
+  ```
+
+Replace `PROJECT_NUMBER` and `PROJECT_ID` with your actual values.
+
+### 7. Manual Deployment (Without GitHub Actions)
+
+If you want to deploy manually:
+
+```bash
+export PROJECT_ID=$(gcloud config get-value project)
+export REGION=us-central1
+
+# Build image
+docker build -t us-central1-docker.pkg.dev/$PROJECT_ID/cde-engine/cde-engine:latest .
+
+# Push to Artifact Registry
+docker push us-central1-docker.pkg.dev/$PROJECT_ID/cde-engine/cde-engine:latest
+
+# Deploy to Cloud Run
+gcloud run deploy cde-engine \
+  --image us-central1-docker.pkg.dev/$PROJECT_ID/cde-engine/cde-engine:latest \
+  --platform managed \
+  --region $REGION \
+  --allow-unauthenticated \
+  --set-secrets "ANTHROPIC_API_KEY=anthropic-api-key:latest" \
+  --memory 2Gi \
+  --cpu 2 \
+  --min-instances 0 \
+  --max-instances 10 \
+  --timeout 300 \
+  --session-affinity \
+  --port 8501
+```
+
+---
+
+## Configuration Options
+
+### Authentication
+
+**Current setup:** `--allow-unauthenticated` (public access)
+
+To restrict access:
+
+```bash
+# Remove public access
+gcloud run services remove-iam-policy-binding cde-engine \
+  --region=$REGION \
+  --member="allUsers" \
+  --role="roles/run.invoker"
+
+# Grant access to specific users/groups
+gcloud run services add-iam-policy-binding cde-engine \
+  --region=$REGION \
+  --member="user:email@example.com" \
+  --role="roles/run.invoker"
+
+# Or use Identity-Aware Proxy (IAP) for Google SSO
+```
+
+### Scaling Configuration
+
+Adjust based on usage patterns:
+
+```bash
+# Cost-optimized (scale to zero)
+--min-instances 0 --max-instances 10
+
+# Always-ready (avoid cold starts)
+--min-instances 1 --max-instances 10
+
+# High-traffic
+--min-instances 2 --max-instances 50
+```
+
+### Custom Domain
+
+```bash
+# Map custom domain
+gcloud run domain-mappings create \
+  --service cde-engine \
+  --domain cde.yourdomain.com \
+  --region $REGION
+```
+
+Follow the DNS instructions provided to complete domain mapping.
+
+---
+
+## Monitoring and Logging
+
+### View Logs
+
+```bash
+gcloud run services logs read cde-engine \
+  --region $REGION \
+  --limit 50
+```
+
+### Set Up Alerts
+
+1. Go to **Cloud Console → Monitoring → Alerting**
+2. Create alert policies for:
+   - High error rates
+   - Response time thresholds
+   - Request count anomalies
+   - Memory/CPU usage
+
+### View Metrics
+
+```bash
+# Get service URL
+gcloud run services describe cde-engine \
+  --region $REGION \
+  --format 'value(status.url)'
+
+# View metrics in console
+open "https://console.cloud.google.com/run/detail/$REGION/cde-engine/metrics"
+```
+
+---
+
+## Troubleshooting
+
+### Authentication Error in GitHub Actions
+
+**Problem:** `Failed to authenticate to Google Cloud`
+
+**Solution:** Verify GitHub secrets are correctly set:
+```bash
+# Get the values again
+./scripts/setup-gcp.sh
+```
+
+### Container Fails to Start
+
+```bash
+# Check logs
+gcloud run services logs read cde-engine --region $REGION --limit 100
+
+# Common issues:
+# - Missing ANTHROPIC_API_KEY secret
+# - Port mismatch (should be 8501)
+# - Memory/CPU limits too low
+```
+
+### Secret Access Error
+
+**Problem:** `Permission denied accessing secret`
+
+**Solution:** Grant access to compute service account:
+```bash
+PROJECT_ID=$(gcloud config get-value project)
+PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format="value(projectNumber)")
+
+gcloud secrets add-iam-policy-binding anthropic-api-key \
+  --member="serviceAccount:${PROJECT_NUMBER}-compute@developer.gserviceaccount.com" \
+  --role="roles/secretmanager.secretAccessor"
+```
+
+### Image Push Failed
+
+**Problem:** `Permission denied: Artifact Registry`
+
+**Solution:** Authenticate Docker:
+```bash
+gcloud auth configure-docker us-central1-docker.pkg.dev
+```
+
+### Streamlit WebSocket Issues
+
+Ensure `--session-affinity` is enabled for proper WebSocket routing.
+
+### Cold Start Performance
+
+If cold starts are problematic:
+- Increase `--min-instances` to 1 or higher
+- Optimize Docker image size
+- Use startup CPU boost (automatic in Cloud Run)
+
+---
+
+## Cost Optimization
+
+### Estimated Monthly Costs
+
+For 5-10 test users with minimal traffic:
+
+- **Cloud Run**: $5-20/month (mostly idle, pay-per-use)
+- **Artifact Registry**: <$1/month
+- **Secret Manager**: Free tier
+- **GCS Cache**: <$1/month
+- **Networking**: Minimal (<$5)
+
+**Total: ~$10-30/month**
+
+### Optimization Tips
+
+1. Use `--min-instances 0` if cold starts are acceptable
+2. Set appropriate `--max-instances` to prevent runaway costs
+3. Configure GCS lifecycle policies to clean old cache
+4. Use budget alerts in GCP console
+
+---
+
+## Security Best Practices
+
+1. **Never commit secrets** to the repository
+2. **Use Secret Manager** for all sensitive values
+3. **Enable audit logging** for compliance
+4. **Restrict IAM permissions** to minimum necessary
+5. **Use VPC Service Controls** if handling sensitive data
+6. **Enable Binary Authorization** for image verification
+7. **Regular security scans** with Artifact Registry vulnerability scanning
+
+---
+
+## CI/CD Pipeline
+
+The GitHub Actions workflow (`.github/workflows/deploy.yml`) automatically:
+
+1. **Lint & Test**: Runs Black, Flake8, MyPy, and pytest
+2. **Build**: Creates Docker image on push to main/phase-a branches
+3. **Push**: Uploads image to Artifact Registry
+4. **Deploy**: Updates Cloud Run service
+5. **Verify**: Runs health check smoke test
+
+### Triggering Deployment
+
+```bash
+# Push to main or phase-a/production-deployment branch
+git push origin phase-a/production-deployment
+
+# Or merge PR to main
+```
+
+---
+
+## Rollback Procedure
+
+```bash
+# List revisions
+gcloud run revisions list --service cde-engine --region $REGION
+
+# Rollback to previous revision
+gcloud run services update-traffic cde-engine \
+  --region $REGION \
+  --to-revisions REVISION_NAME=100
+```
+
+---
+
+## Next Steps After Deployment
+
+1. **Verify deployment**: Access service URL and test key workflows
+2. **Set up monitoring**: Configure alerts and dashboards
+3. **User acceptance testing**: Invite test users
+4. **Add custom domain** (optional): Map to your domain
+5. **Restrict access** (optional): Remove `--allow-unauthenticated` and add IAM policies
+6. **Documentation**: Share access instructions with users
+7. **Backup plan**: Document rollback procedures
+8. **Cost monitoring**: Set up budget alerts
+
+---
+
+## Support and Maintenance
+
+- **Logs**: Cloud Run automatically captures stdout/stderr
+- **Metrics**: Available in Cloud Console
+- **Updates**: Deploy by pushing to tracked branches
+- **Scaling**: Automatic based on traffic
+- **Costs**: Monitor in GCP Billing dashboard
+
+For issues, check the [troubleshooting section](#troubleshooting) or Cloud Run logs.
+
+---
+
+**Questions or Issues?**
+File an issue at: https://github.com/datatecnica/cde-engine/issues

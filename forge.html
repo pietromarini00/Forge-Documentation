@@ -1,0 +1,706 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forge API Reference &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="GCloud Deploy Workflow" href="gcloud-deploy.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="platform/forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="specs/api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specs/curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specs/dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specs/harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specs/registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specs/roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="reference/api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Forge API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-forge_retrieval_core.tfidf_engine">Retrieval Engines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine"><code class="docutils literal notranslate"><span class="pre">TFIDFEngine</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.fit"><code class="docutils literal notranslate"><span class="pre">TFIDFEngine.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.load"><code class="docutils literal notranslate"><span class="pre">TFIDFEngine.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.load_bundled_corpus"><code class="docutils literal notranslate"><span class="pre">TFIDFEngine.load_bundled_corpus()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.load_wordnet_corpus"><code class="docutils literal notranslate"><span class="pre">TFIDFEngine.load_wordnet_corpus()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.pairwise_similarity"><code class="docutils literal notranslate"><span class="pre">TFIDFEngine.pairwise_similarity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.query"><code class="docutils literal notranslate"><span class="pre">TFIDFEngine.query()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.save"><code class="docutils literal notranslate"><span class="pre">TFIDFEngine.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.similarity_matrix"><code class="docutils literal notranslate"><span class="pre">TFIDFEngine.similarity_matrix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.transform"><code class="docutils literal notranslate"><span class="pre">TFIDFEngine.transform()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine"><code class="docutils literal notranslate"><span class="pre">EmbeddingEngine</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.encode"><code class="docutils literal notranslate"><span class="pre">EmbeddingEngine.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.fit"><code class="docutils literal notranslate"><span class="pre">EmbeddingEngine.fit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.is_available"><code class="docutils literal notranslate"><span class="pre">EmbeddingEngine.is_available()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.load"><code class="docutils literal notranslate"><span class="pre">EmbeddingEngine.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.model"><code class="docutils literal notranslate"><span class="pre">EmbeddingEngine.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.pairwise_similarity"><code class="docutils literal notranslate"><span class="pre">EmbeddingEngine.pairwise_similarity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.query"><code class="docutils literal notranslate"><span class="pre">EmbeddingEngine.query()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.save"><code class="docutils literal notranslate"><span class="pre">EmbeddingEngine.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.similarity_matrix"><code class="docutils literal notranslate"><span class="pre">EmbeddingEngine.similarity_matrix()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#forge_retrieval_core.score_combiner.ScoreCombiner"><code class="docutils literal notranslate"><span class="pre">ScoreCombiner</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.score_combiner.ScoreCombiner.combine"><code class="docutils literal notranslate"><span class="pre">ScoreCombiner.combine()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.score_combiner.ScoreCombiner.combine_matrices"><code class="docutils literal notranslate"><span class="pre">ScoreCombiner.combine_matrices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.score_combiner.ScoreCombiner.combine_scores"><code class="docutils literal notranslate"><span class="pre">ScoreCombiner.combine_scores()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.score_combiner.ScoreCombiner.combine_with_rrf"><code class="docutils literal notranslate"><span class="pre">ScoreCombiner.combine_with_rrf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#forge_retrieval_core.score_combiner.ScoreCombiner.reciprocal_rank_fusion"><code class="docutils literal notranslate"><span class="pre">ScoreCombiner.reciprocal_rank_fusion()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-clients.dataforge_client">Clients</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#clients.dataforge_client.DataForgeClient"><code class="docutils literal notranslate"><span class="pre">DataForgeClient</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#clients.dataforge_client.DataForgeClient.accept_submission"><code class="docutils literal notranslate"><span class="pre">DataForgeClient.accept_submission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.dataforge_client.DataForgeClient.assign_gold_dataset"><code class="docutils literal notranslate"><span class="pre">DataForgeClient.assign_gold_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.dataforge_client.DataForgeClient.check_connection"><code class="docutils literal notranslate"><span class="pre">DataForgeClient.check_connection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.dataforge_client.DataForgeClient.claim_submission"><code class="docutils literal notranslate"><span class="pre">DataForgeClient.claim_submission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.dataforge_client.DataForgeClient.close"><code class="docutils literal notranslate"><span class="pre">DataForgeClient.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.dataforge_client.DataForgeClient.get_report"><code class="docutils literal notranslate"><span class="pre">DataForgeClient.get_report()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.dataforge_client.DataForgeClient.get_submission"><code class="docutils literal notranslate"><span class="pre">DataForgeClient.get_submission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.dataforge_client.DataForgeClient.list_submissions"><code class="docutils literal notranslate"><span class="pre">DataForgeClient.list_submissions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.dataforge_client.DataForgeClient.reject_submission"><code class="docutils literal notranslate"><span class="pre">DataForgeClient.reject_submission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.dataforge_client.DataForgeClient.release_submission"><code class="docutils literal notranslate"><span class="pre">DataForgeClient.release_submission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.dataforge_client.DataForgeClient.resubmit_submission"><code class="docutils literal notranslate"><span class="pre">DataForgeClient.resubmit_submission()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.dataforge_client.DataForgeClient.upload_submission"><code class="docutils literal notranslate"><span class="pre">DataForgeClient.upload_submission()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#clients.dataforge_client.get_dataforge_client"><code class="docutils literal notranslate"><span class="pre">get_dataforge_client()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#clients.gold_client.GoldDatasetClient"><code class="docutils literal notranslate"><span class="pre">GoldDatasetClient</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#clients.gold_client.GoldDatasetClient.close"><code class="docutils literal notranslate"><span class="pre">GoldDatasetClient.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.gold_client.GoldDatasetClient.create_gold_dataset"><code class="docutils literal notranslate"><span class="pre">GoldDatasetClient.create_gold_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.gold_client.GoldDatasetClient.delete_gold_dataset"><code class="docutils literal notranslate"><span class="pre">GoldDatasetClient.delete_gold_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.gold_client.GoldDatasetClient.download_gold_csv"><code class="docutils literal notranslate"><span class="pre">GoldDatasetClient.download_gold_csv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.gold_client.GoldDatasetClient.get_gold_dataset"><code class="docutils literal notranslate"><span class="pre">GoldDatasetClient.get_gold_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#clients.gold_client.GoldDatasetClient.list_gold_datasets"><code class="docutils literal notranslate"><span class="pre">GoldDatasetClient.list_gold_datasets()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#clients.gold_client.get_gold_client"><code class="docutils literal notranslate"><span class="pre">get_gold_client()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-components.status_badge">Components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#components.status_badge.status_badge"><code class="docutils literal notranslate"><span class="pre">status_badge()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#components.status_badge.submission_status_icon"><code class="docutils literal notranslate"><span class="pre">submission_status_icon()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#components.wizard.wizard_steps"><code class="docutils literal notranslate"><span class="pre">wizard_steps()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#core-utilities">Core Utilities</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Forge API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/forge.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="forge-api-reference">
+<h1>Forge API Reference<a class="headerlink" href="#forge-api-reference" title="Link to this heading"></a></h1>
+<section id="module-forge_retrieval_core.tfidf_engine">
+<span id="retrieval-engines"></span><h2>Retrieval Engines<a class="headerlink" href="#module-forge_retrieval_core.tfidf_engine" title="Link to this heading"></a></h2>
+<p>[claude-assisted] TF-IDF based text similarity.</p>
+<p>Provides lexical matching via TF-IDF vectorization and cosine similarity.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="forge_retrieval_core.tfidf_engine.TFIDFEngine">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">forge_retrieval_core.tfidf_engine.</span></span><span class="sig-name descname"><span class="pre">TFIDFEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RetrievalConfig</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine" title="Link to this definition"></a></dt>
+<dd><p>TF-IDF based text similarity engine.</p>
+<p>Used for lexical (token-level) matching. Catches variations like
+PatientAge vs patient_age through normalization.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.tfidf_engine.TFIDFEngine.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">texts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background_texts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.fit" title="Link to this definition"></a></dt>
+<dd><p>Build vocabulary and TF-IDF matrix from texts.</p>
+<p>When background_texts is provided it takes precedence; otherwise the
+corpus source is resolved from config (wordnet / file / none).
+The vectorizer is fitted on background_texts + texts for IDF
+calibration, but only the transforms of texts are stored in self.matrix.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>texts: List of texts to index (element texts).
+background_texts: Optional explicit background corpus; overrides config
+when provided.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.tfidf_engine.TFIDFEngine.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.load" title="Link to this definition"></a></dt>
+<dd><p>Load fitted vectorizer and matrix from disk.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>path: Directory path for loading</p>
+</dd>
+<dt>Returns:</dt><dd><p>True if loaded successfully, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.tfidf_engine.TFIDFEngine.load_bundled_corpus">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_bundled_corpus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.load_bundled_corpus" title="Link to this definition"></a></dt>
+<dd><p>Load a bundled background corpus from the package data directory.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>filename: Name of the .csv.gz file inside forge_retrieval_core/data/.</p>
+</dd>
+<dt>Returns:</dt><dd><p>List of normalized text strings.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.tfidf_engine.TFIDFEngine.load_wordnet_corpus">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_wordnet_corpus</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.load_wordnet_corpus" title="Link to this definition"></a></dt>
+<dd><p>Load English word definitions from WordNet for IDF calibration.</p>
+<p>Each WordNet synset contributes a normalized text of the form
+“word definition [example …]”. With ~117k synsets this corpus is
+large enough to meaningfully suppress common English terms and boost
+rare domain-specific tokens in subsequent IDF scoring.</p>
+<p>Requires the ‘nltk’ package and the ‘wordnet’ corpus data.
+Install with: pip install nltk &amp;&amp; python -m nltk.downloader wordnet</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>List of normalized text strings, one per WordNet synset.</p>
+</dd>
+<dt>Raises:</dt><dd><p>ImportError: If nltk is not installed.
+LookupError: If the WordNet corpus data has not been downloaded.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.tfidf_engine.TFIDFEngine.pairwise_similarity">
+<span class="sig-name descname"><span class="pre">pairwise_similarity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.pairwise_similarity" title="Link to this definition"></a></dt>
+<dd><p>Compute TF-IDF similarity between two texts.</p>
+<p>This creates a temporary vectorizer for the pair.
+For bulk comparisons, use similarity_matrix() instead.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>text_a: First text
+text_b: Second text</p>
+</dd>
+<dt>Returns:</dt><dd><p>Cosine similarity score between the texts</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.tfidf_engine.TFIDFEngine.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.query" title="Link to this definition"></a></dt>
+<dd><p>Get similarity scores for a query against the fitted corpus.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>text: Query text</p>
+</dd>
+<dt>Returns:</dt><dd><p>Array of cosine similarity scores (one per indexed text)</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If engine has not been fitted</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.tfidf_engine.TFIDFEngine.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.save" title="Link to this definition"></a></dt>
+<dd><p>Save fitted vectorizer and matrix to disk.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>path: Directory path for saving</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.tfidf_engine.TFIDFEngine.similarity_matrix">
+<span class="sig-name descname"><span class="pre">similarity_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.similarity_matrix" title="Link to this definition"></a></dt>
+<dd><p>Get pairwise similarities for all fitted texts.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>N×N matrix of cosine similarities</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If engine has not been fitted</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.tfidf_engine.TFIDFEngine.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">texts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#forge_retrieval_core.tfidf_engine.TFIDFEngine.transform" title="Link to this definition"></a></dt>
+<dd><p>Transform new texts using fitted vectorizer.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>texts: List of texts to transform</p>
+</dd>
+<dt>Returns:</dt><dd><p>TF-IDF matrix for input texts</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If vectorizer has not been fitted</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p id="module-forge_retrieval_core.embedding_engine">[claude-assisted] Embedding-based semantic similarity.</p>
+<p>Provides semantic matching via dense embeddings and cosine similarity.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="forge_retrieval_core.embedding_engine.EmbeddingEngine">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">forge_retrieval_core.embedding_engine.</span></span><span class="sig-name descname"><span class="pre">EmbeddingEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RetrievalConfig</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine" title="Link to this definition"></a></dt>
+<dd><p>Embedding-based semantic similarity engine.</p>
+<p>Used for semantic matching. Catches synonyms and related concepts
+like date_of_birth vs birth_date.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.embedding_engine.EmbeddingEngine.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">texts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.encode" title="Link to this definition"></a></dt>
+<dd><p>Encode texts to embeddings.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>texts: List of texts to encode</p>
+</dd>
+<dt>Returns:</dt><dd><p>Matrix of embeddings (N × embedding_dim)</p>
+</dd>
+<dt>Raises:</dt><dd><p>RuntimeError: If embedding model is not available</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.embedding_engine.EmbeddingEngine.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">texts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.fit" title="Link to this definition"></a></dt>
+<dd><p>Encode and store embeddings for texts.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>texts: List of texts to embed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.embedding_engine.EmbeddingEngine.is_available">
+<span class="sig-name descname"><span class="pre">is_available</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.is_available" title="Link to this definition"></a></dt>
+<dd><p>Check if the embedding model is available.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.embedding_engine.EmbeddingEngine.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">texts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.load" title="Link to this definition"></a></dt>
+<dd><p>Load embeddings from disk.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>path: Directory path for loading
+texts: Optional texts to validate content hash</p>
+</dd>
+<dt>Returns:</dt><dd><p>True if loaded successfully and hash matches, False otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="forge_retrieval_core.embedding_engine.EmbeddingEngine.model">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.model" title="Link to this definition"></a></dt>
+<dd><p>Lazy-load the embedding model only when needed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.embedding_engine.EmbeddingEngine.pairwise_similarity">
+<span class="sig-name descname"><span class="pre">pairwise_similarity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.pairwise_similarity" title="Link to this definition"></a></dt>
+<dd><p>Compute embedding similarity between two texts.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>text_a: First text
+text_b: Second text</p>
+</dd>
+<dt>Returns:</dt><dd><p>Cosine similarity score between the embeddings</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.embedding_engine.EmbeddingEngine.query">
+<span class="sig-name descname"><span class="pre">query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.query" title="Link to this definition"></a></dt>
+<dd><p>Get similarity scores for a query against the fitted corpus.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>text: Query text</p>
+</dd>
+<dt>Returns:</dt><dd><p>Array of cosine similarity scores (one per indexed text)</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If engine has not been fitted</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.embedding_engine.EmbeddingEngine.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.save" title="Link to this definition"></a></dt>
+<dd><p>Save embeddings to disk.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>path: Directory path for saving</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.embedding_engine.EmbeddingEngine.similarity_matrix">
+<span class="sig-name descname"><span class="pre">similarity_matrix</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#forge_retrieval_core.embedding_engine.EmbeddingEngine.similarity_matrix" title="Link to this definition"></a></dt>
+<dd><p>Get pairwise similarities for all fitted texts.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>N×N matrix of cosine similarities</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: If engine has not been fitted</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p id="module-forge_retrieval_core.score_combiner">[claude-assisted] Score combination for hybrid retrieval.</p>
+<p>Combines TF-IDF and embedding scores using weighted average or RRF.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="forge_retrieval_core.score_combiner.ScoreCombiner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">forge_retrieval_core.score_combiner.</span></span><span class="sig-name descname"><span class="pre">ScoreCombiner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">RetrievalConfig</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#forge_retrieval_core.score_combiner.ScoreCombiner" title="Link to this definition"></a></dt>
+<dd><p>Combines TF-IDF and embedding scores.</p>
+<p>Supports weighted average and Reciprocal Rank Fusion (RRF) modes.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.score_combiner.ScoreCombiner.combine">
+<span class="sig-name descname"><span class="pre">combine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tfidf_scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfidf_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#forge_retrieval_core.score_combiner.ScoreCombiner.combine" title="Link to this definition"></a></dt>
+<dd><p>Combine score arrays using weighted average.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>tfidf_scores: Array of TF-IDF scores
+embedding_scores: Array of embedding scores
+tfidf_weight: Override TF-IDF weight (default from config)
+embedding_weight: Override embedding weight (default from config)</p>
+</dd>
+<dt>Returns:</dt><dd><p>Combined score array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.score_combiner.ScoreCombiner.combine_matrices">
+<span class="sig-name descname"><span class="pre">combine_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tfidf_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfidf_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#forge_retrieval_core.score_combiner.ScoreCombiner.combine_matrices" title="Link to this definition"></a></dt>
+<dd><p>Combine pairwise similarity matrices.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>tfidf_matrix: N×N TF-IDF similarity matrix
+embedding_matrix: N×N embedding similarity matrix
+tfidf_weight: Override TF-IDF weight (default from config)
+embedding_weight: Override embedding weight (default from config)</p>
+</dd>
+<dt>Returns:</dt><dd><p>Combined N×N similarity matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.score_combiner.ScoreCombiner.combine_scores">
+<span class="sig-name descname"><span class="pre">combine_scores</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tfidf_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tfidf_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_weight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#forge_retrieval_core.score_combiner.ScoreCombiner.combine_scores" title="Link to this definition"></a></dt>
+<dd><p>Combine individual scores.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>tfidf_score: TF-IDF similarity score
+embedding_score: Embedding similarity score
+tfidf_weight: Override TF-IDF weight (default from config)
+embedding_weight: Override embedding weight (default from config)</p>
+</dd>
+<dt>Returns:</dt><dd><p>Combined score</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.score_combiner.ScoreCombiner.combine_with_rrf">
+<span class="sig-name descname"><span class="pre">combine_with_rrf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tfidf_scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">embedding_scores</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#forge_retrieval_core.score_combiner.ScoreCombiner.combine_with_rrf" title="Link to this definition"></a></dt>
+<dd><p>Combine TF-IDF and embedding scores using RRF.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>tfidf_scores: Array of TF-IDF scores
+embedding_scores: Array of embedding scores
+k: RRF constant</p>
+</dd>
+<dt>Returns:</dt><dd><p>Combined RRF scores</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="forge_retrieval_core.score_combiner.ScoreCombiner.reciprocal_rank_fusion">
+<span class="sig-name descname"><span class="pre">reciprocal_rank_fusion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">score_arrays</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dtype</span><span class="p"><span class="pre">[</span></span><span class="pre">float64</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#forge_retrieval_core.score_combiner.ScoreCombiner.reciprocal_rank_fusion" title="Link to this definition"></a></dt>
+<dd><p>Combine multiple score arrays using Reciprocal Rank Fusion.</p>
+<p>RRF(d) = sum(1 / (k + rank(d))) for each ranking</p>
+<p>This method is more robust when the two rankings strongly disagree,
+as it avoids averaging scores on different scales.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>score_arrays: List of score arrays to combine
+k: RRF constant (default 60, recommended in original paper)</p>
+</dd>
+<dt>Returns:</dt><dd><p>Combined RRF scores</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-clients.dataforge_client">
+<span id="clients"></span><h2>Clients<a class="headerlink" href="#module-clients.dataforge_client" title="Link to this heading"></a></h2>
+<p>DataForge API client for Forge App.</p>
+<p>Adapted from dataforge/ui/client/dataforge_client.py.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="clients.dataforge_client.DataForgeClient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">clients.dataforge_client.</span></span><span class="sig-name descname"><span class="pre">DataForgeClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#clients.dataforge_client.DataForgeClient" title="Link to this definition"></a></dt>
+<dd><p>Client for the DataForge REST API.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.dataforge_client.DataForgeClient.accept_submission">
+<span class="sig-name descname"><span class="pre">accept_submission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">submission_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reviewer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#clients.dataforge_client.DataForgeClient.accept_submission" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.dataforge_client.DataForgeClient.assign_gold_dataset">
+<span class="sig-name descname"><span class="pre">assign_gold_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">submission_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reviewer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gold_dataset_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#clients.dataforge_client.DataForgeClient.assign_gold_dataset" title="Link to this definition"></a></dt>
+<dd><p>Assign or clear the gold dataset for a pending submission.</p>
+<p>Raises SchemaMismatchError (422) if the dataset’s schema doesn’t match
+the submission’s schema. Raises ConflictError (409) if the reviewer
+doesn’t hold the claim.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.dataforge_client.DataForgeClient.check_connection">
+<span class="sig-name descname"><span class="pre">check_connection</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#clients.dataforge_client.DataForgeClient.check_connection" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.dataforge_client.DataForgeClient.claim_submission">
+<span class="sig-name descname"><span class="pre">claim_submission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">submission_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reviewer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#clients.dataforge_client.DataForgeClient.claim_submission" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.dataforge_client.DataForgeClient.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#clients.dataforge_client.DataForgeClient.close" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.dataforge_client.DataForgeClient.get_report">
+<span class="sig-name descname"><span class="pre">get_report</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">submission_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'json'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></span><a class="headerlink" href="#clients.dataforge_client.DataForgeClient.get_report" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.dataforge_client.DataForgeClient.get_submission">
+<span class="sig-name descname"><span class="pre">get_submission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">submission_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#clients.dataforge_client.DataForgeClient.get_submission" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.dataforge_client.DataForgeClient.list_submissions">
+<span class="sig-name descname"><span class="pre">list_submissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#clients.dataforge_client.DataForgeClient.list_submissions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.dataforge_client.DataForgeClient.reject_submission">
+<span class="sig-name descname"><span class="pre">reject_submission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">submission_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reviewer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#clients.dataforge_client.DataForgeClient.reject_submission" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.dataforge_client.DataForgeClient.release_submission">
+<span class="sig-name descname"><span class="pre">release_submission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">submission_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reviewer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#clients.dataforge_client.DataForgeClient.release_submission" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.dataforge_client.DataForgeClient.resubmit_submission">
+<span class="sig-name descname"><span class="pre">resubmit_submission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">submission_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">submitter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#clients.dataforge_client.DataForgeClient.resubmit_submission" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.dataforge_client.DataForgeClient.upload_submission">
+<span class="sig-name descname"><span class="pre">upload_submission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">study</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">submitter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gold_dataset_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#clients.dataforge_client.DataForgeClient.upload_submission" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="clients.dataforge_client.get_dataforge_client">
+<span class="sig-prename descclassname"><span class="pre">clients.dataforge_client.</span></span><span class="sig-name descname"><span class="pre">get_dataforge_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#clients.dataforge_client.DataForgeClient" title="clients.dataforge_client.DataForgeClient"><span class="pre">DataForgeClient</span></a></span></span><a class="headerlink" href="#clients.dataforge_client.get_dataforge_client" title="Link to this definition"></a></dt>
+<dd><p>Get or create a DataForgeClient singleton for the current session.</p>
+</dd></dl>
+
+<p id="module-clients.gold_client">Gold Dataset API client for Forge App.</p>
+<p>Thin wrapper around the DataForge Gold Dataset API endpoints.
+Follows the same patterns as dataforge_client.py.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="clients.gold_client.GoldDatasetClient">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">clients.gold_client.</span></span><span class="sig-name descname"><span class="pre">GoldDatasetClient</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#clients.gold_client.GoldDatasetClient" title="Link to this definition"></a></dt>
+<dd><p>Client for the DataForge Gold Dataset API endpoints.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.gold_client.GoldDatasetClient.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#clients.gold_client.GoldDatasetClient.close" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.gold_client.GoldDatasetClient.create_gold_dataset">
+<span class="sig-name descname"><span class="pre">create_gold_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_column</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_by</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'user'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#clients.gold_client.GoldDatasetClient.create_gold_dataset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.gold_client.GoldDatasetClient.delete_gold_dataset">
+<span class="sig-name descname"><span class="pre">delete_gold_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#clients.gold_client.GoldDatasetClient.delete_gold_dataset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.gold_client.GoldDatasetClient.download_gold_csv">
+<span class="sig-name descname"><span class="pre">download_gold_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="headerlink" href="#clients.gold_client.GoldDatasetClient.download_gold_csv" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.gold_client.GoldDatasetClient.get_gold_dataset">
+<span class="sig-name descname"><span class="pre">get_gold_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#clients.gold_client.GoldDatasetClient.get_gold_dataset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="clients.gold_client.GoldDatasetClient.list_gold_datasets">
+<span class="sig-name descname"><span class="pre">list_gold_datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#clients.gold_client.GoldDatasetClient.list_gold_datasets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="clients.gold_client.get_gold_client">
+<span class="sig-prename descclassname"><span class="pre">clients.gold_client.</span></span><span class="sig-name descname"><span class="pre">get_gold_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#clients.gold_client.GoldDatasetClient" title="clients.gold_client.GoldDatasetClient"><span class="pre">GoldDatasetClient</span></a></span></span><a class="headerlink" href="#clients.gold_client.get_gold_client" title="Link to this definition"></a></dt>
+<dd><p>Get or create a GoldDatasetClient singleton.</p>
+</dd></dl>
+
+</section>
+<section id="module-components.status_badge">
+<span id="components"></span><h2>Components<a class="headerlink" href="#module-components.status_badge" title="Link to this heading"></a></h2>
+<p>Status badge and icon helpers for submissions and projects.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="components.status_badge.status_badge">
+<span class="sig-prename descclassname"><span class="pre">components.status_badge.</span></span><span class="sig-name descname"><span class="pre">status_badge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#components.status_badge.status_badge" title="Link to this definition"></a></dt>
+<dd><p>Returns an HTML badge string for a given status key.
+Use with st.markdown(…, unsafe_allow_html=True).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="components.status_badge.submission_status_icon">
+<span class="sig-prename descclassname"><span class="pre">components.status_badge.</span></span><span class="sig-name descname"><span class="pre">submission_status_icon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#components.status_badge.submission_status_icon" title="Link to this definition"></a></dt>
+<dd><p>Returns the icon character for a submission status.</p>
+</dd></dl>
+
+<p id="module-components.wizard">Shared wizard step indicator component.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="components.wizard.wizard_steps">
+<span class="sig-prename descclassname"><span class="pre">components.wizard.</span></span><span class="sig-name descname"><span class="pre">wizard_steps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_back</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_step_click</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#components.wizard.wizard_steps" title="Link to this definition"></a></dt>
+<dd><p>Renders a horizontal step indicator with progress dots.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>steps: Step names e.g. [“Upload”, “Configure”, “Curate”, “Publish”]
+current_step: 1-indexed active step number
+allow_back: Whether completed steps are clickable to navigate back
+on_step_click: Callback receiving the 1-indexed step number when clicked</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="core-utilities">
+<h2>Core Utilities<a class="headerlink" href="#core-utilities" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gcloud-deploy.html" class="btn btn-neutral float-left" title="GCloud Deploy Workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

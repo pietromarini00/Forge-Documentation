@@ -1,0 +1,1095 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forge Platform — Roles, Permissions &amp; Governance &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API Reference" href="../reference/api-reference.html" />
+    <link rel="prev" title="SchemaForge: Registry Service" href="registry-service.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Forge Platform — Roles, Permissions &amp; Governance</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#specification-v0-1">Specification v0.1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#executive-summary">Executive Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#entity-model">Entity Model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#user">User</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#org">Org</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#orgmembership">OrgMembership</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schemaproject">SchemaProject</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataproject">DataProject</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#projectmembership">ProjectMembership</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#publishedschema">PublishedSchema</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#submission-extended">Submission (extended)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#elementproposal-phase-5">ElementProposal (Phase 5+)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#permission-matrix">Permission Matrix</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#org-level-permissions">Org-Level Permissions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schema-project-permissions">Schema Project Permissions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-project-permissions">Data Project Permissions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#permission-resolution-logic">Permission Resolution Logic</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#schema-version-governance">Schema Version Governance</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#version-pinning">Version Pinning</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#upgrade-detection">Upgrade Detection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#version-diff">Version Diff</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#upgrade-workflow">Upgrade Workflow</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#path-a-non-breaking-changes-only">Path A: Non-Breaking Changes Only</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#path-b-breaking-changes-detected">Path B: Breaking Changes Detected</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#compliance-sweep">Compliance Sweep</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#resolution-strategies">Resolution Strategies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#submission-lifecycle-with-compliance">Submission Lifecycle with Compliance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#json-backend-implementation-notes">JSON Backend Implementation Notes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#supabase-migration-path">Supabase Migration Path</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#audit-trail">Audit Trail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#open-items-future-considerations">Open Items &amp; Future Considerations</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Forge Platform — Roles, Permissions &amp; Governance</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/specs/roles-and-governance.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="forge-platform-roles-permissions-governance">
+<h1>Forge Platform — Roles, Permissions &amp; Governance<a class="headerlink" href="#forge-platform-roles-permissions-governance" title="Link to this heading"></a></h1>
+<section id="specification-v0-1">
+<h2>Specification v0.1<a class="headerlink" href="#specification-v0-1" title="Link to this heading"></a></h2>
+</section>
+<hr class="docutils" />
+<section id="executive-summary">
+<h2>Executive Summary<a class="headerlink" href="#executive-summary" title="Link to this heading"></a></h2>
+<p>This spec defines the authorization model for the Forge platform: <strong>who can do what, where, and how resources are shared.</strong> It covers organizations, user roles, project-level permissions, schema versioning governance, and compliance workflows.</p>
+<p>The model is designed JSON-first (for the current file-based backend) and maps directly to Supabase/PostgreSQL tables with Row-Level Security when that migration happens.</p>
+<p><strong>Key design principles:</strong></p>
+<ul class="simple">
+<li><p><strong>Org-scoped resources.</strong> Every schema, project, and dataset belongs to an org.</p></li>
+<li><p><strong>Personal orgs.</strong> Every user gets an implicit single-member org for solo work.</p></li>
+<li><p><strong>Two project types</strong> with distinct role sets: Schema Projects (curation) and Data Projects (harmonization + validation).</p></li>
+<li><p><strong>Creator-as-manager.</strong> Whoever creates a resource automatically manages it.</p></li>
+<li><p><strong>Accepted data is never silently invalidated.</strong> Schema upgrades flag non-compliance; humans decide what to do.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="entity-model">
+<h2>Entity Model<a class="headerlink" href="#entity-model" title="Link to this heading"></a></h2>
+<section id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>User
+ └─ personal_org ──→ Org (is_personal=true)
+
+Org
+ ├─ OrgMembership[] ──→ User (role: owner|manager|member)
+ ├─ SchemaProject[]
+ │   ├─ ProjectMembership[] ──→ User (role: manager|contributor)
+ │   └─ output ──→ PublishedSchema (in Registry)
+ └─ DataProject[]
+     ├─ ProjectMembership[] ──→ User (role: manager|submitter|reviewer)
+     ├─ harmonization mappings
+     └─ submissions (DataForge lifecycle)
+
+PublishedSchema
+ ├─ org_id (owner org)
+ ├─ visibility: private|public
+ └─ versions[]
+
+ElementProposal (Phase 5+)
+ ├─ source: DataProject
+ ├─ target: PublishedSchema
+ └─ status: pending|approved|rejected
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="user">
+<h3>User<a class="headerlink" href="#user" title="Link to this heading"></a></h3>
+<p>A person with an account on the platform.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>User:
+  id:              uuid
+  email:           str (unique)
+  name:            str
+  personal_org_id: uuid → Org
+  created_at:      datetime
+</pre></div>
+</div>
+<p>On signup, a personal org is automatically created and linked. The user is the <code class="docutils literal notranslate"><span class="pre">owner</span></code> of their personal org.</p>
+</section>
+<hr class="docutils" />
+<section id="org">
+<h3>Org<a class="headerlink" href="#org" title="Link to this heading"></a></h3>
+<p>A team or workspace that shares resources. Every user has a personal org; team orgs are created explicitly.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Org:
+  id:          uuid
+  name:        str
+  slug:        str (unique, url-friendly, lowercase)
+  is_personal: bool
+  created_by:  uuid → User
+  created_at:  datetime
+</pre></div>
+</div>
+<p><strong>Rules:</strong></p>
+<ul class="simple">
+<li><p>Any user can create a team org.</p></li>
+<li><p>Personal orgs are auto-created on signup, named after the user.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">slug</span></code> is used in URLs and must match <code class="docutils literal notranslate"><span class="pre">^[a-z0-9_-]+$</span></code>.</p></li>
+<li><p>Deleting an org is a destructive action requiring owner confirmation (future).</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="orgmembership">
+<h3>OrgMembership<a class="headerlink" href="#orgmembership" title="Link to this heading"></a></h3>
+<p>Links a user to an org with a role.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>OrgMembership:
+  org_id:    uuid → Org
+  user_id:   uuid → User
+  role:      &quot;owner&quot; | &quot;manager&quot; | &quot;member&quot;
+  added_by:  uuid → User
+  added_at:  datetime
+</pre></div>
+</div>
+<p><strong>Org Roles:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Role</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Owner</strong></p></td>
+<td><p>Full control. Can delete org, transfer ownership, manage all members and projects. Every org has at least one owner.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Manager</strong></p></td>
+<td><p>Can create projects, invite/remove members (except owners), manage schemas. Cannot delete the org.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Member</strong></p></td>
+<td><p>Can browse org schemas, be added to projects. Cannot create projects or invite others unless granted project-level roles.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Rules:</strong></p>
+<ul class="simple">
+<li><p>The org creator is automatically assigned <code class="docutils literal notranslate"><span class="pre">owner</span></code>.</p></li>
+<li><p>An org must always have at least one <code class="docutils literal notranslate"><span class="pre">owner</span></code>.</p></li>
+<li><p>For personal orgs, the user is the sole <code class="docutils literal notranslate"><span class="pre">owner</span></code>; they can invite others as <code class="docutils literal notranslate"><span class="pre">manager</span></code> or <code class="docutils literal notranslate"><span class="pre">member</span></code>.</p></li>
+<li><p>Adding a user to an org requires <code class="docutils literal notranslate"><span class="pre">owner</span></code> or <code class="docutils literal notranslate"><span class="pre">manager</span></code> role.</p></li>
+<li><p>Removing a user from an org removes them from all projects within that org.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="schemaproject">
+<h3>SchemaProject<a class="headerlink" href="#schemaproject" title="Link to this heading"></a></h3>
+<p>A workspace for curating and publishing a canonical schema. Output is a versioned schema in the Registry.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>SchemaProject:
+  id:                   uuid
+  org_id:               uuid → Org
+  name:                 str
+  status:               &quot;draft&quot; | &quot;published&quot;
+  published_schema_id:  uuid → PublishedSchema (set after first publish)
+  created_by:           uuid → User
+  created_at:           datetime
+</pre></div>
+</div>
+<p><strong>Rules:</strong></p>
+<ul class="simple">
+<li><p>Only org <code class="docutils literal notranslate"><span class="pre">owner</span></code> or <code class="docutils literal notranslate"><span class="pre">manager</span></code> can create schema projects.</p></li>
+<li><p>Creator is automatically assigned <code class="docutils literal notranslate"><span class="pre">manager</span></code> role on the project.</p></li>
+<li><p>A schema project can publish multiple versions over its lifetime.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">status</span></code> reflects whether any version has been published yet.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="dataproject">
+<h3>DataProject<a class="headerlink" href="#dataproject" title="Link to this heading"></a></h3>
+<p>A workspace for harmonizing source data to a schema and managing data submissions through validation and QC.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>DataProject:
+  id:                     uuid
+  org_id:                 uuid → Org
+  name:                   str
+  status:                 &quot;active&quot; | &quot;archived&quot;
+  schema_id:              uuid → PublishedSchema
+  schema_version:         str (pinned version, e.g., &quot;2.0&quot;)
+  schema_upgraded_at:     datetime | null
+  schema_upgraded_by:     uuid → User | null
+  created_by:             uuid → User
+  created_at:             datetime
+</pre></div>
+</div>
+<p><strong>Rules:</strong></p>
+<ul class="simple">
+<li><p>Any org member (including <code class="docutils literal notranslate"><span class="pre">member</span></code> role) can create data projects. This is intentional — members are typically data contributors who need to set up their own harmonization/submission workspaces.</p></li>
+<li><p>Creator is automatically assigned <code class="docutils literal notranslate"><span class="pre">manager</span></code> role on the project.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">schema_version</span></code> is pinned at project creation and only updated through the explicit upgrade workflow (see Schema Version Governance below).</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="projectmembership">
+<h3>ProjectMembership<a class="headerlink" href="#projectmembership" title="Link to this heading"></a></h3>
+<p>Links a user to a project with a role. Roles differ by project type.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ProjectMembership:
+  project_id:   uuid → SchemaProject | DataProject
+  project_type: &quot;schema&quot; | &quot;data&quot;
+  user_id:      uuid → User
+  role:         str (see below)
+  added_by:     uuid → User
+  added_at:     datetime
+</pre></div>
+</div>
+<p><strong>Schema Project Roles:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Role</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Manager</strong></p></td>
+<td><p>Full curation control: edit elements, configure schema, publish versions, manage project members.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Contributor</strong></p></td>
+<td><p>Can suggest additions or changes to elements. Suggestions go into a review queue for managers to approve or reject.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Data Project Roles:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Role</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Manager</strong></p></td>
+<td><p>Full control: configure project, run harmonization, upload data, review/accept/reject submissions, manage project members. Superset of all other roles.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Submitter</strong></p></td>
+<td><p>Can run harmonization (map fields), upload data submissions, view validation results for own submissions, propose new schema elements.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Reviewer</strong></p></td>
+<td><p>Can view all submissions in the project, claim submissions for review, accept or reject submissions.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Rules:</strong></p>
+<ul class="simple">
+<li><p>A user has exactly <strong>one role</strong> per project. No multi-role assignments. If someone needs to both submit and review, they should be a <code class="docutils literal notranslate"><span class="pre">manager</span></code>.</p></li>
+<li><p>Only project <code class="docutils literal notranslate"><span class="pre">manager</span></code> (or org <code class="docutils literal notranslate"><span class="pre">owner</span></code>/<code class="docutils literal notranslate"><span class="pre">manager</span></code>) can add/remove project members.</p></li>
+<li><p>A user must be an org member before they can be added to a project within that org.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="publishedschema">
+<h3>PublishedSchema<a class="headerlink" href="#publishedschema" title="Link to this heading"></a></h3>
+<p>A schema published to the Registry. Owned by an org, optionally visible to all.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>PublishedSchema:
+  id:            uuid
+  org_id:        uuid → Org
+  name:          str
+  slug:          str (unique, matches ^[a-z0-9_-]+$)
+  visibility:    &quot;private&quot; | &quot;public&quot;
+  current_version: str
+  published_by:  uuid → User
+  created_at:    datetime
+</pre></div>
+</div>
+<p><strong>Visibility:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Level</p></th>
+<th class="head"><p>Who can see</p></th>
+<th class="head"><p>Who can use as harmonization target</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Private</strong></p></td>
+<td><p>Only members of the owning org</p></td>
+<td><p>Only members of the owning org</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Public</strong></p></td>
+<td><p>Anyone on the platform (read-only browse)</p></td>
+<td><p>Anyone — can link as target in their own Data Projects</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Rules:</strong></p>
+<ul class="simple">
+<li><p>Visibility is set at publish time and can be changed by schema project managers or org owners/managers.</p></li>
+<li><p>Public schemas are read-only to non-org users. Only the owning org can publish new versions.</p></li>
+<li><p>Using a public schema as a harmonization target does not grant any access to the owning org’s other resources.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="submission-extended">
+<h3>Submission (extended)<a class="headerlink" href="#submission-extended" title="Link to this heading"></a></h3>
+<p>Extends the existing DataForge Submission model with governance fields.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Submission:
+  ...existing DataForge fields (id, study, status, etc.)...
+
+  # Governance additions
+  validated_against_version:  str          # schema version at validation time
+  compliance_status:          &quot;compliant&quot; | &quot;non_compliant&quot; | &quot;exempt&quot; | null
+  compliance_checked_at:      datetime | null
+  compliance_reviewed_by:     uuid → User | null
+  compliance_note:            str | null   # reason for exemption
+  superseded_by:              uuid → Submission | null  # pointer to correction
+</pre></div>
+</div>
+<p>See <strong>Schema Version Governance</strong> section below for how these fields are used.</p>
+</section>
+<hr class="docutils" />
+<section id="elementproposal-phase-5">
+<h3>ElementProposal (Phase 5+)<a class="headerlink" href="#elementproposal-phase-5" title="Link to this heading"></a></h3>
+<p>Allows Data Project users to propose new elements for a schema they’re harmonizing against. Modeled now, built later.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>ElementProposal:
+  id:                       uuid
+  source_data_project_id:   uuid → DataProject
+  target_schema_id:         uuid → PublishedSchema
+  proposed_by:              uuid → User
+  element_name:             str
+  element_type:             str (string, integer, float, etc.)
+  description:              str
+  constraints:              dict | null (allowed_values, range, etc.)
+  justification:            str (why this element is needed)
+  status:                   &quot;pending&quot; | &quot;approved&quot; | &quot;rejected&quot;
+  reviewed_by:              uuid → User | null
+  reviewed_at:              datetime | null
+  review_notes:             str | null
+  created_at:               datetime
+</pre></div>
+</div>
+<p><strong>Workflow (Phase 5+):</strong></p>
+<ol class="arabic simple">
+<li><p>During harmonization, a submitter encounters a source field with no match.</p></li>
+<li><p>They click “Propose New Element” — fills in name, type, description, justification.</p></li>
+<li><p>Proposal is created, linked to the Data Project and target schema.</p></li>
+<li><p>Schema Project managers see proposals in their review queue.</p></li>
+<li><p>Manager approves (element added to next schema version) or rejects (with explanation).</p></li>
+<li><p>Proposer is notified of the outcome.</p></li>
+</ol>
+<p><strong>Rules:</strong></p>
+<ul class="simple">
+<li><p>Any Data Project <code class="docutils literal notranslate"><span class="pre">manager</span></code> or <code class="docutils literal notranslate"><span class="pre">submitter</span></code> can create proposals for the schema their project is linked to.</p></li>
+<li><p>Only Schema Project <code class="docutils literal notranslate"><span class="pre">manager</span></code> can approve or reject proposals.</p></li>
+<li><p>Approved proposals don’t auto-publish — they’re queued for the next schema version.</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="permission-matrix">
+<h2>Permission Matrix<a class="headerlink" href="#permission-matrix" title="Link to this heading"></a></h2>
+<section id="org-level-permissions">
+<h3>Org-Level Permissions<a class="headerlink" href="#org-level-permissions" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action</p></th>
+<th class="head text-center"><p>Owner</p></th>
+<th class="head text-center"><p>Manager</p></th>
+<th class="head text-center"><p>Member</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Delete org</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>Transfer ownership</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-even"><td><p>Manage org settings</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>Invite / remove members</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-even"><td><p>Change member roles</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x*</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>Create schema project</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-even"><td><p>Create data project</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+</tr>
+<tr class="row-odd"><td><p>Browse org schemas</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+</tr>
+<tr class="row-even"><td><p>View all org projects</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>View own projects</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+</tr>
+</tbody>
+</table>
+<p>*Managers can change roles up to <code class="docutils literal notranslate"><span class="pre">manager</span></code> but cannot promote to <code class="docutils literal notranslate"><span class="pre">owner</span></code> or demote other managers/owners.</p>
+</section>
+<section id="schema-project-permissions">
+<h3>Schema Project Permissions<a class="headerlink" href="#schema-project-permissions" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action</p></th>
+<th class="head text-center"><p>Manager</p></th>
+<th class="head text-center"><p>Contributor</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Edit schema elements</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>Configure schema metadata</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-even"><td><p>Publish schema version</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>Set schema visibility</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-even"><td><p>Suggest element additions/changes</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+</tr>
+<tr class="row-odd"><td><p>Review suggestions</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-even"><td><p>Manage project members</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>View schema (read-only)</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="data-project-permissions">
+<h3>Data Project Permissions<a class="headerlink" href="#data-project-permissions" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Action</p></th>
+<th class="head text-center"><p>Manager</p></th>
+<th class="head text-center"><p>Submitter</p></th>
+<th class="head text-center"><p>Reviewer</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Configure project (link schema, settings)</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>Manage project members</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-even"><td><p>Upgrade schema version</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>Run compliance sweep</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-even"><td><p>Run harmonization (map fields)</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>Upload data submissions</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-even"><td><p>View own submissions</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>View all submissions</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+<td class="text-center"><p>x</p></td>
+</tr>
+<tr class="row-even"><td><p>Propose new schema element</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>Claim submission for review</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+<td class="text-center"><p>x</p></td>
+</tr>
+<tr class="row-even"><td><p>Accept / reject submission</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+<td class="text-center"><p>x</p></td>
+</tr>
+<tr class="row-odd"><td><p>Exempt submission from compliance</p></td>
+<td class="text-center"><p>x</p></td>
+<td class="text-center"><p></p></td>
+<td class="text-center"><p></p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note:</strong> A submitter can only view their own submissions. Reviewers and managers can view all submissions in the project. This supports separation of duties — submitters from different sites don’t see each other’s data.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="permission-resolution-logic">
+<h2>Permission Resolution Logic<a class="headerlink" href="#permission-resolution-logic" title="Link to this heading"></a></h2>
+<p>Permissions are resolved with a simple cascade:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>can_do(user, action, resource):
+
+  1. Identify the org that owns the resource.
+  2. Check OrgMembership:
+     - If user has no org membership → DENY
+     - If action is org-level → check org role → ALLOW or DENY
+  3. Check ProjectMembership:
+     - If user has no project membership:
+       - Org owner/manager can VIEW any project (read-only admin access)
+       - Otherwise → DENY
+     - If user has project membership → check project role against action → ALLOW or DENY
+
+  Special rules:
+  - Org owner/manager can always manage project membership (even without a ProjectMembership record)
+  - Org owner can override any project-level decision (emergency access)
+  - Public schema browse does not require org membership
+</pre></div>
+</div>
+<p>For the JSON backend, this is a simple function that loads the relevant membership records and checks roles. For Supabase, it maps to RLS policies on each table.</p>
+</section>
+<hr class="docutils" />
+<section id="schema-version-governance">
+<h2>Schema Version Governance<a class="headerlink" href="#schema-version-governance" title="Link to this heading"></a></h2>
+<section id="version-pinning">
+<h3>Version Pinning<a class="headerlink" href="#version-pinning" title="Link to this heading"></a></h3>
+<p>Every Data Project pins to a specific schema version at creation time. This ensures validation consistency — all submissions within a project are validated against the same schema definition.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>DataProject:
+  schema_id: &quot;gp2-clinical&quot;
+  schema_version: &quot;2.0&quot;  ← pinned
+</pre></div>
+</div>
+</section>
+<section id="upgrade-detection">
+<h3>Upgrade Detection<a class="headerlink" href="#upgrade-detection" title="Link to this heading"></a></h3>
+<p>Upgrade detection is <strong>computed at render time</strong>, not stored. When the UI loads a Data Project:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pinned</span> <span class="o">=</span> <span class="n">project</span><span class="o">.</span><span class="n">schema_version</span>          <span class="c1"># &quot;2.0&quot;</span>
+<span class="n">latest</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">get_latest_version</span><span class="p">(</span><span class="n">project</span><span class="o">.</span><span class="n">schema_id</span><span class="p">)</span>  <span class="c1"># &quot;2.1&quot;</span>
+
+<span class="k">if</span> <span class="n">latest</span> <span class="o">&gt;</span> <span class="n">pinned</span><span class="p">:</span>
+    <span class="n">show_upgrade_banner</span><span class="p">(</span><span class="n">pinned</span><span class="p">,</span> <span class="n">latest</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>No notification infrastructure needed. Works identically on JSON and Supabase backends.</p>
+</section>
+<section id="version-diff">
+<h3>Version Diff<a class="headerlink" href="#version-diff" title="Link to this heading"></a></h3>
+<p>When a manager considers upgrading, the system computes a diff between the pinned and latest versions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SchemaVersionDiff</span><span class="p">:</span>
+  <span class="n">from_version</span><span class="p">:</span>      <span class="nb">str</span>
+  <span class="n">to_version</span><span class="p">:</span>        <span class="nb">str</span>
+  <span class="n">changes</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="n">element</span><span class="p">:</span>      <span class="nb">str</span>        <span class="c1"># element name</span>
+      <span class="n">change_type</span><span class="p">:</span>  <span class="nb">str</span>        <span class="c1"># added | removed | modified</span>
+      <span class="n">breaking</span><span class="p">:</span>     <span class="nb">bool</span>       <span class="c1"># see classification below</span>
+      <span class="n">field</span><span class="p">:</span>        <span class="nb">str</span> <span class="o">|</span> <span class="n">null</span> <span class="c1"># which field changed (for modifications)</span>
+      <span class="n">old_value</span><span class="p">:</span>    <span class="nb">any</span> <span class="o">|</span> <span class="n">null</span>
+      <span class="n">new_value</span><span class="p">:</span>    <span class="nb">any</span> <span class="o">|</span> <span class="n">null</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+  <span class="n">has_breaking_changes</span><span class="p">:</span> <span class="nb">bool</span>   <span class="c1"># convenience flag</span>
+</pre></div>
+</div>
+<p><strong>Breaking Change Classification:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Change</p></th>
+<th class="head text-center"><p>Breaking?</p></th>
+<th class="head"><p>Why</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>New optional element added</p></td>
+<td class="text-center"><p>No</p></td>
+<td><p>Existing data unaffected</p></td>
+</tr>
+<tr class="row-odd"><td><p>Description or label updated</p></td>
+<td class="text-center"><p>No</p></td>
+<td><p>No impact on data validity</p></td>
+</tr>
+<tr class="row-even"><td><p>Constraint loosened (range widened, values added)</p></td>
+<td class="text-center"><p>No</p></td>
+<td><p>Previously valid data is still valid</p></td>
+</tr>
+<tr class="row-odd"><td><p>Constraint tightened (range narrowed, values removed)</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td><p>Previously valid data may now fail</p></td>
+</tr>
+<tr class="row-even"><td><p>Allowed values changed</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td><p>Old values no longer valid</p></td>
+</tr>
+<tr class="row-odd"><td><p>Element type changed</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td><p>Old data may not parse</p></td>
+</tr>
+<tr class="row-even"><td><p>Required field added</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td><p>Old submissions may lack this field</p></td>
+</tr>
+<tr class="row-odd"><td><p>Element removed</p></td>
+<td class="text-center"><p><strong>Yes</strong></p></td>
+<td><p>Mapped fields reference something that no longer exists</p></td>
+</tr>
+</tbody>
+</table>
+<p>The diff is computed from Registry version history — not stored separately.</p>
+</section>
+<section id="upgrade-workflow">
+<h3>Upgrade Workflow<a class="headerlink" href="#upgrade-workflow" title="Link to this heading"></a></h3>
+<section id="path-a-non-breaking-changes-only">
+<h4>Path A: Non-Breaking Changes Only<a class="headerlink" href="#path-a-non-breaking-changes-only" title="Link to this heading"></a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Manager clicks &quot;Upgrade to v2.1&quot;
+  → Pinned version updated
+  → Harmonization: new unmapped elements flagged (&quot;new in v2.1&quot;)
+  → Pending submissions: re-validate against v2.1
+  → Accepted submissions: no change needed
+  → Done
+</pre></div>
+</div>
+</section>
+<section id="path-b-breaking-changes-detected">
+<h4>Path B: Breaking Changes Detected<a class="headerlink" href="#path-b-breaking-changes-detected" title="Link to this heading"></a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Manager clicks &quot;Upgrade to v2.1&quot;
+  → Diff computed, breaking changes found
+  → Warning shown with change details
+  → Manager confirms → Upgrade proceeds + Compliance Sweep triggered
+</pre></div>
+</div>
+</section>
+</section>
+<section id="compliance-sweep">
+<h3>Compliance Sweep<a class="headerlink" href="#compliance-sweep" title="Link to this heading"></a></h3>
+<p>A compliance sweep re-validates all accepted submissions against the new schema version. It is <strong>read-only</strong> — no submission statuses change automatically.</p>
+<p><strong>Trigger:</strong> Automatically offered when upgrading with breaking changes. Can also be run manually by a manager at any time.</p>
+<p><strong>Process:</strong></p>
+<ol class="arabic simple">
+<li><p>Load all accepted submissions in the project.</p></li>
+<li><p>Re-validate each against the new schema version.</p></li>
+<li><p>For each submission, compute: would it pass or fail under the new rules?</p></li>
+<li><p>Generate a Compliance Report.</p></li>
+</ol>
+<p><strong>Compliance Report:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Schema Upgrade Compliance: v2.0 → v2.1
+──────────────────────────────────────
+
+12 accepted submissions re-validated
+
+  Compliant:      3  (pass under new schema)
+  Non-compliant:  9  (would fail under new schema)
+
+Non-compliant submissions:
+
+  S-012 (Site-A): &quot;sex&quot; — 48 rows contain &quot;male&quot; (not in new allowed values)
+  S-015 (Site-A): &quot;sex&quot; — 31 rows contain &quot;male&quot;
+  S-023 (Site-B): &quot;sex&quot; — 62 rows contain &quot;female&quot;
+  ...
+</pre></div>
+</div>
+</section>
+<section id="resolution-strategies">
+<h3>Resolution Strategies<a class="headerlink" href="#resolution-strategies" title="Link to this heading"></a></h3>
+<p>For each non-compliant submission, the manager chooses a resolution:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Strategy</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Effect</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Request correction</strong></p></td>
+<td><p>Send back to original submitter for re-submission with corrected values.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">compliance_status</span> <span class="pre">=</span> <span class="pre">&quot;non_compliant&quot;</span></code>, submitter notified. Original submission’s <code class="docutils literal notranslate"><span class="pre">superseded_by</span></code> will point to the new submission once resubmitted.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Exempt</strong></p></td>
+<td><p>Accept the non-compliance with a documented reason.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">compliance_status</span> <span class="pre">=</span> <span class="pre">&quot;exempt&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">compliance_note</span></code> recorded, <code class="docutils literal notranslate"><span class="pre">compliance_reviewed_by</span></code> set.</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Apply transform</strong> <em>(Phase 5+)</em></p></td>
+<td><p>Auto-remap values based on a mapping table (e.g., <code class="docutils literal notranslate"><span class="pre">male</span> <span class="pre">→</span> <span class="pre">1</span></code>).</p></td>
+<td><p>Creates a new submission version with transformed values. Original preserved in history.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Rules:</strong></p>
+<ul class="simple">
+<li><p>Only Data Project <code class="docutils literal notranslate"><span class="pre">manager</span></code> can resolve compliance issues.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">exempt</span></code> requires a written note (enforced by UI).</p></li>
+<li><p>All resolutions are recorded in the audit trail.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Request</span> <span class="pre">correction</span></code> uses the existing reject/resubmit workflow — no new submission lifecycle needed.</p></li>
+<li><p>Accepted data is <strong>never silently invalidated</strong>. Every status change requires a human decision.</p></li>
+</ul>
+</section>
+<section id="submission-lifecycle-with-compliance">
+<h3>Submission Lifecycle with Compliance<a class="headerlink" href="#submission-lifecycle-with-compliance" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                                    ┌──────────────────────┐
+                                    │     Schema Upgrade    │
+                                    │   (breaking change)   │
+                                    └──────────┬───────────┘
+                                               │
+                                               ▼
+                                    ┌──────────────────────┐
+                                    │   Compliance Sweep    │
+                                    │   (re-validate all)   │
+                                    └──────────┬───────────┘
+                                               │
+                              ┌────────────────┼────────────────┐
+                              │                │                │
+                              ▼                ▼                ▼
+                        ┌──────────┐    ┌──────────┐    ┌──────────┐
+                        │Compliant │    │  Exempt  │    │ Request  │
+                        │ (no-op)  │    │ (noted)  │    │Correction│
+                        └──────────┘    └──────────┘    └────┬─────┘
+                                                             │
+                                                             ▼
+                                                    ┌──────────────┐
+                                                    │  Submitter   │
+                                                    │ fixes &amp; re-  │
+                                                    │ submits      │
+                                                    └──────┬───────┘
+                                                           │
+                                                           ▼
+                                                    ┌──────────────┐
+                                                    │  Normal QC   │
+                                                    │  review flow │
+                                                    └──────────────┘
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="json-backend-implementation-notes">
+<h2>JSON Backend Implementation Notes<a class="headerlink" href="#json-backend-implementation-notes" title="Link to this heading"></a></h2>
+<p>For the current file-based backend, these entities map to JSON files:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>.forge/
+├── users/
+│   └── {user_id}.json              # User profile
+├── orgs/
+│   ├── {org_id}/
+│   │   ├── org.json                # Org metadata
+│   │   ├── members.json            # OrgMembership[]
+│   │   ├── schema-projects/
+│   │   │   └── {project_id}/
+│   │   │       ├── project.json    # SchemaProject metadata
+│   │   │       └── members.json    # ProjectMembership[]
+│   │   └── data-projects/
+│   │       └── {project_id}/
+│   │           ├── project.json    # DataProject metadata
+│   │           ├── members.json    # ProjectMembership[]
+│   │           └── compliance/
+│   │               └── sweep_{timestamp}.json  # Compliance reports
+│   └── index.json                  # Org listing for quick lookup
+└── proposals/
+    └── {proposal_id}.json          # ElementProposal (Phase 5+)
+</pre></div>
+</div>
+<p>Permission checks are simple function calls that load the relevant JSON files and check role fields. No middleware or framework needed.</p>
+<section id="supabase-migration-path">
+<h3>Supabase Migration Path<a class="headerlink" href="#supabase-migration-path" title="Link to this heading"></a></h3>
+<p>Each JSON entity maps 1:1 to a Supabase table:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>JSON File</p></th>
+<th class="head"><p>Supabase Table</p></th>
+<th class="head"><p>RLS Policy</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">users/{id}.json</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">users</span></code></p></td>
+<td><p>User can read/write own row</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">orgs/{id}/org.json</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">orgs</span></code></p></td>
+<td><p>Members can read; owner/manager can write</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">orgs/{id}/members.json</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">org_memberships</span></code></p></td>
+<td><p>Members can read; owner/manager can insert/delete</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">schema-projects/{id}/project.json</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">schema_projects</span></code></p></td>
+<td><p>Project members can read; manager can write</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">data-projects/{id}/project.json</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_projects</span></code></p></td>
+<td><p>Project members can read; manager can write</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">*/members.json</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">project_memberships</span></code></p></td>
+<td><p>Project members can read; manager can write</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">proposals/{id}.json</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">element_proposals</span></code></p></td>
+<td><p>Creator can read/write; schema manager can review</p></td>
+</tr>
+</tbody>
+</table>
+<p>The permission resolution logic (see above) translates directly to Supabase RLS policies using <code class="docutils literal notranslate"><span class="pre">auth.uid()</span></code> and membership lookups.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="audit-trail">
+<h2>Audit Trail<a class="headerlink" href="#audit-trail" title="Link to this heading"></a></h2>
+<p>All permission-sensitive actions are logged:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>AuditEntry:
+  id:          uuid
+  timestamp:   datetime
+  actor_id:    uuid → User
+  org_id:      uuid → Org
+  project_id:  uuid | null → Project
+  action:      str (see below)
+  target_type: str (org|project|schema|submission|membership|proposal)
+  target_id:   uuid
+  details:     dict (action-specific metadata)
+</pre></div>
+</div>
+<p><strong>Audited Actions:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Category</p></th>
+<th class="head"><p>Actions</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Org management</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">org.created</span></code>, <code class="docutils literal notranslate"><span class="pre">org.member_added</span></code>, <code class="docutils literal notranslate"><span class="pre">org.member_removed</span></code>, <code class="docutils literal notranslate"><span class="pre">org.member_role_changed</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Schema projects</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">schema_project.created</span></code>, <code class="docutils literal notranslate"><span class="pre">schema.published</span></code>, <code class="docutils literal notranslate"><span class="pre">schema.visibility_changed</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Data projects</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_project.created</span></code>, <code class="docutils literal notranslate"><span class="pre">data_project.schema_upgraded</span></code>, <code class="docutils literal notranslate"><span class="pre">data_project.archived</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Project membership</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">project.member_added</span></code>, <code class="docutils literal notranslate"><span class="pre">project.member_removed</span></code>, <code class="docutils literal notranslate"><span class="pre">project.member_role_changed</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Submissions</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">submission.uploaded</span></code>, <code class="docutils literal notranslate"><span class="pre">submission.validated</span></code>, <code class="docutils literal notranslate"><span class="pre">submission.claimed</span></code>, <code class="docutils literal notranslate"><span class="pre">submission.accepted</span></code>, <code class="docutils literal notranslate"><span class="pre">submission.rejected</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Compliance</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">compliance.sweep_run</span></code>, <code class="docutils literal notranslate"><span class="pre">compliance.exempted</span></code>, <code class="docutils literal notranslate"><span class="pre">compliance.correction_requested</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Proposals</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">proposal.created</span></code>, <code class="docutils literal notranslate"><span class="pre">proposal.approved</span></code>, <code class="docutils literal notranslate"><span class="pre">proposal.rejected</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="open-items-future-considerations">
+<h2>Open Items &amp; Future Considerations<a class="headerlink" href="#open-items-future-considerations" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Item</p></th>
+<th class="head"><p>Status</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Element Proposals (suggest from harmonization)</p></td>
+<td><p><strong>Phase 5+</strong></p></td>
+<td><p>Entity modeled, UI deferred. Critical for multi-site workflows.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Apply Transform (auto-remap on compliance)</p></td>
+<td><p><strong>Phase 5+</strong></p></td>
+<td><p>Powerful but complex. Requires value mapping UI and new submission versioning.</p></td>
+</tr>
+<tr class="row-even"><td><p>Org billing / quotas</p></td>
+<td><p><strong>Future</strong></p></td>
+<td><p>Not relevant until hosted/SaaS model.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Cross-org collaboration</p></td>
+<td><p><strong>Future</strong></p></td>
+<td><p>Orgs can share via public schemas. Direct cross-org project sharing deferred.</p></td>
+</tr>
+<tr class="row-even"><td><p>Fine-grained field-level permissions</p></td>
+<td><p><strong>Not planned</strong></p></td>
+<td><p>Adds complexity without clear need. Role-based access is sufficient.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Invitation accept/reject flow</p></td>
+<td><p><strong>Supabase phase</strong></p></td>
+<td><p>JSON backend: direct add. Supabase: add email invite → accept flow.</p></td>
+</tr>
+<tr class="row-even"><td><p>SSO / institutional login</p></td>
+<td><p><strong>Supabase phase</strong></p></td>
+<td><p>Supabase Auth supports Google, SAML. Layer on after base auth.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="registry-service.html" class="btn btn-neutral float-left" title="SchemaForge: Registry Service" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../reference/api-reference.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

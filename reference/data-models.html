@@ -1,0 +1,1438 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Model Reference &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Glossary" href="glossary.html" />
+    <link rel="prev" title="API Reference" href="api-reference.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../platform/forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../specs/api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api-reference.html">API Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data Model Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#registry-service-postgresql-orm">Registry Service (PostgreSQL ORM)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#schema"><code class="docutils literal notranslate"><span class="pre">Schema</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#element"><code class="docutils literal notranslate"><span class="pre">Element</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schemaversion"><code class="docutils literal notranslate"><span class="pre">SchemaVersion</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#valueset"><code class="docutils literal notranslate"><span class="pre">ValueSet</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#dataforge-pydantic-persisted-as-json-files">DataForge (Pydantic, persisted as JSON files)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submission"><code class="docutils literal notranslate"><span class="pre">Submission</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#submissionversion"><code class="docutils literal notranslate"><span class="pre">SubmissionVersion</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#validationresult"><code class="docutils literal notranslate"><span class="pre">ValidationResult</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#validationissue"><code class="docutils literal notranslate"><span class="pre">ValidationIssue</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schema-dataforge-s-internal-copy"><code class="docutils literal notranslate"><span class="pre">Schema</span></code> (DataForge’s internal copy)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fieldconfig"><code class="docutils literal notranslate"><span class="pre">FieldConfig</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ruleconfig"><code class="docutils literal notranslate"><span class="pre">RuleConfig</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#golddataset"><code class="docutils literal notranslate"><span class="pre">GoldDataset</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#identifierscheme"><code class="docutils literal notranslate"><span class="pre">IdentifierScheme</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#identifierdef"><code class="docutils literal notranslate"><span class="pre">IdentifierDef</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#auditentry"><code class="docutils literal notranslate"><span class="pre">AuditEntry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#forge-app-pydantic-persisted-as-local-json-csv-files">forge-app (Pydantic, persisted as local JSON/CSV files)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#schemaprojectmanifest"><code class="docutils literal notranslate"><span class="pre">SchemaProjectManifest</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dataprojectmanifest"><code class="docutils literal notranslate"><span class="pre">DataProjectManifest</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#curationsession"><code class="docutils literal notranslate"><span class="pre">CurationSession</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#elementcuration"><code class="docutils literal notranslate"><span class="pre">ElementCuration</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#curatedelement"><code class="docutils literal notranslate"><span class="pre">CuratedElement</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#curatedmatchset"><code class="docutils literal notranslate"><span class="pre">CuratedMatchSet</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fieldmatchcuration"><code class="docutils literal notranslate"><span class="pre">FieldMatchCuration</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#cross-service-relationships">Cross-Service Relationships</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#storage-locations">Storage Locations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Data Model Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/data-models.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="data-model-reference">
+<h1>Data Model Reference<a class="headerlink" href="#data-model-reference" title="Link to this heading"></a></h1>
+<p>Every Pydantic model and ORM model in the platform, grouped by service.</p>
+<hr class="docutils" />
+<section id="registry-service-postgresql-orm">
+<h2>Registry Service (PostgreSQL ORM)<a class="headerlink" href="#registry-service-postgresql-orm" title="Link to this heading"></a></h2>
+<section id="schema">
+<h3><code class="docutils literal notranslate"><span class="pre">Schema</span></code><a class="headerlink" href="#schema" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">services/registry-service/app/models/schema.py</span></code></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Column</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>UUID</p></td>
+<td><p>PK</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Unique slug, indexed. Must match <code class="docutils literal notranslate"><span class="pre">^[a-z0-9_-]+$</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">display_name</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Human-readable name</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">description</span></code></p></td>
+<td><p>str?</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">version</span></code></p></td>
+<td><p>int</p></td>
+<td><p>Auto-incremented on update</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">is_active</span></code></p></td>
+<td><p>bool</p></td>
+<td><p>Soft-delete flag</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">is_published</span></code></p></td>
+<td><p>bool</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">metadata_</span></code></p></td>
+<td><p>JSONB?</p></td>
+<td><p>Stores <code class="docutils literal notranslate"><span class="pre">validation_rules</span></code> and other extensible data</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">created_at</span></code></p></td>
+<td><p>datetime</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">updated_at</span></code></p></td>
+<td><p>datetime</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Relationships:</strong> <code class="docutils literal notranslate"><span class="pre">elements</span></code> (1:many → Element), <code class="docutils literal notranslate"><span class="pre">versions</span></code> (1:many → SchemaVersion)</p>
+</section>
+<section id="element">
+<h3><code class="docutils literal notranslate"><span class="pre">Element</span></code><a class="headerlink" href="#element" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">services/registry-service/app/models/element.py</span></code></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Column</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>UUID</p></td>
+<td><p>PK</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">schema_id</span></code></p></td>
+<td><p>UUID</p></td>
+<td><p>FK → Schema, indexed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">item</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Element name, indexed. Unique within schema.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">description</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">collection</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>Grouping category</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">item_type</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>STRING, NUMERIC, ENUM, DATE, BINARY</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">values</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>Pipe-separated allowed values</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">alternate_names</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>Pipe-separated aliases</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>REQUIRED or OPTIONAL</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sort_order</span></code></p></td>
+<td><p>int</p></td>
+<td><p>Display ordering</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">is_active</span></code></p></td>
+<td><p>bool</p></td>
+<td><p>Soft-delete flag</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">metadata_</span></code></p></td>
+<td><p>JSONB?</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Constraints:</strong> Unique(schema_id, item), Index(schema_id, collection)</p>
+</section>
+<section id="schemaversion">
+<h3><code class="docutils literal notranslate"><span class="pre">SchemaVersion</span></code><a class="headerlink" href="#schemaversion" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">services/registry-service/app/models/schema_version.py</span></code></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Column</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>UUID</p></td>
+<td><p>PK</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">schema_id</span></code></p></td>
+<td><p>UUID</p></td>
+<td><p>FK → Schema</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">version</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">snapshot</span></code></p></td>
+<td><p>JSONB</p></td>
+<td><p>Full schema state at this version</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">change_summary</span></code></p></td>
+<td><p>str?</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">changed_by</span></code></p></td>
+<td><p>str?</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">created_at</span></code></p></td>
+<td><p>datetime</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="valueset">
+<h3><code class="docutils literal notranslate"><span class="pre">ValueSet</span></code><a class="headerlink" href="#valueset" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">services/registry-service/app/models/value_set.py</span></code></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Column</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>UUID</p></td>
+<td><p>PK</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Unique slug</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">display_name</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">description</span></code></p></td>
+<td><p>str?</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">value_set_type</span></code></p></td>
+<td><p>str</p></td>
+<td><p>“flat” or “hierarchical”</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">version</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">is_active</span></code></p></td>
+<td><p>bool</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">is_published</span></code></p></td>
+<td><p>bool</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">entries</span></code></p></td>
+<td><p>JSONB</p></td>
+<td><p>List of row dicts</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">columns</span></code></p></td>
+<td><p>JSONB</p></td>
+<td><p>Column definitions</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">code_column</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Which column is the code</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">display_column</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Which column is the display label</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">parent_column</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>For hierarchical sets</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">metadata_</span></code></p></td>
+<td><p>JSONB?</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Relationships:</strong> <code class="docutils literal notranslate"><span class="pre">versions</span></code> (1:many → ValueSetVersion)</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="dataforge-pydantic-persisted-as-json-files">
+<h2>DataForge (Pydantic, persisted as JSON files)<a class="headerlink" href="#dataforge-pydantic-persisted-as-json-files" title="Link to this heading"></a></h2>
+<section id="submission">
+<h3><code class="docutils literal notranslate"><span class="pre">Submission</span></code><a class="headerlink" href="#submission" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/submission/models.py</span></code></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>UUID</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">project</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Project name</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">study</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Study name</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">schema_name</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">schema_id</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>Registry schema UUID. Persisted for resubmit.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">gold_dataset_id</span></code></p></td>
+<td><p>UUID?</p></td>
+<td><p>Target gold dataset</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">submitter</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Unvalidated string (no auth yet)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">status</span></code></p></td>
+<td><p>SubmissionStatus</p></td>
+<td><p>See state machine in API Reference</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">versions</span></code></p></td>
+<td><p>list[SubmissionVersion]</p></td>
+<td><p>Append-only version history</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">claimed_by</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>Reviewer who holds the claim</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">claimed_at</span></code></p></td>
+<td><p>datetime?</p></td>
+<td><p>Claim expiry tracked from this</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">created_at</span></code></p></td>
+<td><p>datetime</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">updated_at</span></code></p></td>
+<td><p>datetime</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="submissionversion">
+<h3><code class="docutils literal notranslate"><span class="pre">SubmissionVersion</span></code><a class="headerlink" href="#submissionversion" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p>Same file</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">version</span></code></p></td>
+<td><p>int</p></td>
+<td><p>1-indexed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">file_hash</span></code></p></td>
+<td><p>str</p></td>
+<td><p>SHA-256 of uploaded file</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">file_name</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">row_count</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">column_count</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">uploaded_at</span></code></p></td>
+<td><p>datetime</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_result_id</span></code></p></td>
+<td><p>str?</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="validationresult">
+<h3><code class="docutils literal notranslate"><span class="pre">ValidationResult</span></code><a class="headerlink" href="#validationresult" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/validation/models.py</span></code></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">schema_name</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">schema_version</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">record_count</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">column_count</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">issues</span></code></p></td>
+<td><p>list[ValidationIssue]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">columns_mapped</span></code></p></td>
+<td><p>dict[str, str]</p></td>
+<td><p>Source → canonical column mapping</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">is_valid</span></code></p></td>
+<td><p>bool</p></td>
+<td><p>Computed: no ERROR-severity issues</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">error_count</span></code></p></td>
+<td><p>int</p></td>
+<td><p>Computed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">warning_count</span></code></p></td>
+<td><p>int</p></td>
+<td><p>Computed</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="validationissue">
+<h3><code class="docutils literal notranslate"><span class="pre">ValidationIssue</span></code><a class="headerlink" href="#validationissue" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p>Same file</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">issue_type</span></code></p></td>
+<td><p>IssueType</p></td>
+<td><p>MISSING_REQUIRED, TYPE_ERROR, INVALID_ENUM, OUT_OF_RANGE, RULE_VIOLATION, SUBMISSION_VIOLATION</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">severity</span></code></p></td>
+<td><p>Severity</p></td>
+<td><p>ERROR, WARNING, INFO</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">field</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>Column name</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">row</span></code></p></td>
+<td><p>int?</p></td>
+<td><p>1-indexed row number</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rule_name</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>For RULE_VIOLATION type</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">message</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Human-readable description</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">value</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>The offending value</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">context</span></code></p></td>
+<td><p>dict</p></td>
+<td><p>Additional context</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="schema-dataforge-s-internal-copy">
+<h3><code class="docutils literal notranslate"><span class="pre">Schema</span></code> (DataForge’s internal copy)<a class="headerlink" href="#schema-dataforge-s-internal-copy" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/schema/models.py</span></code></p>
+</div></blockquote>
+<p>Loaded at validation time via <code class="docutils literal notranslate"><span class="pre">RegistrySchemaLoader</span></code> from the Registry API.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">display_name</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">version</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">elements</span></code></p></td>
+<td><p>list[FieldConfig]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">validation_rules</span></code></p></td>
+<td><p>list[RuleConfig]</p></td>
+<td><p>From Registry <code class="docutils literal notranslate"><span class="pre">metadata_.validation_rules</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="fieldconfig">
+<h3><code class="docutils literal notranslate"><span class="pre">FieldConfig</span></code><a class="headerlink" href="#fieldconfig" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p>Same file</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">item</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Field name</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">description</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">collection</span></code></p></td>
+<td><p>str?</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">item_type</span></code></p></td>
+<td><p>ItemType</p></td>
+<td><p>STRING, NUMERIC, ENUM, DATE, BINARY</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">values</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>Pipe-separated allowed values</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">alternate_names</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>Pipe-separated</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></td>
+<td><p>Priority</p></td>
+<td><p>REQUIRED or OPTIONAL</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="ruleconfig">
+<h3><code class="docutils literal notranslate"><span class="pre">RuleConfig</span></code><a class="headerlink" href="#ruleconfig" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p>Same file</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">description</span></code></p></td>
+<td><p>str?</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">rule_type</span></code></p></td>
+<td><p>RuleType</p></td>
+<td><p>CONDITIONAL or SUBMISSION</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">condition</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>Python expression (e.g., <code class="docutils literal notranslate"><span class="pre">row['status']</span> <span class="pre">==</span> <span class="pre">'affected'</span></code>)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">constraint</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Python expression that must evaluate to True</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">severity</span></code></p></td>
+<td><p>Severity</p></td>
+<td><p>ERROR or WARNING</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">enabled</span></code></p></td>
+<td><p>bool</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="golddataset">
+<h3><code class="docutils literal notranslate"><span class="pre">GoldDataset</span></code><a class="headerlink" href="#golddataset" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/gold/models.py</span></code></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">id</span></code></p></td>
+<td><p>UUID</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">description</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">schema_id</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Registry schema UUID</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">schema_name</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">identifier_scheme</span></code></p></td>
+<td><p>IdentifierScheme?</p></td>
+<td><p>Dedup + ID generation config</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">created_by</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">created_at</span></code></p></td>
+<td><p>datetime</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">updated_at</span></code></p></td>
+<td><p>datetime</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">record_count</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">submission_count</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="identifierscheme">
+<h3><code class="docutils literal notranslate"><span class="pre">IdentifierScheme</span></code><a class="headerlink" href="#identifierscheme" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p>Same file</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">identifiers</span></code></p></td>
+<td><p>list[IdentifierDef]</p></td>
+<td><p>Source and golden ID definitions</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">dedup</span></code></p></td>
+<td><p>DedupStrategy</p></td>
+<td><p>Match keys + duplicate action</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">assignment</span></code></p></td>
+<td><p>AssignmentTiming</p></td>
+<td><p>ON_UPLOAD, ON_REVIEW, or ON_ACCEPT</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="identifierdef">
+<h3><code class="docutils literal notranslate"><span class="pre">IdentifierDef</span></code><a class="headerlink" href="#identifierdef" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p>Same file</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Column name for this ID</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">id_class</span></code></p></td>
+<td><p>IdClass</p></td>
+<td><p>SOURCE or GOLDEN</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">scope</span></code></p></td>
+<td><p>IdScope</p></td>
+<td><p>ENTITY or RECORD</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">source_columns</span></code></p></td>
+<td><p>list[str]</p></td>
+<td><p>Columns to read from submitted data</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">generation</span></code></p></td>
+<td><p>IdGeneration?</p></td>
+<td><p>How to generate (UUID, template, composite)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">parent</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>Parent ID name for hierarchical IDs</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mutability</span></code></p></td>
+<td><p>ColumnMutability</p></td>
+<td><p>SUBMITTER, MANAGER, or SYSTEM</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="auditentry">
+<h3><code class="docutils literal notranslate"><span class="pre">AuditEntry</span></code><a class="headerlink" href="#auditentry" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/audit/models.py</span></code></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">action</span></code></p></td>
+<td><p>AuditAction</p></td>
+<td><p>SUBMISSION_CREATED, STATUS_CHANGED, FILE_UPLOADED, VALIDATION_RUN, REVIEW_CLAIMED, REVIEW_RELEASED, REVIEW_ACCEPTED, REVIEW_REJECTED, REVIEW_GOLD_ASSIGNED</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">actor</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Who performed the action</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">timestamp</span></code></p></td>
+<td><p>datetime</p></td>
+<td><p>UTC</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">details</span></code></p></td>
+<td><p>dict</p></td>
+<td><p>Action-specific context</p></td>
+</tr>
+</tbody>
+</table>
+<p>Stored as append-only JSONL at <code class="docutils literal notranslate"><span class="pre">{storage_root}/submissions/{submission_id}/audit.jsonl</span></code>.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="forge-app-pydantic-persisted-as-local-json-csv-files">
+<h2>forge-app (Pydantic, persisted as local JSON/CSV files)<a class="headerlink" href="#forge-app-pydantic-persisted-as-local-json-csv-files" title="Link to this heading"></a></h2>
+<section id="schemaprojectmanifest">
+<h3><code class="docutils literal notranslate"><span class="pre">SchemaProjectManifest</span></code><a class="headerlink" href="#schemaprojectmanifest" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">services/forge-app/schemas/manifest.py</span></code></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">project_id</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">project_name</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">user_id</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Currently set to user email</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">current_step</span></code></p></td>
+<td><p>int</p></td>
+<td><p>Wizard step (1-5)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">created_at</span></code></p></td>
+<td><p>datetime</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">modified_at</span></code></p></td>
+<td><p>datetime</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">source_filename</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Uploaded CDE file name</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">source_row_count</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">variable_count</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">completed_variables</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">published_schema_id</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>Set after successful publish to Registry</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">published_schema_name</span></code></p></td>
+<td><p>str?</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">steps</span></code></p></td>
+<td><p>dict[str, StepMetadata]</p></td>
+<td><p>Per-step completion tracking</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="dataprojectmanifest">
+<h3><code class="docutils literal notranslate"><span class="pre">DataProjectManifest</span></code><a class="headerlink" href="#dataprojectmanifest" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p>Same file</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">project_id</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">project_name</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">user_id</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">schema_id</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Registry schema UUID</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">schema_name</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">schema_version</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">harmonization_enabled</span></code></p></td>
+<td><p>bool</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">harmonization_step</span></code></p></td>
+<td><p>int?</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">harmonization_complete</span></code></p></td>
+<td><p>bool</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pipeline_step</span></code></p></td>
+<td><p>int</p></td>
+<td><p>Current wizard step (1-5)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">study</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_complete</span></code></p></td>
+<td><p>bool</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">has_data_file</span></code></p></td>
+<td><p>bool</p></td>
+<td><p>Whether a data file was uploaded alongside the data dict</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">data_file_name</span></code></p></td>
+<td><p>str?</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">gold_dataset_id</span></code></p></td>
+<td><p>str?</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">gold_dataset_name</span></code></p></td>
+<td><p>str?</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">submission_ids</span></code></p></td>
+<td><p>list[str]</p></td>
+<td><p>All submission UUIDs created from this project</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">active_submission_id</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>Current/latest submission</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">steps</span></code></p></td>
+<td><p>dict[str, StepMetadata]</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="curationsession">
+<h3><code class="docutils literal notranslate"><span class="pre">CurationSession</span></code><a class="headerlink" href="#curationsession" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">services/forge-app/core/curation/models.py</span></code></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">project_id</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">source_filename</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">source_row_count</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">current_step</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">config</span></code></p></td>
+<td><p>CurationConfig</p></td>
+<td><p>Naming, AI, and retrieval settings</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">column_mapping</span></code></p></td>
+<td><p>dict[str, str]</p></td>
+<td><p>Source column → canonical column mapping</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">duplicate_groups</span></code></p></td>
+<td><p>list[DuplicateGroup]</p></td>
+<td><p>Detected duplicates</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">variable_similarities</span></code></p></td>
+<td><p>dict[str, dict[str, float]]</p></td>
+<td><p>Pairwise similarity scores</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">suggestions_complete</span></code></p></td>
+<td><p>bool</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">element_curations</span></code></p></td>
+<td><p>dict[str, ElementCuration]</p></td>
+<td><p><strong>Keyed by variable name</strong></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">curated_elements</span></code></p></td>
+<td><p>list[CuratedElement]</p></td>
+<td><p>Final curated output</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">validation_rules</span></code></p></td>
+<td><p>list[dict]</p></td>
+<td><p>Rules built in Step 4</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="elementcuration">
+<h3><code class="docutils literal notranslate"><span class="pre">ElementCuration</span></code><a class="headerlink" href="#elementcuration" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p>Same file</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">source_variable</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Original variable name</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">source_row</span></code></p></td>
+<td><p>int</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">decision</span></code></p></td>
+<td><p>CurationDecision</p></td>
+<td><p>PENDING, ACCEPTED, MODIFIED, REJECTED, SKIPPED, MERGED</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">curated_element</span></code></p></td>
+<td><p>CuratedElement?</p></td>
+<td><p>The curated result (if accepted/modified)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">curation_notes</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">curated_at</span></code></p></td>
+<td><p>datetime?</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="curatedelement">
+<h3><code class="docutils literal notranslate"><span class="pre">CuratedElement</span></code><a class="headerlink" href="#curatedelement" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p>Same file</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Cleaned variable name</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">display_name</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">description</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">type</span></code></p></td>
+<td><p>ElementType</p></td>
+<td><p>STRING, INTEGER, FLOAT, BOOLEAN, ENUM, DATE, DATETIME</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nullable</span></code></p></td>
+<td><p>bool</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">constraints</span></code></p></td>
+<td><p>dict?</p></td>
+<td><p>e.g., <code class="docutils literal notranslate"><span class="pre">{&quot;min&quot;:</span> <span class="pre">0,</span> <span class="pre">&quot;max&quot;:</span> <span class="pre">120}</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">allowed_values</span></code></p></td>
+<td><p>list[str]?</p></td>
+<td><p>For ENUM type</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">collection</span></code></p></td>
+<td><p>str?</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">aliases</span></code></p></td>
+<td><p>list[str]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ai_suggested</span></code></p></td>
+<td><p>bool</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">user_modified</span></code></p></td>
+<td><p>bool</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="curatedmatchset">
+<h3><code class="docutils literal notranslate"><span class="pre">CuratedMatchSet</span></code><a class="headerlink" href="#curatedmatchset" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">services/forge-app/core/harmonization/models.py</span></code></p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">metadata</span></code></p></td>
+<td><p>CuratedMatchSetMetadata</p></td>
+<td><p>Name, description, source file, schema, timestamps</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">field_curations</span></code></p></td>
+<td><p>list[FieldMatchCuration]</p></td>
+<td><p>One per source field</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="fieldmatchcuration">
+<h3><code class="docutils literal notranslate"><span class="pre">FieldMatchCuration</span></code><a class="headerlink" href="#fieldmatchcuration" title="Link to this heading"></a></h3>
+<blockquote>
+<div><p>Same file</p>
+</div></blockquote>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">source_name</span></code></p></td>
+<td><p>str</p></td>
+<td><p>Source field name</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">source_form</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">source_description</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">source_values</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ai_matched_cde</span></code></p></td>
+<td><p>str</p></td>
+<td><p>AI’s best match</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ai_matched_description</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ai_matched_collection</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ai_match_confidence</span></code></p></td>
+<td><p>float</p></td>
+<td><p>0.0 - 1.0</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ai_match_status</span></code></p></td>
+<td><p>str</p></td>
+<td><p>HIGH_QUALITY_MATCH, MEDIUM_QUALITY_MATCH, etc.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ai_rationale</span></code></p></td>
+<td><p>str</p></td>
+<td><p>AI’s explanation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ai_concerns</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ai_alternative_matches</span></code></p></td>
+<td><p>list[str]</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ai_needs_new_cde</span></code></p></td>
+<td><p>bool</p></td>
+<td><p>True if no good match exists</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">curation_decision</span></code></p></td>
+<td><p>CurationDecision</p></td>
+<td><p>PENDING, ACCEPTED, REJECTED, MODIFIED</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">curated_cde</span></code></p></td>
+<td><p>str?</p></td>
+<td><p>Override CDE (if MODIFIED)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">curation_notes</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">curated_at</span></code></p></td>
+<td><p>datetime?</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">curated_by</span></code></p></td>
+<td><p>str</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<hr class="docutils" />
+<section id="cross-service-relationships">
+<h2>Cross-Service Relationships<a class="headerlink" href="#cross-service-relationships" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>SchemaProjectManifest.published_schema_id ──→ Registry Schema.id
+DataProjectManifest.schema_id ─────────────→ Registry Schema.id
+DataProjectManifest.gold_dataset_id ───────→ GoldDataset.id
+DataProjectManifest.active_submission_id ──→ Submission.id
+Submission.schema_id ──────────────────────→ Registry Schema.id
+Submission.gold_dataset_id ────────────────→ GoldDataset.id
+GoldDataset.schema_id ────────────────────→ Registry Schema.id
+</pre></div>
+</div>
+</section>
+<hr class="docutils" />
+<section id="storage-locations">
+<h2>Storage Locations<a class="headerlink" href="#storage-locations" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Data</p></th>
+<th class="head"><p>Where</p></th>
+<th class="head"><p>Format</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Schemas, elements, versions</p></td>
+<td><p>PostgreSQL (Registry)</p></td>
+<td><p>SQLAlchemy ORM</p></td>
+</tr>
+<tr class="row-odd"><td><p>Value sets</p></td>
+<td><p>PostgreSQL (Registry)</p></td>
+<td><p>SQLAlchemy ORM</p></td>
+</tr>
+<tr class="row-even"><td><p>Schema project manifests</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.cache/forge-app/schema_projects/{user}/{id}/</span></code></p></td>
+<td><p>JSON</p></td>
+</tr>
+<tr class="row-odd"><td><p>Curation sessions</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.cache/forge-app/schema_projects/{user}/{id}/</span></code></p></td>
+<td><p>JSON</p></td>
+</tr>
+<tr class="row-even"><td><p>Data project manifests</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.cache/forge-app/data_projects/{user}/</span></code></p></td>
+<td><p>JSON</p></td>
+</tr>
+<tr class="row-odd"><td><p>Harmonization artifacts</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.cache/forge-app/harmonization/{project}/{user}/</span></code></p></td>
+<td><p>CSV + JSON</p></td>
+</tr>
+<tr class="row-even"><td><p>Submissions + versions</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data/storage/submissions/{id}/</span></code></p></td>
+<td><p>JSON + CSV</p></td>
+</tr>
+<tr class="row-odd"><td><p>Validation results</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data/storage/submissions/{id}/v{n}/</span></code></p></td>
+<td><p>JSON</p></td>
+</tr>
+<tr class="row-even"><td><p>Audit logs</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data/storage/submissions/{id}/</span></code></p></td>
+<td><p>JSONL (append-only)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Gold datasets</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data/gold/{id}/</span></code></p></td>
+<td><p>JSON metadata + CSV data</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="api-reference.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="glossary.html" class="btn btn-neutral float-right" title="Glossary" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

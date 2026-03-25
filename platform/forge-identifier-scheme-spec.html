@@ -1,0 +1,740 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Identifier Schemes &amp; Golden IDs — Spec &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Forge Production Roadmap" href="forge-production-roadmap.html" />
+    <link rel="prev" title="Forge" href="forge-executive-summary.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Identifier Schemes &amp; Golden IDs — Spec</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#problem-statement">Problem Statement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#design">Design</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#core-data-model">Core Data Model</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#identifierdef">IdentifierDef</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#dedupstrategy">DedupStrategy</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#assignmenttiming">AssignmentTiming</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#identifierscheme">IdentifierScheme</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#changes-to-golddataset">Changes to GoldDataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#column-mutability-in-the-schema">Column Mutability in the Schema</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#use-case-walkthroughs">Use Case Walkthroughs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gp2">GP2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pathnd">PathND</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hris-migration">HRIS Migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#minimal-uuid-only-no-dedup">Minimal (UUID-only, no dedup)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#implementation">Implementation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sequence-resolution">Sequence Resolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parent-child-resolution">Parent-Child Resolution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#dedup-flow-updated">Dedup Flow (Updated)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#files-to-modify">Files to Modify</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#files-already-correct-no-changes-needed">Files Already Correct (No Changes Needed)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#api-changes">API Changes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-gold-dataset">Create Gold Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#get-gold-dataset">Get Gold Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#accept-submission-updated-response">Accept Submission (Updated Response)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#migration">Migration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#verification">Verification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#future-enhancements-out-of-scope">Future Enhancements (Out of Scope)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../specs/api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Identifier Schemes &amp; Golden IDs — Spec</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/platform/forge-identifier-scheme-spec.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="identifier-schemes-golden-ids-spec">
+<h1>Identifier Schemes &amp; Golden IDs — Spec<a class="headerlink" href="#identifier-schemes-golden-ids-spec" title="Link to this heading"></a></h1>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<p>Add a configurable identifier management system to Gold Datasets in DataForge. Data managers define an <strong>Identifier Scheme</strong> on each gold dataset that specifies: which columns are source IDs (provided by submitters), which are golden IDs (generated by the platform), how golden IDs are generated, and how incoming records are deduplicated against existing data.</p>
+<p>This replaces the current single <code class="docutils literal notranslate"><span class="pre">key_column</span></code> field on <code class="docutils literal notranslate"><span class="pre">GoldDataset</span></code> with a general-purpose system that handles hierarchical IDs, cross-system mappings, and project-specific naming conventions.</p>
+</section>
+<hr class="docutils" />
+<section id="problem-statement">
+<h2>Problem Statement<a class="headerlink" href="#problem-statement" title="Link to this heading"></a></h2>
+<p>Research consortia and data integration projects routinely deal with multiple identifier systems:</p>
+<ul class="simple">
+<li><p><strong>GP2:</strong> Sites submit samples with internal IDs. The platform assigns a <code class="docutils literal notranslate"><span class="pre">gp2id</span></code> (unique person) and <code class="docutils literal notranslate"><span class="pre">gp2sampleid</span></code> (<code class="docutils literal notranslate"><span class="pre">{gp2id}_s{N}</span></code> for repeat genotyping).</p></li>
+<li><p><strong>PathND:</strong> Sites submit samples. The platform assigns a <code class="docutils literal notranslate"><span class="pre">pathnd_id</span></code> (unique person) and an <code class="docutils literal notranslate"><span class="pre">image_id</span></code> per image for that person.</p></li>
+<li><p><strong>HRIS migrations:</strong> Users have an ID in one system, a different ID in the new system, plus auxiliary identifiers (SSN, DL number).</p></li>
+</ul>
+<p>Common patterns across these:</p>
+<ol class="arabic simple">
+<li><p><strong>Source IDs</strong> come from submitters and must be preserved</p></li>
+<li><p><strong>Golden IDs</strong> are assigned by the platform and follow a naming convention</p></li>
+<li><p>Golden IDs can be <strong>hierarchical</strong> — a child ID is derived from a parent ID</p></li>
+<li><p><strong>Deduplication</strong> uses source IDs (or combinations of fields) to detect records already in the gold dataset</p></li>
+<li><p><strong>ID generation</strong> varies by project: sequential with prefix, UUID, composite from other columns</p></li>
+</ol>
+<p>The current <code class="docutils literal notranslate"><span class="pre">key_column:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span></code> on <code class="docutils literal notranslate"><span class="pre">GoldDataset</span></code> only supports single-column exact-match dedup. There is no concept of source vs golden IDs, no ID generation, and no hierarchy.</p>
+</section>
+<hr class="docutils" />
+<section id="design">
+<h2>Design<a class="headerlink" href="#design" title="Link to this heading"></a></h2>
+<section id="core-data-model">
+<h3>Core Data Model<a class="headerlink" href="#core-data-model" title="Link to this heading"></a></h3>
+<section id="identifierdef">
+<h4>IdentifierDef<a class="headerlink" href="#identifierdef" title="Link to this heading"></a></h4>
+<p>Defines a single identifier column in the gold dataset.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">IdClass</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">SOURCE</span> <span class="o">=</span> <span class="s2">&quot;source&quot;</span>    <span class="c1"># Provided by submitter, preserved as-is</span>
+    <span class="n">GOLDEN</span> <span class="o">=</span> <span class="s2">&quot;golden&quot;</span>    <span class="c1"># Generated by the platform</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">IdScope</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">ENTITY</span> <span class="o">=</span> <span class="s2">&quot;entity&quot;</span>    <span class="c1"># One per unique real-world thing (person, site)</span>
+    <span class="n">RECORD</span> <span class="o">=</span> <span class="s2">&quot;record&quot;</span>    <span class="c1"># One per row (sample, image, genotyping event)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">IdGenMethod</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">UUID</span> <span class="o">=</span> <span class="s2">&quot;uuid&quot;</span>            <span class="c1"># uuid4(), no config needed</span>
+    <span class="n">TEMPLATE</span> <span class="o">=</span> <span class="s2">&quot;template&quot;</span>    <span class="c1"># Pattern with variables and optional {seq}</span>
+    <span class="n">COMPOSITE</span> <span class="o">=</span> <span class="s2">&quot;composite&quot;</span>  <span class="c1"># Join values from other columns</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ColumnMutability</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">SUBMITTER</span> <span class="o">=</span> <span class="s2">&quot;submitter&quot;</span>  <span class="c1"># Normal upload column, provided by submitter</span>
+    <span class="n">MANAGER</span> <span class="o">=</span> <span class="s2">&quot;manager&quot;</span>      <span class="c1"># Set/locked by data manager (e.g., site code)</span>
+    <span class="n">SYSTEM</span> <span class="o">=</span> <span class="s2">&quot;system&quot;</span>        <span class="c1"># Generated by platform (golden IDs)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">IdGeneration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">IdGenMethod</span>
+    <span class="n">template</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>         <span class="c1"># e.g. &quot;GP2-{site}-{seq:05d}&quot;</span>
+    <span class="n">components</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># e.g. [&quot;site&quot;, &quot;year&quot;, &quot;sample_type&quot;]</span>
+    <span class="n">separator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span>                <span class="c1"># For composite method</span>
+    <span class="n">seq_scope</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="s2">&quot;global&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;group&quot;</span>
+    <span class="c1"># &quot;group&quot; = seq increments per unique combo of other template vars</span>
+    <span class="c1"># &quot;global&quot; = seq increments across entire gold dataset</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">IdentifierDef</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>                           <span class="c1"># Column name in gold dataset</span>
+    <span class="n">id_class</span><span class="p">:</span> <span class="n">IdClass</span>                   <span class="c1"># source or golden</span>
+    <span class="n">scope</span><span class="p">:</span> <span class="n">IdScope</span>                      <span class="c1"># entity or record</span>
+    <span class="n">source_columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>      <span class="c1"># Which upload columns map to this ID</span>
+    <span class="n">generation</span><span class="p">:</span> <span class="n">IdGeneration</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># How to generate (golden IDs only)</span>
+    <span class="n">parent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>           <span class="c1"># Name of parent IdentifierDef (for hierarchy)</span>
+    <span class="n">mutability</span><span class="p">:</span> <span class="n">ColumnMutability</span> <span class="o">=</span> <span class="n">ColumnMutability</span><span class="o">.</span><span class="n">SUBMITTER</span>
+</pre></div>
+</div>
+</section>
+<section id="dedupstrategy">
+<h4>DedupStrategy<a class="headerlink" href="#dedupstrategy" title="Link to this heading"></a></h4>
+<p>Controls how incoming records are matched against existing data.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">DedupAction</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">REJECT</span> <span class="o">=</span> <span class="s2">&quot;reject&quot;</span>    <span class="c1"># Block the submission</span>
+    <span class="n">UPDATE</span> <span class="o">=</span> <span class="s2">&quot;update&quot;</span>    <span class="c1"># Overwrite existing records</span>
+    <span class="n">FLAG</span> <span class="o">=</span> <span class="s2">&quot;flag&quot;</span>        <span class="c1"># Accept but flag for review</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">DedupStrategy</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">match_keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>     <span class="c1"># Identifier names to match on</span>
+    <span class="n">on_duplicate</span><span class="p">:</span> <span class="n">DedupAction</span> <span class="o">=</span> <span class="n">DedupAction</span><span class="o">.</span><span class="n">REJECT</span>
+</pre></div>
+</div>
+<p>When <code class="docutils literal notranslate"><span class="pre">match_keys</span></code> contains multiple identifiers, a match on <strong>any</strong> key triggers the duplicate action (OR logic). This handles the HRIS case where a person might be found via <code class="docutils literal notranslate"><span class="pre">old_system_id</span></code>, <code class="docutils literal notranslate"><span class="pre">ssn</span></code>, or <code class="docutils literal notranslate"><span class="pre">dl_number</span></code>.</p>
+</section>
+<section id="assignmenttiming">
+<h4>AssignmentTiming<a class="headerlink" href="#assignmenttiming" title="Link to this heading"></a></h4>
+<p>When golden IDs are generated in the submission lifecycle.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">AssignmentTiming</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">ON_UPLOAD</span> <span class="o">=</span> <span class="s2">&quot;on_upload&quot;</span>    <span class="c1"># Auto-assign during validation</span>
+    <span class="n">ON_REVIEW</span> <span class="o">=</span> <span class="s2">&quot;on_review&quot;</span>    <span class="c1"># Reviewer assigns/confirms</span>
+    <span class="n">ON_ACCEPT</span> <span class="o">=</span> <span class="s2">&quot;on_accept&quot;</span>    <span class="c1"># Auto-assign at accept time</span>
+</pre></div>
+</div>
+</section>
+<section id="identifierscheme">
+<h4>IdentifierScheme<a class="headerlink" href="#identifierscheme" title="Link to this heading"></a></h4>
+<p>Top-level configuration, stored on the <code class="docutils literal notranslate"><span class="pre">GoldDataset</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">IdentifierScheme</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">identifiers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IdentifierDef</span><span class="p">]</span>
+    <span class="n">dedup</span><span class="p">:</span> <span class="n">DedupStrategy</span>
+    <span class="n">assignment</span><span class="p">:</span> <span class="n">AssignmentTiming</span> <span class="o">=</span> <span class="n">AssignmentTiming</span><span class="o">.</span><span class="n">ON_ACCEPT</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="changes-to-golddataset">
+<h3>Changes to GoldDataset<a class="headerlink" href="#changes-to-golddataset" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">GoldDataset</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="n">UUID</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">schema_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">schema_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">identifier_scheme</span><span class="p">:</span> <span class="n">IdentifierScheme</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># NEW — replaces key_column</span>
+    <span class="c1"># key_column: str | None  ← REMOVED</span>
+    <span class="n">created_by</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">record_count</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">submission_count</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">updated_at</span><span class="p">:</span> <span class="n">datetime</span>
+</pre></div>
+</div>
+<p>Backward compatibility: if <code class="docutils literal notranslate"><span class="pre">identifier_scheme</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, the gold dataset behaves as it does today (no dedup, no ID generation). Existing gold datasets with <code class="docutils literal notranslate"><span class="pre">key_column</span></code> can be migrated by converting to an <code class="docutils literal notranslate"><span class="pre">IdentifierScheme</span></code> with a single source identifier and <code class="docutils literal notranslate"><span class="pre">dedup.match_keys</span> <span class="pre">=</span> <span class="pre">[key_column]</span></code>.</p>
+</section>
+<hr class="docutils" />
+<section id="column-mutability-in-the-schema">
+<h3>Column Mutability in the Schema<a class="headerlink" href="#column-mutability-in-the-schema" title="Link to this heading"></a></h3>
+<p>Golden ID columns and manager-locked columns (like <code class="docutils literal notranslate"><span class="pre">site</span></code>) need special treatment during validation:</p>
+<ul class="simple">
+<li><p><strong>submitter</strong> columns — normal, expected in uploaded files, validated as usual</p></li>
+<li><p><strong>manager</strong> columns — may be in the upload file or set by the manager at the gold dataset level. Validation does not reject a submission for missing manager columns.</p></li>
+<li><p><strong>system</strong> columns — never in the upload file. Validation ignores these. They are added at ID generation time.</p></li>
+</ul>
+<p>This maps to the schema’s <code class="docutils literal notranslate"><span class="pre">FieldConfig</span></code> model. The <code class="docutils literal notranslate"><span class="pre">mutability</span></code> attribute on <code class="docutils literal notranslate"><span class="pre">IdentifierDef</span></code> tells the accept flow which columns to generate vs which to expect in the data.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="use-case-walkthroughs">
+<h2>Use Case Walkthroughs<a class="headerlink" href="#use-case-walkthroughs" title="Link to this heading"></a></h2>
+<section id="gp2">
+<h3>GP2<a class="headerlink" href="#gp2" title="Link to this heading"></a></h3>
+<p><strong>Identifier Scheme:</strong></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;site_sample_id&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;id_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;source&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;entity&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;source_columns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;sample_id&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;mutability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;submitter&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;site&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;id_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;source&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;entity&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;source_columns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;mutability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;manager&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gp2id&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;id_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;golden&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;entity&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;generation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;template&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;template&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GP2-{site}-{seq:05d}&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;seq_scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;group&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;mutability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;system&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gp2sampleid&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;id_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;golden&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;record&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;parent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gp2id&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;generation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;template&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;template&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{gp2id}_s{seq}&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;seq_scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;group&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;mutability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;system&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;dedup&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;match_keys&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;site_sample_id&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;on_duplicate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reject&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;assignment&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;on_accept&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><strong>Flow:</strong></p>
+<ol class="arabic simple">
+<li><p>Site uploads CSV with columns: <code class="docutils literal notranslate"><span class="pre">sample_id</span></code>, <code class="docutils literal notranslate"><span class="pre">site</span></code>, <code class="docutils literal notranslate"><span class="pre">sex</span></code>, <code class="docutils literal notranslate"><span class="pre">age</span></code>, <code class="docutils literal notranslate"><span class="pre">diagnosis</span></code>, …</p></li>
+<li><p>Validation runs against the schema (field types, required, enums, rules). No golden ID columns expected.</p></li>
+<li><p>Reviewer claims and accepts.</p></li>
+<li><p>Accept flow:</p>
+<ul class="simple">
+<li><p>Maps <code class="docutils literal notranslate"><span class="pre">sample_id</span></code> → <code class="docutils literal notranslate"><span class="pre">site_sample_id</span></code> (via <code class="docutils literal notranslate"><span class="pre">source_columns</span></code>)</p></li>
+<li><p>Checks <code class="docutils literal notranslate"><span class="pre">site_sample_id</span></code> values against existing gold dataset → rejects if duplicates</p></li>
+<li><p>For new entities: resolves <code class="docutils literal notranslate"><span class="pre">{site}</span></code> from the row’s <code class="docutils literal notranslate"><span class="pre">site</span></code> column, finds max seq for that site group, generates <code class="docutils literal notranslate"><span class="pre">gp2id</span></code></p></li>
+<li><p>For each record: generates <code class="docutils literal notranslate"><span class="pre">gp2sampleid</span></code> using <code class="docutils literal notranslate"><span class="pre">{gp2id}_s{seq}</span></code> (seq per gp2id group)</p></li>
+<li><p>Appends row with all columns: source data + golden IDs + provenance</p></li>
+</ul>
+</li>
+</ol>
+<p><strong>Gold dataset row:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">site_sample_id</span> <span class="o">|</span> <span class="n">site</span>  <span class="o">|</span> <span class="n">gp2id</span>           <span class="o">|</span> <span class="n">gp2sampleid</span>        <span class="o">|</span> <span class="n">sex</span> <span class="o">|</span> <span class="n">age</span> <span class="o">|</span> <span class="o">...</span> <span class="o">|</span> <span class="n">_submission_id</span> <span class="o">|</span> <span class="o">...</span>
+<span class="n">NRC</span><span class="o">-</span><span class="mi">0047</span>       <span class="o">|</span> <span class="n">SITE1</span> <span class="o">|</span> <span class="n">GP2</span><span class="o">-</span><span class="n">SITE1</span><span class="o">-</span><span class="mi">00001</span> <span class="o">|</span> <span class="n">GP2</span><span class="o">-</span><span class="n">SITE1</span><span class="o">-</span><span class="mi">00001</span><span class="n">_s1</span> <span class="o">|</span> <span class="n">M</span>   <span class="o">|</span> <span class="mi">65</span>  <span class="o">|</span> <span class="o">...</span> <span class="o">|</span> <span class="o">&lt;</span><span class="n">uuid</span><span class="o">&gt;</span>         <span class="o">|</span> <span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="pathnd">
+<h3>PathND<a class="headerlink" href="#pathnd" title="Link to this heading"></a></h3>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;source_sample_id&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;id_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;source&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;entity&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;source_columns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;sample_id&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;mutability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;submitter&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;site&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;id_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;source&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;entity&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;source_columns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;site&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;mutability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;manager&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pathnd_id&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;id_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;golden&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;entity&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;generation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;template&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;template&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;PATHND-{site}-{seq:05d}&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;seq_scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;group&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;mutability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;system&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;image_id&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;id_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;golden&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;record&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;parent&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;pathnd_id&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;generation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;template&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;template&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;{pathnd_id}_img{seq}&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">&quot;seq_scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;group&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;mutability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;system&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;dedup&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;match_keys&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;source_sample_id&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;on_duplicate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reject&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;assignment&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;on_accept&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="hris-migration">
+<h3>HRIS Migration<a class="headerlink" href="#hris-migration" title="Link to this heading"></a></h3>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;old_system_id&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;id_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;source&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;entity&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;source_columns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;employee_id&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;mutability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;submitter&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ssn&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;id_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;source&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;entity&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;source_columns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;ssn&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;mutability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;submitter&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;dl_number&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;id_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;source&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;entity&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;source_columns&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;drivers_license&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;mutability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;submitter&quot;</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;new_employee_id&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;id_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;golden&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;entity&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;generation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uuid&quot;</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;mutability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;system&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;dedup&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;match_keys&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;old_system_id&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;ssn&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;dl_number&quot;</span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;on_duplicate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;update&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;assignment&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;on_accept&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="minimal-uuid-only-no-dedup">
+<h3>Minimal (UUID-only, no dedup)<a class="headerlink" href="#minimal-uuid-only-no-dedup" title="Link to this heading"></a></h3>
+<p>For projects that just need unique record IDs without complex naming:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;record_id&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;id_class&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;golden&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;scope&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;record&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;generation&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;method&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uuid&quot;</span><span class="w"> </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">&quot;mutability&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;system&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;dedup&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;match_keys&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span>
+<span class="w">    </span><span class="nt">&quot;on_duplicate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reject&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;assignment&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;on_accept&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Link to this heading"></a></h2>
+<section id="sequence-resolution">
+<h3>Sequence Resolution<a class="headerlink" href="#sequence-resolution" title="Link to this heading"></a></h3>
+<p>For <code class="docutils literal notranslate"><span class="pre">template</span></code> generation with <code class="docutils literal notranslate"><span class="pre">{seq}</span></code>, the system needs to determine the next sequence number.</p>
+<p><strong>Group-scoped sequences (<code class="docutils literal notranslate"><span class="pre">seq_scope:</span> <span class="pre">&quot;group&quot;</span></code>):</strong></p>
+<ol class="arabic simple">
+<li><p>Parse the template to extract non-<code class="docutils literal notranslate"><span class="pre">{seq}</span></code> variables (e.g., <code class="docutils literal notranslate"><span class="pre">{site}</span></code> in <code class="docutils literal notranslate"><span class="pre">&quot;GP2-{site}-{seq:05d}&quot;</span></code>)</p></li>
+<li><p>Resolve those variables from the current row’s data</p></li>
+<li><p>Scan existing golden IDs in the gold dataset that match the same group (e.g., all IDs starting with <code class="docutils literal notranslate"><span class="pre">GP2-SITE1-</span></code>)</p></li>
+<li><p>Extract the max sequence number from those IDs</p></li>
+<li><p>Assign next = max + 1</p></li>
+</ol>
+<p><strong>Global-scoped sequences (<code class="docutils literal notranslate"><span class="pre">seq_scope:</span> <span class="pre">&quot;global&quot;</span></code>):</strong></p>
+<ol class="arabic simple">
+<li><p>Scan all existing golden IDs in the gold dataset for this column</p></li>
+<li><p>Extract the max sequence number</p></li>
+<li><p>Assign next = max + 1</p></li>
+</ol>
+<p><strong>CSV backend:</strong> Scan the gold dataset CSV column, parse existing IDs with a regex derived from the template, extract max seq. This is O(n) per accept but acceptable for CSV-scale data.</p>
+<p><strong>Future Postgres backend:</strong> Use a <code class="docutils literal notranslate"><span class="pre">sequences</span></code> table with <code class="docutils literal notranslate"><span class="pre">(dataset_id,</span> <span class="pre">identifier_name,</span> <span class="pre">group_key)</span> <span class="pre">→</span> <span class="pre">current_value</span></code>. Atomic increment via <code class="docutils literal notranslate"><span class="pre">UPDATE</span> <span class="pre">...</span> <span class="pre">RETURNING</span></code>.</p>
+</section>
+<section id="parent-child-resolution">
+<h3>Parent-Child Resolution<a class="headerlink" href="#parent-child-resolution" title="Link to this heading"></a></h3>
+<p>When a child identifier references a <code class="docutils literal notranslate"><span class="pre">parent</span></code>:</p>
+<ol class="arabic simple">
+<li><p>The parent’s golden ID must be resolved first (topological sort on the <code class="docutils literal notranslate"><span class="pre">parent</span></code> graph)</p></li>
+<li><p>The child’s template can reference <code class="docutils literal notranslate"><span class="pre">{parent_name}</span></code> — resolved to the parent’s generated value for this row</p></li>
+<li><p>The child’s <code class="docutils literal notranslate"><span class="pre">{seq}</span></code> is scoped within its parent’s value (e.g., <code class="docutils literal notranslate"><span class="pre">GP2-SITE1-00001_s1</span></code>, <code class="docutils literal notranslate"><span class="pre">GP2-SITE1-00001_s2</span></code>)</p></li>
+</ol>
+<p><strong>Entity vs Record scope interaction:</strong></p>
+<p>If the parent is <code class="docutils literal notranslate"><span class="pre">entity</span></code>-scoped and the child is <code class="docutils literal notranslate"><span class="pre">record</span></code>-scoped, multiple rows with the same entity get the same parent ID but different child IDs. The accept flow must:</p>
+<ol class="arabic simple">
+<li><p>Group rows by dedup match keys</p></li>
+<li><p>Assign one parent golden ID per unique entity</p></li>
+<li><p>Assign sequential child IDs within each entity</p></li>
+</ol>
+</section>
+<section id="dedup-flow-updated">
+<h3>Dedup Flow (Updated)<a class="headerlink" href="#dedup-flow-updated" title="Link to this heading"></a></h3>
+<p>The current <code class="docutils literal notranslate"><span class="pre">find_duplicates(dataset_id,</span> <span class="pre">key_column,</span> <span class="pre">values)</span></code> becomes:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">find_duplicates</span><span class="p">(</span>
+    <span class="n">dataset_id</span><span class="p">:</span> <span class="n">UUID</span><span class="p">,</span>
+    <span class="n">match_keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MatchKey</span><span class="p">],</span>  <span class="c1"># [{identifier_name, source_column, values}]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DedupResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check each match key against existing data.</span>
+<span class="sd">    Returns which keys matched, which values, and the matching rows.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>Where <code class="docutils literal notranslate"><span class="pre">DedupResult</span></code> contains:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">has_duplicates:</span> <span class="pre">bool</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">matches:</span> <span class="pre">list[DedupMatch]</span></code> — each with <code class="docutils literal notranslate"><span class="pre">identifier_name</span></code>, <code class="docutils literal notranslate"><span class="pre">matched_values</span></code>, <code class="docutils literal notranslate"><span class="pre">existing_row_indices</span></code></p></li>
+</ul>
+<p>The accept flow then applies the configured <code class="docutils literal notranslate"><span class="pre">on_duplicate</span></code> action:</p>
+<ul class="simple">
+<li><p><strong>reject:</strong> Raise <code class="docutils literal notranslate"><span class="pre">GoldDuplicateKeyError</span></code> with details</p></li>
+<li><p><strong>update:</strong> Overwrite matched rows (preserve golden IDs, update data columns)</p></li>
+<li><p><strong>flag:</strong> Append but add a <code class="docutils literal notranslate"><span class="pre">_duplicate_flag</span></code> provenance column</p></li>
+</ul>
+</section>
+<section id="files-to-modify">
+<h3>Files to Modify<a class="headerlink" href="#files-to-modify" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>File</p></th>
+<th class="head"><p>Change</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/gold/models.py</span></code></p></td>
+<td><p>Add <code class="docutils literal notranslate"><span class="pre">IdentifierScheme</span></code>, <code class="docutils literal notranslate"><span class="pre">IdentifierDef</span></code>, <code class="docutils literal notranslate"><span class="pre">IdGeneration</span></code>, <code class="docutils literal notranslate"><span class="pre">DedupStrategy</span></code>, enums. Replace <code class="docutils literal notranslate"><span class="pre">key_column</span></code> with <code class="docutils literal notranslate"><span class="pre">identifier_scheme</span></code> on <code class="docutils literal notranslate"><span class="pre">GoldDataset</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/gold/base.py</span></code></p></td>
+<td><p>Update <code class="docutils literal notranslate"><span class="pre">GoldDataBackend</span></code> protocol: new <code class="docutils literal notranslate"><span class="pre">find_duplicates</span></code> signature, add <code class="docutils literal notranslate"><span class="pre">generate_ids()</span></code> method</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/gold/csv_backend.py</span></code></p></td>
+<td><p>Implement new dedup logic (multi-key), sequence scanning, ID generation</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/gold/errors.py</span></code></p></td>
+<td><p>Update <code class="docutils literal notranslate"><span class="pre">GoldDuplicateKeyError</span></code> to include match details</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/gold/service.py</span></code></p></td>
+<td><p>Update <code class="docutils literal notranslate"><span class="pre">GoldDatasetService</span></code> to handle identifier scheme in CRUD</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/review/service.py</span></code></p></td>
+<td><p>Update <code class="docutils literal notranslate"><span class="pre">accept()</span></code> to use identifier scheme for dedup + ID generation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/api/routes/gold.py</span></code></p></td>
+<td><p>Update create/get endpoints to accept/return identifier scheme</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/api/schemas.py</span></code></p></td>
+<td><p>Add request/response schemas for identifier scheme</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="files-already-correct-no-changes-needed">
+<h3>Files Already Correct (No Changes Needed)<a class="headerlink" href="#files-already-correct-no-changes-needed" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/submission/models.py</span></code> — submissions don’t know about identifiers</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/validation/</span></code> — validation is schema-based, not identifier-based</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">services/dataforge/src/dataforge/storage/</span></code> — submission storage is unchanged</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="api-changes">
+<h2>API Changes<a class="headerlink" href="#api-changes" title="Link to this heading"></a></h2>
+<section id="create-gold-dataset">
+<h3>Create Gold Dataset<a class="headerlink" href="#create-gold-dataset" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/v1/gold/</span></code></p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gp2-clinical-pilot&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;schema_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;schema_name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;gp2-clinical&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;GP2 clinical pilot cohort&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;identifier_scheme&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;identifiers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="err">...</span><span class="w"> </span><span class="p">],</span>
+<span class="w">    </span><span class="nt">&quot;dedup&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;match_keys&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;site_sample_id&quot;</span><span class="p">],</span><span class="w"> </span><span class="nt">&quot;on_duplicate&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reject&quot;</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;assignment&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;on_accept&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">identifier_scheme</span></code> is optional. If omitted, the gold dataset has no dedup and no ID generation (same as today without <code class="docutils literal notranslate"><span class="pre">key_column</span></code>).</p>
+</section>
+<section id="get-gold-dataset">
+<h3>Get Gold Dataset<a class="headerlink" href="#get-gold-dataset" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/v1/gold/{id}</span></code></p>
+<p>Response includes <code class="docutils literal notranslate"><span class="pre">identifier_scheme</span></code> in full.</p>
+</section>
+<section id="accept-submission-updated-response">
+<h3>Accept Submission (Updated Response)<a class="headerlink" href="#accept-submission-updated-response" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">POST</span> <span class="pre">/api/v1/submissions/{id}/accept</span></code></p>
+<p>On success, the response now includes:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;rows_appended&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">50</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;ids_generated&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;gp2id&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;new&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">45</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;existing&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;gp2sampleid&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">&quot;new&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">50</span><span class="w"> </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="migration">
+<h2>Migration<a class="headerlink" href="#migration" title="Link to this heading"></a></h2>
+<p>Existing gold datasets with <code class="docutils literal notranslate"><span class="pre">key_column</span></code> set should be migrated:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Migration: key_column → identifier_scheme</span>
+<span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">key_column</span><span class="p">:</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">identifier_scheme</span> <span class="o">=</span> <span class="n">IdentifierScheme</span><span class="p">(</span>
+        <span class="n">identifiers</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">IdentifierDef</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">key_column</span><span class="p">,</span>
+                <span class="n">id_class</span><span class="o">=</span><span class="n">IdClass</span><span class="o">.</span><span class="n">SOURCE</span><span class="p">,</span>
+                <span class="n">scope</span><span class="o">=</span><span class="n">IdScope</span><span class="o">.</span><span class="n">RECORD</span><span class="p">,</span>
+                <span class="n">source_columns</span><span class="o">=</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">key_column</span><span class="p">],</span>
+                <span class="n">mutability</span><span class="o">=</span><span class="n">ColumnMutability</span><span class="o">.</span><span class="n">SUBMITTER</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">],</span>
+        <span class="n">dedup</span><span class="o">=</span><span class="n">DedupStrategy</span><span class="p">(</span>
+            <span class="n">match_keys</span><span class="o">=</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">key_column</span><span class="p">],</span>
+            <span class="n">on_duplicate</span><span class="o">=</span><span class="n">DedupAction</span><span class="o">.</span><span class="n">REJECT</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>This preserves current behavior exactly.</p>
+</section>
+<hr class="docutils" />
+<section id="verification">
+<h2>Verification<a class="headerlink" href="#verification" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Unit tests:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">IdentifierScheme</span></code> model validation (valid configs, invalid parent references, etc.)</p></li>
+<li><p>Sequence resolution: group-scoped and global-scoped</p></li>
+<li><p>Parent-child ordering (topological sort)</p></li>
+<li><p>Dedup with single and multiple match keys</p></li>
+<li><p>ID generation for all three methods (uuid, template, composite)</p></li>
+<li><p>Migration from <code class="docutils literal notranslate"><span class="pre">key_column</span></code> to <code class="docutils literal notranslate"><span class="pre">identifier_scheme</span></code></p></li>
+</ul>
+</li>
+<li><p><strong>Integration tests:</strong></p>
+<ul class="simple">
+<li><p>Create gold dataset with GP2-style identifier scheme</p></li>
+<li><p>Upload and accept submission → verify golden IDs generated correctly</p></li>
+<li><p>Upload second submission with duplicate source IDs → verify rejection</p></li>
+<li><p>Upload second submission with new source IDs → verify sequence continues</p></li>
+<li><p>HRIS-style: verify dedup across multiple source ID columns (OR logic)</p></li>
+<li><p>UUID method: verify unique IDs generated without naming convention</p></li>
+</ul>
+</li>
+<li><p><strong>Manual test:</strong></p>
+<ul class="simple">
+<li><p>Create gold dataset via API with identifier scheme</p></li>
+<li><p>Upload CSV, accept, download gold dataset CSV</p></li>
+<li><p>Verify golden ID columns present with correct values</p></li>
+<li><p>Upload second CSV with overlap → verify dedup behavior</p></li>
+<li><p>Upload second CSV without overlap → verify sequence increments correctly</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="future-enhancements-out-of-scope">
+<h2>Future Enhancements (Out of Scope)<a class="headerlink" href="#future-enhancements-out-of-scope" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Cross-dataset dedup</strong> — check identifiers across multiple gold datasets</p></li>
+<li><p><strong>Fuzzy dedup</strong> — approximate matching for names, addresses, etc.</p></li>
+<li><p><strong>ID reassignment</strong> — change golden IDs after acceptance (retraction + re-issue)</p></li>
+<li><p><strong>Identifier registry UI</strong> — dedicated page to browse/search all assigned identifiers</p></li>
+<li><p><strong>Bulk ID import</strong> — pre-populate golden IDs from an external system</p></li>
+<li><p><strong>Custom generation logic</strong> — plugin/callback for project-specific ID generation beyond templates</p></li>
+<li><p><strong>Sequence reservation</strong> — reserve a block of sequence numbers for offline use</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="forge-executive-summary.html" class="btn btn-neutral float-left" title="Forge" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="forge-production-roadmap.html" class="btn btn-neutral float-right" title="Forge Production Roadmap" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

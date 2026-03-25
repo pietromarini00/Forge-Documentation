@@ -1,0 +1,1225 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forge Unified App — MVP Specification &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Validation Rules — Interactive Rule Builder Spec" href="forge-validation-rules-spec.html" />
+    <link rel="prev" title="Forge Production Roadmap" href="forge-production-roadmap.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="forge-api-first-vision.html">Forge — API-First Platform Vision</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Forge Unified App — MVP Specification</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview">1. Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#problem">Problem</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#solution">Solution</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#goals">Goals</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#non-goals-mvp">Non-Goals (MVP)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#architecture">2. Architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#high-level">High-Level</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#what-changes-vs-what-stays">What changes vs. what stays</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#service-directory">Service directory</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#data-model-two-project-types">3. Data Model: Two Project Types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#design-rationale">Design Rationale</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schema-project-manifest">Schema Project Manifest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-project-manifest">Data Project Manifest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schema-selector-component">Schema Selector Component</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#page-specifications">4. Page Specifications</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#home-dashboard-app-py">4.0 Home — Dashboard (<code class="docutils literal notranslate"><span class="pre">app.py</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas-page-pages-1-schemas-py">4.1 Schemas Page (<code class="docutils literal notranslate"><span class="pre">pages/1_Schemas.py</span></code>)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#a-schema-browser-default">4.1a Schema Browser (default)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#b-curation-wizard-schema-project-id">4.1b Curation Wizard (<code class="docutils literal notranslate"><span class="pre">?schema_project={id}</span></code>)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c-schema-detail-schema-id">4.1c Schema Detail (<code class="docutils literal notranslate"><span class="pre">?schema={id}</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#harmonize-page-pages-2-harmonize-py">4.2 Harmonize Page (<code class="docutils literal notranslate"><span class="pre">pages/2_Harmonize.py</span></code>)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#a-data-project-list-default">4.2a Data Project List (default)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#b-mapping-wizard-data-project-id">4.2b Mapping Wizard (<code class="docutils literal notranslate"><span class="pre">?data_project={id}</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#data-page-pages-3-data-py">4.3 Data Page (<code class="docutils literal notranslate"><span class="pre">pages/3_Data.py</span></code>)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#a-submissions-dashboard-default">4.3a Submissions Dashboard (default)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#b-upload-validate-wizard">4.3b Upload &amp; Validate Wizard</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#c-review-view-submission-id">4.3c Review View (<code class="docutils literal notranslate"><span class="pre">?submission={id}</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#settings-page-pages-4-settings-py">4.4 Settings Page (<code class="docutils literal notranslate"><span class="pre">pages/4_Settings.py</span></code>)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#navigation-shared-components">5. Navigation &amp; Shared Components</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#sidebar">Sidebar</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#contextual-handoffs">Contextual Handoffs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#wizard-framework">Wizard Framework</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#user-journeys">6. User Journeys</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#journey-a-create-a-schema-and-use-it-full-loop">Journey A: Create a Schema and Use It (Full Loop)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#journey-b-validate-data-against-an-existing-schema-skip-harmonization">Journey B: Validate Data Against an Existing Schema (Skip Harmonization)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#journey-c-map-data-to-an-existing-schema-no-curation-needed">Journey C: Map Data to an Existing Schema (No Curation Needed)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#dataforge-registry-integration">7. DataForge ↔ Registry Integration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#required-changes">Required Changes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#technical-implementation">8. Technical Implementation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#streamlit-multi-page-app-structure">Streamlit Multi-Page App Structure</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#state-management">State Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#query-parameter-routing">Query Parameter Routing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#business-logic-extraction">Business Logic Extraction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#docker-compose-addition">Docker Compose Addition</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#implementation-phases">9. Implementation Phases</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#phase-1-foundation">Phase 1: Foundation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-2-schema-curation">Phase 2: Schema Curation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-3-harmonization">Phase 3: Harmonization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-4-data-validation">Phase 4: Data Validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#phase-5-polish-integration-testing">Phase 5: Polish &amp; Integration Testing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#decisions-resolved">10. Decisions (Resolved)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#success-criteria">11. Success Criteria</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../specs/api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Forge Unified App — MVP Specification</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/platform/forge-unified-app-spec.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="forge-unified-app-mvp-specification">
+<h1>Forge Unified App — MVP Specification<a class="headerlink" href="#forge-unified-app-mvp-specification" title="Link to this heading"></a></h1>
+<blockquote>
+<div><p><strong>Status:</strong> Phase 4 Complete
+<strong>Last updated:</strong> 2026-02-28 (Phase 4 complete)
+<strong>Depends on:</strong> <a class="reference internal" href="forge-executive-summary.html"><span class="std std-doc">Executive Summary</span></a> · <a class="reference internal" href="forge-production-roadmap.html"><span class="std std-doc">Production Roadmap</span></a></p>
+</div></blockquote>
+<hr class="docutils" />
+<section id="overview">
+<h2>1. Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
+<section id="problem">
+<h3>Problem<a class="headerlink" href="#problem" title="Link to this heading"></a></h3>
+<p>Forge currently ships as four separate services on four different ports. An internal user testing the full data lifecycle must:</p>
+<ol class="arabic simple">
+<li><p>Open the Curation Workbench (<code class="docutils literal notranslate"><span class="pre">:8502</span></code>) to create a canonical schema</p></li>
+<li><p>Query the Registry API (<code class="docutils literal notranslate"><span class="pre">:8000</span></code>) to verify the schema was published</p></li>
+<li><p>Open the Harmonization Engine (<code class="docutils literal notranslate"><span class="pre">:8501</span></code>) to map incoming data to the schema</p></li>
+<li><p>Open the DataForge UI (<code class="docutils literal notranslate"><span class="pre">:8503</span></code>) to validate, review, and accept the data</p></li>
+</ol>
+<p>This means three browser tabs, three separate session states, no shared navigation, and zero contextual handoff between steps. Users must mentally track which schema they’re working with and manually re-select it in each tool.</p>
+</section>
+<section id="solution">
+<h3>Solution<a class="headerlink" href="#solution" title="Link to this heading"></a></h3>
+<p>Ship a <strong>single Streamlit multi-page application</strong> (“Forge”) that unifies all three user-facing services into one coherent workflow. The backend APIs (Registry Service, DataForge API) remain unchanged. The unified app is a new UI layer that consumes these APIs and consolidates the existing Streamlit UIs.</p>
+</section>
+<section id="goals">
+<h3>Goals<a class="headerlink" href="#goals" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Single entry point</strong> — One URL, one sidebar, one identity for internal testers</p></li>
+<li><p><strong>Schema-centric workflow</strong> — Select a schema once; it flows into harmonization and validation</p></li>
+<li><p><strong>Contextual handoffs</strong> — Finish one step, launch the next with context pre-loaded</p></li>
+<li><p><strong>Preserve what works</strong> — Existing wizard flows are proven; extract and re-use, don’t rewrite</p></li>
+<li><p><strong>Test the full loop</strong> — Internal users can exercise Create → Map → Validate → Review end-to-end</p></li>
+</ul>
+</section>
+<section id="non-goals-mvp">
+<h3>Non-Goals (MVP)<a class="headerlink" href="#non-goals-mvp" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>User authentication (Supabase Auth is a later phase)</p></li>
+<li><p>Roles, organizations, or permissions (post-MVP)</p></li>
+<li><p>React frontend migration (post-MVP, after workflows are validated)</p></li>
+<li><p>Value transforms in harmonization (Phase B feature)</p></li>
+<li><p>Cross-submission validation in DataForge</p></li>
+<li><p>Schema evolution / variable addition requests</p></li>
+<li><p>Public/external user access</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="architecture">
+<h2>2. Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h2>
+<section id="high-level">
+<h3>High-Level<a class="headerlink" href="#high-level" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌───────────────────────────────────────────────────────────────┐
+│                FORGE (Unified Streamlit App)                   │
+│                         Port 8505                              │
+│                                                                │
+│  ┌──────────┐  ┌──────────────┐  ┌──────────────────────────┐│
+│  │ Schemas   │  │ Harmonize    │  │ Data                     ││
+│  │ Module    │  │ Module       │  │ Module                   ││
+│  │           │  │              │  │                          ││
+│  │ • Browse  │  │ • Projects   │  │ • Submissions            ││
+│  │ • Create  │  │ • Map wizard │  │ • Upload + Validate      ││
+│  │ • Detail  │  │              │  │ • Review                 ││
+│  └──────────┘  └──────────────┘  └──────────────────────────┘│
+│                                                                │
+│  Shared: Sidebar · Identity · Schema Selector · Registry Client│
+│                                                                │
+│  ┌────────────────────────────────────────────────────────────┐│
+│  │  Backend APIs (unchanged)                                  ││
+│  │  • Registry Service (FastAPI :8000)                        ││
+│  │  • DataForge API (FastAPI :8001)                           ││
+│  │  • Anthropic Claude API (AI features)                      ││
+│  └────────────────────────────────────────────────────────────┘│
+└───────────────────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+<section id="what-changes-vs-what-stays">
+<h3>What changes vs. what stays<a class="headerlink" href="#what-changes-vs-what-stays" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Current state</p></th>
+<th class="head"><p>Unified MVP</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Registry Service API</p></td>
+<td><p>FastAPI on <code class="docutils literal notranslate"><span class="pre">:8000</span></code></p></td>
+<td><p><strong>No change.</strong> Consumed by unified app.</p></td>
+</tr>
+<tr class="row-odd"><td><p>DataForge API</p></td>
+<td><p>FastAPI on <code class="docutils literal notranslate"><span class="pre">:8001</span></code></p></td>
+<td><p><strong>No change.</strong> Consumed by unified app.</p></td>
+</tr>
+<tr class="row-even"><td><p>Curation business logic</p></td>
+<td><p>Inline in <code class="docutils literal notranslate"><span class="pre">curation-workbench/app/app.py</span></code> (2,170 lines)</p></td>
+<td><p><strong>Extract</strong> <code class="docutils literal notranslate"><span class="pre">core/</span></code> modules. Wire into Forge pages.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Harmonization business logic</p></td>
+<td><p>Inline in <code class="docutils literal notranslate"><span class="pre">harmonization-engine/app/app.py</span></code> (1,700 lines)</p></td>
+<td><p><strong>Extract</strong> <code class="docutils literal notranslate"><span class="pre">core/</span></code> modules. Wire into Forge pages.</p></td>
+</tr>
+<tr class="row-even"><td><p>DataForge UI</p></td>
+<td><p>Multi-page Streamlit in <code class="docutils literal notranslate"><span class="pre">dataforge/ui/</span></code></p></td>
+<td><p><strong>Already modular.</strong> Adapt pages into Forge.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Identity</p></td>
+<td><p>Separate per service (or none)</p></td>
+<td><p><strong>Single</strong> sidebar component, shared across all modules.</p></td>
+</tr>
+<tr class="row-even"><td><p>Project management</p></td>
+<td><p>Different model per service</p></td>
+<td><p><strong>Two project types</strong> (see §3).</p></td>
+</tr>
+<tr class="row-odd"><td><p>Standalone Streamlit apps</p></td>
+<td><p>Three separate apps on <code class="docutils literal notranslate"><span class="pre">:8501</span></code>, <code class="docutils literal notranslate"><span class="pre">:8502</span></code>, <code class="docutils literal notranslate"><span class="pre">:8503</span></code></p></td>
+<td><p><strong>Remain deployable</strong> for backward compatibility. Unified app is additive.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="service-directory">
+<h3>Service directory<a class="headerlink" href="#service-directory" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>services/
+├── forge-app/                    # NEW — Unified Streamlit application
+│   ├── app.py                    #   Entry point (Home / Dashboard)
+│   ├── pages/
+│   │   ├── 1_Schemas.py          #   Browse, create, view schemas
+│   │   ├── 2_Harmonize.py        #   Map data to schemas
+│   │   ├── 3_Data.py             #   Upload, validate, review data
+│   │   └── 4_Settings.py         #   Identity, preferences
+│   ├── components/               #   Shared UI components
+│   │   ├── sidebar.py            #     Navigation + identity + context
+│   │   ├── schema_selector.py    #     Reusable schema dropdown
+│   │   ├── status_badge.py       #     Status indicators
+│   │   └── wizard.py             #     Wizard step framework
+│   ├── clients/                  #   API clients
+│   │   ├── registry_client.py    #     Registry Service client
+│   │   └── dataforge_client.py   #     DataForge API client
+│   ├── core/                     #   Business logic (extracted from existing services)
+│   │   ├── curation/             #     Curation engine, suggestion service, duplicate detection
+│   │   ├── harmonization/        #     Matcher, match engine, retrieval
+│   │   └── shared/               #     Common utilities
+│   ├── schemas/                  #   Pydantic models
+│   │   ├── manifest.py           #     Project manifests (both types)
+│   │   └── models.py             #     Shared data models
+│   ├── tests/
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   └── .streamlit/
+│       └── config.toml
+├── harmonization-engine/         # UNCHANGED — standalone deployment
+├── curation-workbench/           # UNCHANGED — standalone deployment
+├── dataforge/                    # UNCHANGED — API + standalone UI
+├── registry-service/             # UNCHANGED — backend API
+└── shared/                       # UNCHANGED — common utilities
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="data-model-two-project-types">
+<h2>3. Data Model: Two Project Types<a class="headerlink" href="#data-model-two-project-types" title="Link to this heading"></a></h2>
+<section id="design-rationale">
+<h3>Design Rationale<a class="headerlink" href="#design-rationale" title="Link to this heading"></a></h3>
+<p>Schemas and data have fundamentally different lifecycles:</p>
+<ul class="simple">
+<li><p><strong>One schema → many data projects.</strong> A canonical schema (e.g., “NINDS CDEs v2”) is created once by a schema manager. Dozens of data managers then use that schema to map and validate their datasets.</p></li>
+<li><p><strong>Schema curation is creative work.</strong> It involves AI-assisted deduplication, naming standardization, constraint definition. It’s a standalone workflow.</p></li>
+<li><p><strong>Data mapping + validation is operational work.</strong> It involves uploading files, running matchers, reviewing results. It naturally flows as one continuous process.</p></li>
+</ul>
+<p>Therefore:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Project Type</p></th>
+<th class="head"><p>Scope</p></th>
+<th class="head"><p>Lifecycle</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Schema Project</strong></p></td>
+<td><p>Creating/evolving a canonical schema</p></td>
+<td><p>Upload CDE list → Curate → Publish to Registry</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Data Project</strong></p></td>
+<td><p>Mapping + validating data against a schema</p></td>
+<td><p>Select schema → (optional) Harmonize → Upload to DataForge → Review</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="schema-project-manifest">
+<h3>Schema Project Manifest<a class="headerlink" href="#schema-project-manifest" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SchemaProjectManifest</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracks a schema curation effort.&quot;&quot;&quot;</span>
+    <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span>                  <span class="c1"># UUID</span>
+    <span class="n">project_name</span><span class="p">:</span> <span class="nb">str</span>                <span class="c1"># Display name</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>                     <span class="c1"># Creator identity</span>
+    <span class="n">current_step</span><span class="p">:</span> <span class="nb">int</span>                <span class="c1"># 1–4</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">modified_at</span><span class="p">:</span> <span class="n">datetime</span>
+
+    <span class="c1"># Curation state</span>
+    <span class="n">source_filename</span><span class="p">:</span> <span class="nb">str</span>             <span class="c1"># Original CDE list file</span>
+    <span class="n">source_row_count</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">variable_count</span><span class="p">:</span> <span class="nb">int</span>              <span class="c1"># After initial parse</span>
+    <span class="n">completed_variables</span><span class="p">:</span> <span class="nb">int</span>         <span class="c1"># Curation progress</span>
+
+    <span class="c1"># Outcome</span>
+    <span class="n">published_schema_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>  <span class="c1"># Registry UUID after publish</span>
+    <span class="n">published_schema_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+
+    <span class="n">steps</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">StepMetadata</span><span class="p">]</span>   <span class="c1"># 1_upload, 2_configure, 3_curate, 4_publish</span>
+</pre></div>
+</div>
+</section>
+<section id="data-project-manifest">
+<h3>Data Project Manifest<a class="headerlink" href="#data-project-manifest" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">DataProjectManifest</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracks a data mapping + validation effort.&quot;&quot;&quot;</span>
+    <span class="n">project_id</span><span class="p">:</span> <span class="nb">str</span>                  <span class="c1"># UUID</span>
+    <span class="n">project_name</span><span class="p">:</span> <span class="nb">str</span>                <span class="c1"># Display name</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>                     <span class="c1"># Creator identity</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">modified_at</span><span class="p">:</span> <span class="n">datetime</span>
+
+    <span class="c1"># Schema reference (set once during project creation)</span>
+    <span class="n">schema_id</span><span class="p">:</span> <span class="nb">str</span>                   <span class="c1"># Registry UUID</span>
+    <span class="n">schema_name</span><span class="p">:</span> <span class="nb">str</span>                 <span class="c1"># Display name (cached for UI)</span>
+    <span class="n">schema_version</span><span class="p">:</span> <span class="nb">int</span>              <span class="c1"># Version at time of selection</span>
+
+    <span class="c1"># Harmonization state (optional — user may skip)</span>
+    <span class="n">harmonization_enabled</span><span class="p">:</span> <span class="nb">bool</span>      <span class="c1"># Whether user chose to harmonize</span>
+    <span class="n">harmonization_step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span>   <span class="c1"># 1–3 (setup, match, curate)</span>
+    <span class="n">harmonization_complete</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">mapping_artifact_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>  <span class="c1"># Path to exported mapping JSON</span>
+
+    <span class="c1"># DataForge state</span>
+    <span class="n">submission_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>        <span class="c1"># DataForge submission UUIDs</span>
+    <span class="n">active_submission_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="c1"># Current submission being worked on</span>
+
+    <span class="n">steps</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">StepMetadata</span><span class="p">]</span>   <span class="c1"># Dynamic based on harmonization_enabled</span>
+</pre></div>
+</div>
+</section>
+<section id="schema-selector-component">
+<h3>Schema Selector Component<a class="headerlink" href="#schema-selector-component" title="Link to this heading"></a></h3>
+<p>A shared dropdown that queries the Registry Service and returns the selected schema. Used by Data Project creation and anywhere a schema reference is needed.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">schema_selector</span><span class="p">(</span>
+    <span class="n">registry_client</span><span class="p">:</span> <span class="n">RegistryClient</span><span class="p">,</span>
+    <span class="n">label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Select a canonical schema&quot;</span><span class="p">,</span>
+    <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;schema_selector&quot;</span><span class="p">,</span>
+    <span class="n">filter_published</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SchemaInfo</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Renders a selectbox of available schemas from the Registry.</span>
+<span class="sd">    Returns SchemaInfo(id, name, display_name, version, element_count) or None.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>Display format: <code class="docutils literal notranslate"><span class="pre">&quot;{display_name}</span> <span class="pre">(v{version},</span> <span class="pre">{element_count}</span> <span class="pre">elements)&quot;</span></code></p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="page-specifications">
+<h2>4. Page Specifications<a class="headerlink" href="#page-specifications" title="Link to this heading"></a></h2>
+<section id="home-dashboard-app-py">
+<h3>4.0 Home — Dashboard (<code class="docutils literal notranslate"><span class="pre">app.py</span></code>)<a class="headerlink" href="#home-dashboard-app-py" title="Link to this heading"></a></h3>
+<p><strong>Purpose:</strong> Landing page. Orient the user, surface recent activity, provide quick actions.</p>
+<p><strong>Layout:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌──────────────────────────────────────────────────┐
+│  FORGE                                            │
+│  AI-powered schema management &amp; data              │
+│  harmonization for biomedical research            │
+├──────────────────────────────────────────────────┤
+│                                                    │
+│  Quick Actions                                     │
+│  ┌──────────┐ ┌──────────────┐ ┌───────────────┐ │
+│  │ + Create  │ │ + New Data   │ │ + Upload Data │ │
+│  │   Schema  │ │   Project    │ │ (Quick)       │ │
+│  └──────────┘ └──────────────┘ └───────────────┘ │
+│                                                    │
+│  Recent Schema Projects          Recent Data       │
+│  ┌──────────────────────┐       Projects           │
+│  │ NINDS CDEs     Draft │       ┌────────────────┐│
+│  │ 450/520 curated      │       │ GP2 Study A    ││
+│  │ Modified 2h ago      │       │ Schema: NINDS  ││
+│  └──────────────────────┘       │ Status: Review ││
+│  ┌──────────────────────┐       └────────────────┘│
+│  │ ADNI Core    Published│       ┌────────────────┐│
+│  │ 320 elements         │       │ PPMI Cohort 3  ││
+│  │ Modified 1d ago      │       │ Schema: ADNI   ││
+│  └──────────────────────┘       │ Status: Mapping││
+│                                  └────────────────┘│
+└──────────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p><strong>Behavior:</strong></p>
+<ul class="simple">
+<li><p>Recent projects loaded from local manifest cache</p></li>
+<li><p>Quick action buttons navigate to the relevant page with <code class="docutils literal notranslate"><span class="pre">create=true</span></code> query param</p></li>
+<li><p>“Upload Data (Quick)” skips harmonization — creates a Data Project with <code class="docutils literal notranslate"><span class="pre">harmonization_enabled=False</span></code></p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="schemas-page-pages-1-schemas-py">
+<h3>4.1 Schemas Page (<code class="docutils literal notranslate"><span class="pre">pages/1_Schemas.py</span></code>)<a class="headerlink" href="#schemas-page-pages-1-schemas-py" title="Link to this heading"></a></h3>
+<p><strong>Purpose:</strong> Browse published schemas, create new ones via the curation wizard, view schema details.</p>
+<p><strong>Three views</strong> controlled by query params:</p>
+<section id="a-schema-browser-default">
+<h4>4.1a Schema Browser (default)<a class="headerlink" href="#a-schema-browser-default" title="Link to this heading"></a></h4>
+<p>Lists all schemas from Registry (published) and local schema projects (in-progress).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌──────────────────────────────────────────────────┐
+│  Schemas                          [+ New Schema] │
+├──────────────────────────────────────────────────┤
+│                                                    │
+│  Published Schemas (from Registry)                │
+│  ┌────────────────────────────────────────────┐   │
+│  │ Name          │ Version │ Elements │ Status│   │
+│  │───────────────│─────────│──────────│───────│   │
+│  │ NINDS CDEs    │ v2      │ 450      │ ✅    │   │
+│  │ ADNI Core     │ v1      │ 320      │ ✅    │   │
+│  └────────────────────────────────────────────┘   │
+│                                                    │
+│  My Schema Projects (in-progress curation)        │
+│  ┌────────────────────────────────────────────┐   │
+│  │ Name          │ Progress │ Step    │ Action│   │
+│  │───────────────│──────────│─────────│───────│   │
+│  │ PD Biomarkers │ 89/120   │ Curate  │ Open  │   │
+│  └────────────────────────────────────────────┘   │
+│                                                    │
+└──────────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p><strong>Actions:</strong></p>
+<ul class="simple">
+<li><p>Click published schema → Schema Detail view</p></li>
+<li><p>Click in-progress project → Resume curation wizard</p></li>
+<li><p>“+ New Schema” → Start curation wizard (Step 1)</p></li>
+</ul>
+</section>
+<section id="b-curation-wizard-schema-project-id">
+<h4>4.1b Curation Wizard (<code class="docutils literal notranslate"><span class="pre">?schema_project={id}</span></code>)<a class="headerlink" href="#b-curation-wizard-schema-project-id" title="Link to this heading"></a></h4>
+<p>The existing 4-step curation flow, extracted from <code class="docutils literal notranslate"><span class="pre">curation-workbench/app/app.py</span></code>:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Step</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p><strong>Upload</strong></p></td>
+<td><p>Parse CDE list (CSV/TSV/Excel), auto-detect columns</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p><strong>Configure</strong></p></td>
+<td><p>Set naming conventions, description rules, similarity thresholds, AI model</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p><strong>Curate</strong></p></td>
+<td><p>Variable-by-variable editor with AI suggestions, duplicate merging, constraint forms</p></td>
+</tr>
+<tr class="row-odd"><td><p>4</p></td>
+<td><p><strong>Publish</strong></p></td>
+<td><p>Preview schema, set metadata, publish to Registry</p></td>
+</tr>
+</tbody>
+</table>
+<p>This is functionally identical to the current Curation Workbench wizard. The key change is that Step 4 now performs an actual Registry API publish (currently stubbed).</p>
+<p><strong>On publish success:</strong></p>
+<ul class="simple">
+<li><p>Schema appears in the Published Schemas list</p></li>
+<li><p>User sees a success banner with action: <em>“Use this schema → Create a Data Project”</em></p></li>
+<li><p>That action navigates to the Data page with the schema pre-selected</p></li>
+</ul>
+</section>
+<section id="c-schema-detail-schema-id">
+<h4>4.1c Schema Detail (<code class="docutils literal notranslate"><span class="pre">?schema={id}</span></code>)<a class="headerlink" href="#c-schema-detail-schema-id" title="Link to this heading"></a></h4>
+<p>Read-only view of a published schema’s elements, pulled from Registry API.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌──────────────────────────────────────────────────┐
+│  ← Back to Schemas                                │
+│                                                    │
+│  NINDS Common Data Elements  v2                   │
+│  450 elements · Published 2025-01-15              │
+│                                                    │
+│  [Use for Data Project]  [Export ▾]               │
+│                                                    │
+│  Search: [____________]  Filter by collection: [▾]│
+│                                                    │
+│  ┌────────────────────────────────────────────┐   │
+│  │ Item       │ Type    │ Collection │Required│   │
+│  │────────────│─────────│────────────│────────│   │
+│  │ patient_id │ string  │ Admin      │ Yes    │   │
+│  │ age        │ numeric │ Demo       │ Yes    │   │
+│  │ sex        │ enum    │ Demo       │ Yes    │   │
+│  │ ...        │ ...     │ ...        │ ...    │   │
+│  └────────────────────────────────────────────┘   │
+│                                                    │
+└──────────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p><strong>Actions:</strong></p>
+<ul class="simple">
+<li><p>“Use for Data Project” → Navigate to Data page, schema pre-selected</p></li>
+<li><p>Export → JSON, CSV, TSV, YAML (via Registry export endpoint)</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="harmonize-page-pages-2-harmonize-py">
+<h3>4.2 Harmonize Page (<code class="docutils literal notranslate"><span class="pre">pages/2_Harmonize.py</span></code>)<a class="headerlink" href="#harmonize-page-pages-2-harmonize-py" title="Link to this heading"></a></h3>
+<p><strong>Purpose:</strong> Map source data fields to a canonical schema’s elements using AI-powered matching. This page is accessed through a Data Project that has harmonization enabled.</p>
+<p><strong>Two views:</strong></p>
+<section id="a-data-project-list-default">
+<h4>4.2a Data Project List (default)<a class="headerlink" href="#a-data-project-list-default" title="Link to this heading"></a></h4>
+<p>Lists Data Projects that have harmonization enabled, showing mapping progress.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌──────────────────────────────────────────────────┐
+│  Harmonize                   [+ New Data Project]│
+├──────────────────────────────────────────────────┤
+│                                                  │
+│  Data Projects with Harmonization                │
+│  ┌────────────────────────────────────────────┐  │
+│  │ Project     │ Schema    │ Progress │ Step  │  │
+│  │─────────────│───────────│──────────│───────│  │
+│  │ GP2 Study A │ NINDS v2  │ 89/156   │ Curate│  │
+│  │ PPMI Wave 3 │ ADNI v1   │ --       │ Setup │  │
+│  └────────────────────────────────────────────┘  │
+│                                                  │
+└──────────────────────────────────────────────────┘
+</pre></div>
+</div>
+<p><strong>“+ New Data Project”</strong> creates a Data Project with <code class="docutils literal notranslate"><span class="pre">harmonization_enabled=True</span></code>. The creation dialog includes:</p>
+<ol class="arabic simple">
+<li><p>Project name</p></li>
+<li><p>Schema selector (dropdown from Registry)</p></li>
+<li><p>→ Starts the mapping wizard at Step 1</p></li>
+</ol>
+</section>
+<section id="b-mapping-wizard-data-project-id">
+<h4>4.2b Mapping Wizard (<code class="docutils literal notranslate"><span class="pre">?data_project={id}</span></code>)<a class="headerlink" href="#b-mapping-wizard-data-project-id" title="Link to this heading"></a></h4>
+<p>The existing 3-step harmonization flow, extracted from <code class="docutils literal notranslate"><span class="pre">harmonization-engine/app/app.py</span></code>:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Step</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p><strong>Setup</strong></p></td>
+<td><p>Upload data dictionary (CSV/TSV). Schema is pre-loaded from the Data Project’s <code class="docutils literal notranslate"><span class="pre">schema_id</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p><strong>Match</strong></p></td>
+<td><p>Run AI-powered field matching (TF-IDF + embeddings + LLM evaluation)</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p><strong>Curate</strong></p></td>
+<td><p>Review matches field-by-field. Accept, reject, select alternatives, mark no-match.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Key difference from standalone: <strong>Step 1 no longer asks the user to select or upload a schema.</strong> The schema is already set on the Data Project. The user only uploads their source data dictionary.</p>
+<p><strong>On curation complete:</strong></p>
+<ul class="simple">
+<li><p>Mapping artifact saved to Data Project manifest</p></li>
+<li><p>User sees action: <em>“Proceed to data validation →”</em></p></li>
+<li><p>That action navigates to the Data page with the Data Project context, pre-filling the schema and offering to apply the mapping</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="data-page-pages-3-data-py">
+<h3>4.3 Data Page (<code class="docutils literal notranslate"><span class="pre">pages/3_Data.py</span></code>)<a class="headerlink" href="#data-page-pages-3-data-py" title="Link to this heading"></a></h3>
+<p><strong>Purpose:</strong> Upload data files, validate against canonical schemas, review and accept/reject submissions. This is the DataForge UI, integrated into the unified app.</p>
+<p><strong>Three views:</strong></p>
+<section id="a-submissions-dashboard-default">
+<h4>4.3a Submissions Dashboard (default)<a class="headerlink" href="#a-submissions-dashboard-default" title="Link to this heading"></a></h4>
+<p>Lists all submissions across Data Projects, with filtering.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌──────────────────────────────────────────────────┐
+│  Data                           [+ New Submission]│
+├──────────────────────────────────────────────────┤
+│                                                    │
+│  Filter: [All statuses ▾] [All projects ▾]        │
+│                                                    │
+│  ┌────────────────────────────────────────────┐   │
+│  │ Submission  │ Project   │ Schema │ Status  │   │
+│  │─────────────│───────────│────────│─────────│   │
+│  │ GP2-001     │ GP2 Std A │ NINDS  │ ⏳ Rev  │   │
+│  │ PPMI-003    │ PPMI W3   │ ADNI   │ ❌ Corr │   │
+│  │ GP2-002     │ GP2 Std A │ NINDS  │ ✅ Acc  │   │
+│  └────────────────────────────────────────────┘   │
+│                                                    │
+└──────────────────────────────────────────────────┘
+</pre></div>
+</div>
+</section>
+<section id="b-upload-validate-wizard">
+<h4>4.3b Upload &amp; Validate Wizard<a class="headerlink" href="#b-upload-validate-wizard" title="Link to this heading"></a></h4>
+<p>Two entry points:</p>
+<ol class="arabic simple">
+<li><p><strong>From a Data Project</strong> (harmonization completed or skipped) — schema is pre-selected</p></li>
+<li><p><strong>“+ New Submission”</strong> — user selects schema from dropdown, then uploads</p></li>
+</ol>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Step</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p><strong>Setup</strong></p></td>
+<td><p>Select or confirm Data Project + schema. Enter study identifier.</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p><strong>Upload</strong></p></td>
+<td><p>Upload CSV data file. If harmonization mapping exists, offer to preview column name transforms.</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p><strong>Results</strong></p></td>
+<td><p>Display validation report (errors, warnings, field-level issues). Actions: Submit for review, or download report and fix.</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Schema selection flow (Step 1):</strong></p>
+<ul class="simple">
+<li><p>If arriving from a Data Project → schema pre-filled, read-only</p></li>
+<li><p>If arriving from “+ New Submission” → schema selector dropdown + optional “Create Data Project” or use ad-hoc</p></li>
+</ul>
+</section>
+<section id="c-review-view-submission-id">
+<h4>4.3c Review View (<code class="docutils literal notranslate"><span class="pre">?submission={id}</span></code>)<a class="headerlink" href="#c-review-view-submission-id" title="Link to this heading"></a></h4>
+<p>Full submission review interface (from existing DataForge Review page):</p>
+<ul class="simple">
+<li><p>Submission metadata and version history</p></li>
+<li><p>Validation report with error/warning breakdown</p></li>
+<li><p>Field-level issue details</p></li>
+<li><p>Reviewer actions: Claim → Review → Accept or Reject (with comments)</p></li>
+<li><p>Corrections flow: Reject → submitter uploads new version → re-validate</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="settings-page-pages-4-settings-py">
+<h3>4.4 Settings Page (<code class="docutils literal notranslate"><span class="pre">pages/4_Settings.py</span></code>)<a class="headerlink" href="#settings-page-pages-4-settings-py" title="Link to this heading"></a></h3>
+<p><strong>Purpose:</strong> Identity configuration. Minimal for MVP.</p>
+<ul class="simple">
+<li><p><strong>Display name</strong> — Text input, stored in <code class="docutils literal notranslate"><span class="pre">st.session_state</span></code> and persisted to local config</p></li>
+<li><p><strong>Email</strong> — Text input, used for project ownership attribution</p></li>
+<li><p>No authentication for MVP — this is a trust-based identity for internal testing</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="navigation-shared-components">
+<h2>5. Navigation &amp; Shared Components<a class="headerlink" href="#navigation-shared-components" title="Link to this heading"></a></h2>
+<section id="sidebar">
+<h3>Sidebar<a class="headerlink" href="#sidebar" title="Link to this heading"></a></h3>
+<p>The sidebar is persistent across all pages and provides:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>┌─────────────────────┐
+│  🔷 FORGE            │
+│                      │
+│  ── Navigate ──      │
+│  📋 Home             │
+│  📐 Schemas          │
+│  🔄 Harmonize        │
+│  📊 Data             │
+│                      │
+│  ── You ──           │
+│  👤 Alice Smith      │
+│     alice@lab.org    │
+│                      │
+│  ── Context ──       │
+│  Schema: NINDS v2    │
+│  Project: GP2 Std A  │
+│  (shown when active) │
+│                      │
+│  ── Quick Actions ── │
+│  + New Schema        │
+│  + New Data Project  │
+│                      │
+│  ─────────────────   │
+│  ⚙ Settings          │
+└─────────────────────┘
+</pre></div>
+</div>
+<p><strong>Context panel:</strong> When a user is actively working in a Data Project, the sidebar shows the active schema and project. This provides orientation as the user moves between Harmonize and Data pages.</p>
+</section>
+<section id="contextual-handoffs">
+<h3>Contextual Handoffs<a class="headerlink" href="#contextual-handoffs" title="Link to this heading"></a></h3>
+<p>The most important UX improvement over separate apps. These are implemented as action buttons that navigate with query parameters:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>From</p></th>
+<th class="head"><p>To</p></th>
+<th class="head"><p>Context passed</p></th>
+<th class="head"><p>Trigger</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Schema publish (Curation Step 4)</p></td>
+<td><p>Data page (new submission)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">schema_id</span></code></p></td>
+<td><p>“Use this schema →” button</p></td>
+</tr>
+<tr class="row-odd"><td><p>Schema detail view</p></td>
+<td><p>Data page (new project)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">schema_id</span></code></p></td>
+<td><p>“Use for Data Project” button</p></td>
+</tr>
+<tr class="row-even"><td><p>Harmonize complete (Step 3)</p></td>
+<td><p>Data page (upload wizard)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">data_project_id</span></code>, <code class="docutils literal notranslate"><span class="pre">schema_id</span></code>, <code class="docutils literal notranslate"><span class="pre">mapping_path</span></code></p></td>
+<td><p>“Proceed to validation →” button</p></td>
+</tr>
+<tr class="row-odd"><td><p>Data submission rejected</p></td>
+<td><p>Data page (upload wizard)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">submission_id</span></code> (for resubmit)</p></td>
+<td><p>“Upload correction” button</p></td>
+</tr>
+<tr class="row-even"><td><p>Home quick actions</p></td>
+<td><p>Schema / Data pages</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">create=true</span></code></p></td>
+<td><p>Quick action buttons</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="wizard-framework">
+<h3>Wizard Framework<a class="headerlink" href="#wizard-framework" title="Link to this heading"></a></h3>
+<p>All wizards share a common step indicator component:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">wizard_steps</span><span class="p">(</span>
+    <span class="n">steps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>          <span class="c1"># [&quot;Upload&quot;, &quot;Configure&quot;, &quot;Curate&quot;, &quot;Publish&quot;]</span>
+    <span class="n">current_step</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>         <span class="c1"># 1-indexed</span>
+    <span class="n">allow_back</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">on_step_click</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># For clickable completed steps</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Renders a horizontal step indicator with progress dots.&quot;&quot;&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="user-journeys">
+<h2>6. User Journeys<a class="headerlink" href="#user-journeys" title="Link to this heading"></a></h2>
+<section id="journey-a-create-a-schema-and-use-it-full-loop">
+<h3>Journey A: Create a Schema and Use It (Full Loop)<a class="headerlink" href="#journey-a-create-a-schema-and-use-it-full-loop" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>1. User opens Forge → Home
+2. Clicks &quot;+ Create Schema&quot; → Schemas page, curation wizard
+3. Step 1: Uploads CDE list (CSV with 520 variables)
+4. Step 2: Configures naming (snake_case), sets similarity threshold (0.80)
+5. Step 3: Curates variables one by one
+   - AI suggests canonical names, types, constraints
+   - Duplicate detection flags 47 pairs → user merges/keeps
+   - Progress: 520 → 450 canonical elements
+6. Step 4: Sets schema name &quot;NINDS CDEs&quot;, description → Publishes to Registry
+7. Sees success → Clicks &quot;Use this schema → Create a Data Project&quot;
+8. → Navigates to Harmonize page, new Data Project dialog
+9. Names project &quot;GP2 Study A&quot;, schema pre-selected as &quot;NINDS CDEs v2&quot;
+10. Step 1: Uploads data dictionary (156 columns)
+11. Step 2: AI matches fields → 130 high-confidence, 20 medium, 6 low
+12. Step 3: Curates uncertain matches → 142 mapped, 14 intentionally unmapped
+13. Clicks &quot;Proceed to validation →&quot;
+14. → Navigates to Data page, upload wizard with project context
+15. Step 1: Project and schema pre-filled
+16. Step 2: Uploads actual data CSV (347 rows)
+17. Step 3: Validation report shows 12 errors, 5 warnings
+18. Downloads report, fixes source data, re-uploads
+19. Step 3: Clean validation → Submits for review
+20. Another user claims and reviews → Accepts
+21. Data is in the system ✅
+</pre></div>
+</div>
+</section>
+<section id="journey-b-validate-data-against-an-existing-schema-skip-harmonization">
+<h3>Journey B: Validate Data Against an Existing Schema (Skip Harmonization)<a class="headerlink" href="#journey-b-validate-data-against-an-existing-schema-skip-harmonization" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>1. User opens Forge → Home
+2. Clicks &quot;+ Upload Data (Quick)&quot;
+3. → Data page, upload wizard
+4. Step 1: Selects &quot;NINDS CDEs v2&quot; from schema dropdown, enters study name
+5. Step 2: Uploads CSV (columns already match canonical schema names)
+6. Step 3: Validation report → clean → Submits for review
+</pre></div>
+</div>
+<p>This journey skips harmonization entirely. The user’s data already conforms to the schema.</p>
+</section>
+<section id="journey-c-map-data-to-an-existing-schema-no-curation-needed">
+<h3>Journey C: Map Data to an Existing Schema (No Curation Needed)<a class="headerlink" href="#journey-c-map-data-to-an-existing-schema-no-curation-needed" title="Link to this heading"></a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>1. User opens Forge → Harmonize
+2. Clicks &quot;+ New Data Project&quot;
+3. Selects &quot;NINDS CDEs v2&quot; from dropdown, names project &quot;PPMI Wave 3&quot;
+4. Runs the 3-step mapping wizard
+5. On completion → proceeds to Data validation
+</pre></div>
+</div>
+<p>The schema already exists in Registry. No curation needed.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="dataforge-registry-integration">
+<h2>7. DataForge ↔ Registry Integration<a class="headerlink" href="#dataforge-registry-integration" title="Link to this heading"></a></h2>
+<p>Currently, DataForge uses string schema names and local JSON fixtures for validation. The unified app requires DataForge to validate against schemas from the Registry.</p>
+<section id="required-changes">
+<h3>Required Changes<a class="headerlink" href="#required-changes" title="Link to this heading"></a></h3>
+<ol class="arabic">
+<li><p><strong>Schema resolution in DataForge API:</strong></p>
+<ul class="simple">
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">schema_id</span></code> field to Submission model (alongside existing <code class="docutils literal notranslate"><span class="pre">schema_name</span></code>)</p></li>
+<li><p>When <code class="docutils literal notranslate"><span class="pre">schema_id</span></code> is provided, fetch schema definition from Registry API</p></li>
+<li><p>Convert Registry <code class="docutils literal notranslate"><span class="pre">ElementResponse</span></code> objects to DataForge <code class="docutils literal notranslate"><span class="pre">FieldConfig</span></code> objects</p></li>
+<li><p>Fall back to local fixtures when <code class="docutils literal notranslate"><span class="pre">schema_id</span></code> is not provided (backward compatibility)</p></li>
+</ul>
+</li>
+<li><p><strong>Registry → DataForge field mapping:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Registry <code class="docutils literal notranslate"><span class="pre">ElementResponse</span></code></p></th>
+<th class="head"><p>DataForge <code class="docutils literal notranslate"><span class="pre">FieldConfig</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">item</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">item</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">description</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">description</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">collection</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">collection</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">item_type</span></code> (numeric/string/date/enum/binary)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">item_type</span></code> (NUMERIC/STRING/DATE/ENUM/BINARY)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">values</span></code> (pipe-delimited or range)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">values</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">alternate_names</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">alternate_names</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code> (Required/Optional)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">priority</span></code> (REQUIRED/OPTIONAL)</p></td>
+</tr>
+</tbody>
+</table>
+</li>
+<li><p><strong>Registry client in DataForge API:</strong></p>
+<ul class="simple">
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">RegistryClient</span></code> to DataForge API (similar to the one in harmonization-engine)</p></li>
+<li><p>Inject via FastAPI <code class="docutils literal notranslate"><span class="pre">Depends()</span></code> pattern</p></li>
+<li><p>Cache schema definitions per <code class="docutils literal notranslate"><span class="pre">(schema_id,</span> <span class="pre">version)</span></code> to avoid repeated API calls</p></li>
+</ul>
+</li>
+</ol>
+</section>
+</section>
+<hr class="docutils" />
+<section id="technical-implementation">
+<h2>8. Technical Implementation<a class="headerlink" href="#technical-implementation" title="Link to this heading"></a></h2>
+<section id="streamlit-multi-page-app-structure">
+<h3>Streamlit Multi-Page App Structure<a class="headerlink" href="#streamlit-multi-page-app-structure" title="Link to this heading"></a></h3>
+<p>Use Streamlit’s native multi-page app pattern (<code class="docutils literal notranslate"><span class="pre">pages/</span></code> directory). Each page is a self-contained module that imports from <code class="docutils literal notranslate"><span class="pre">core/</span></code>, <code class="docutils literal notranslate"><span class="pre">clients/</span></code>, and <code class="docutils literal notranslate"><span class="pre">components/</span></code>.</p>
+</section>
+<section id="state-management">
+<h3>State Management<a class="headerlink" href="#state-management" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Global identity (all pages)</span>
+<span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;identity_name&quot;</span><span class="p">]</span>          <span class="c1"># User display name</span>
+<span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;identity_email&quot;</span><span class="p">]</span>         <span class="c1"># User email</span>
+
+<span class="c1"># Curation wizard state — prefix _wizard_ (pages/1_Schemas.py)</span>
+<span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;_wizard_project_id&quot;</span><span class="p">]</span>     <span class="c1"># Active schema project ID</span>
+<span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;_wizard_session&quot;</span><span class="p">]</span>        <span class="c1"># CurationSession (persisted on step transitions)</span>
+<span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;_wizard_suggestions&quot;</span><span class="p">]</span>    <span class="c1"># SuggestionsResult from AISuggestionService</span>
+<span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;_wizard_detector&quot;</span><span class="p">]</span>       <span class="c1"># DuplicateDetector instance (not persisted)</span>
+<span class="c1"># per-variable keys: _wizard_applied_{var}, _wizard_merge_{var}, _wizard_type_{var}</span>
+
+<span class="c1"># Harmonization wizard state — prefix _harm_ (pages/2_Harmonize.py)</span>
+<span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;_harm_project_id&quot;</span><span class="p">]</span>              <span class="c1"># Active data project ID</span>
+<span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;_harm_data_dict_df&quot;</span><span class="p">]</span>            <span class="c1"># Uploaded source data dictionary DataFrame</span>
+<span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;_harm_results_df&quot;</span><span class="p">]</span>              <span class="c1"># Match results DataFrame</span>
+<span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;_harm_curated_set&quot;</span><span class="p">]</span>             <span class="c1"># CuratedMatchSet (persisted to disk)</span>
+<span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;_harm_matcher_</span><span class="si">{project_id}</span><span class="s2">&quot;</span><span class="p">]</span>    <span class="c1"># ComprehensiveMatcher instance (per project)</span>
+<span class="n">st</span><span class="o">.</span><span class="n">session_state</span><span class="p">[</span><span class="s2">&quot;_harm_show_create&quot;</span><span class="p">]</span>             <span class="c1"># Bool flag for project creation dialog</span>
+</pre></div>
+</div>
+</section>
+<section id="query-parameter-routing">
+<h3>Query Parameter Routing<a class="headerlink" href="#query-parameter-routing" title="Link to this heading"></a></h3>
+<p>Each page uses <code class="docutils literal notranslate"><span class="pre">st.query_params</span></code> for deep linking and contextual navigation:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Schemas page</span>
+<span class="err">?</span><span class="n">schema_project</span><span class="o">=</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>    <span class="c1"># Open curation wizard for this project</span>
+<span class="err">?</span><span class="n">schema</span><span class="o">=</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>            <span class="c1"># View published schema detail</span>
+<span class="err">?</span><span class="n">create</span><span class="o">=</span><span class="n">true</span>            <span class="c1"># Start new schema project</span>
+
+<span class="c1"># Harmonize page</span>
+<span class="err">?</span><span class="n">data_project</span><span class="o">=</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>      <span class="c1"># Open mapping wizard for this project</span>
+<span class="err">?</span><span class="n">create</span><span class="o">=</span><span class="n">true</span>            <span class="c1"># Start new data project</span>
+<span class="err">?</span><span class="n">schema_id</span><span class="o">=</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>         <span class="c1"># Pre-select schema for new project</span>
+
+<span class="c1"># Data page</span>
+<span class="err">?</span><span class="n">submission</span><span class="o">=</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>        <span class="c1"># View/review specific submission</span>
+<span class="err">?</span><span class="n">data_project</span><span class="o">=</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>      <span class="c1"># Open upload wizard with project context</span>
+<span class="err">?</span><span class="n">schema_id</span><span class="o">=</span><span class="p">{</span><span class="nb">id</span><span class="p">}</span>         <span class="c1"># Pre-select schema for new submission</span>
+<span class="err">?</span><span class="n">create</span><span class="o">=</span><span class="n">true</span>            <span class="c1"># Start new submission</span>
+</pre></div>
+</div>
+</section>
+<section id="business-logic-extraction">
+<h3>Business Logic Extraction<a class="headerlink" href="#business-logic-extraction" title="Link to this heading"></a></h3>
+<p>Business logic is extracted from the monolithic Streamlit apps into importable <code class="docutils literal notranslate"><span class="pre">core/</span></code> modules with no Streamlit coupling.</p>
+<p><strong>From <code class="docutils literal notranslate"><span class="pre">harmonization-engine/app/app.py</span></code> → <code class="docutils literal notranslate"><span class="pre">core/harmonization/</span></code> (Phase 3, complete):</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Module</p></th>
+<th class="head"><p>What</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">core/harmonization/models.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">MatchStatus</span></code>, <code class="docutils literal notranslate"><span class="pre">CurationDecision</span></code>, <code class="docutils literal notranslate"><span class="pre">FieldMatchCuration</span></code>, <code class="docutils literal notranslate"><span class="pre">CuratedMatchSet</span></code> (with TSV/JSON export methods)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">core/harmonization/matcher.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ComprehensiveMatcher</span></code> — 2-tier matching (exact name → AI evaluation via Claude)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">core/harmonization/retrieval.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">HybridRetriever</span></code> — TF-IDF + embedding candidate retrieval via forge-retrieval-core; project-scoped cache path</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">core/harmonization/match_engine.py</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">run_matching()</span></code> — full pipeline with progress callback; <code class="docutils literal notranslate"><span class="pre">elements_to_reference_df()</span></code> — Registry <code class="docutils literal notranslate"><span class="pre">ElementInfo</span></code> → matcher DataFrame</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">core/harmonization/curation.py</span></code></p></td>
+<td><p>Curation service functions: create set from results, update decisions, filter, sort, bulk accept/reset</p></td>
+</tr>
+</tbody>
+</table>
+<p>Persistence is handled by <code class="docutils literal notranslate"><span class="pre">core/storage.py</span></code>: <code class="docutils literal notranslate"><span class="pre">save/load_harm_data_dict()</span></code>, <code class="docutils literal notranslate"><span class="pre">save/load_harm_results()</span></code>, <code class="docutils literal notranslate"><span class="pre">save/load_curated_match_set()</span></code>.</p>
+<p><strong>From <code class="docutils literal notranslate"><span class="pre">curation-workbench/app/app.py</span></code> → <code class="docutils literal notranslate"><span class="pre">core/curation/</span></code> (Phase 2, complete):</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Module</p></th>
+<th class="head"><p>What</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">core/curation/parser.py</span></code></p></td>
+<td><p>File parsing (CSV/TSV/Excel), auto column detection</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">core/curation/duplicate_detector.py</span></code></p></td>
+<td><p>TF-IDF + embedding duplicate detection via forge-retrieval-core</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">core/curation/suggestion_service.py</span></code></p></td>
+<td><p>Claude API AI suggestion engine</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">core/curation/publisher.py</span></code></p></td>
+<td><p>Registry publish logic (actual API call, not stubbed)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">core/curation/models.py</span></code></p></td>
+<td><p>All curation data models (RawElement, CuratedElement, CurationSession, etc.)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="docker-compose-addition">
+<h3>Docker Compose Addition<a class="headerlink" href="#docker-compose-addition" title="Link to this heading"></a></h3>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">forge-app</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">context</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span>
+<span class="w">    </span><span class="nt">dockerfile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">services/forge-app/Dockerfile</span>
+<span class="w">  </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;8505:8505&quot;</span>
+<span class="w">  </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">REGISTRY_SERVICE_URL=http://registry-service:8000</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DATAFORGE_API_URL=http://dataforge-api:8001</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}</span>
+<span class="w">  </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry-service</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">dataforge-api</span>
+<span class="w">  </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">forge-app-cache:/app/.cache</span>
+</pre></div>
+</div>
+</section>
+</section>
+<hr class="docutils" />
+<section id="implementation-phases">
+<h2>9. Implementation Phases<a class="headerlink" href="#implementation-phases" title="Link to this heading"></a></h2>
+<section id="phase-1-foundation">
+<h3>Phase 1: Foundation<a class="headerlink" href="#phase-1-foundation" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> App shell with navigation, shared components, and schema browsing.</p>
+<ul class="simple">
+<li><p>[x] Create <code class="docutils literal notranslate"><span class="pre">services/forge-app/</span></code> directory structure</p></li>
+<li><p>[x] Implement sidebar with navigation and identity</p></li>
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">RegistryClient</span></code> (adapt from harmonization-engine)</p></li>
+<li><p>[x] Implement Schema Selector component</p></li>
+<li><p>[x] Build Schemas page — browser view (list from Registry)</p></li>
+<li><p>[x] Build Schemas page — detail view (elements table)</p></li>
+<li><p>[x] Build Home page with project lists (empty state)</p></li>
+<li><p>[x] Build Settings page (identity only)</p></li>
+<li><p>[x] Dockerfile and docker-compose integration</p></li>
+<li><p>[x] Basic test suite for clients and components</p></li>
+</ul>
+</section>
+<section id="phase-2-schema-curation">
+<h3>Phase 2: Schema Curation<a class="headerlink" href="#phase-2-schema-curation" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Full curation wizard working inside the unified app.</p>
+<ul class="simple">
+<li><p>[x] Extract curation business logic from <code class="docutils literal notranslate"><span class="pre">curation-workbench/app/app.py</span></code> into <code class="docutils literal notranslate"><span class="pre">core/curation/</span></code></p></li>
+<li><p>[x] Build curation wizard (4 steps) in Schemas page</p></li>
+<li><p>[x] Implement Registry publish in Step 4 (currently stubbed)</p></li>
+<li><p>[x] Add contextual handoff: publish → “Use this schema”</p></li>
+<li><p>[x] Schema project manifest persistence</p></li>
+<li><p>[x] Test curation flow end-to-end</p></li>
+</ul>
+</section>
+<section id="phase-3-harmonization">
+<h3>Phase 3: Harmonization<a class="headerlink" href="#phase-3-harmonization" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Full mapping wizard working inside the unified app.</p>
+<ul class="simple">
+<li><p>[x] Extract harmonization logic from <code class="docutils literal notranslate"><span class="pre">harmonization-engine/app/app.py</span></code> into <code class="docutils literal notranslate"><span class="pre">core/harmonization/</span></code></p></li>
+<li><p>[x] Build Data Project creation flow (name + schema selector)</p></li>
+<li><p>[x] Build mapping wizard (3 steps) in Harmonize page</p></li>
+<li><p>[x] Schema auto-loaded from Data Project (no upload/select in Step 1)</p></li>
+<li><p>[x] Add contextual handoff: mapping complete → “Proceed to validation”</p></li>
+<li><p>[x] Data project manifest persistence</p></li>
+<li><p>[x] Test harmonization flow end-to-end</p></li>
+</ul>
+</section>
+<section id="phase-4-data-validation">
+<h3>Phase 4: Data Validation<a class="headerlink" href="#phase-4-data-validation" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> DataForge upload/validate/review integrated into the unified app.</p>
+<ul class="simple">
+<li><p>[x] Implement <code class="docutils literal notranslate"><span class="pre">DataForgeClient</span></code> (adapt from <code class="docutils literal notranslate"><span class="pre">dataforge/ui/client/</span></code>)</p></li>
+<li><p>[x] Add <code class="docutils literal notranslate"><span class="pre">schema_id</span></code> support to DataForge API (Registry integration via <code class="docutils literal notranslate"><span class="pre">RegistrySchemaLoader</span></code>)</p></li>
+<li><p>[x] Build Data page — submissions dashboard</p></li>
+<li><p>[x] Build upload &amp; validate wizard (3 steps)</p></li>
+<li><p>[x] Build review view (claim, inspect, accept/reject)</p></li>
+<li><p>[x] Wire contextual handoff from Harmonize → Data</p></li>
+<li><p>[x] Wire corrections flow (reject → re-upload)</p></li>
+<li><p>[x] Test data validation flow end-to-end</p></li>
+</ul>
+</section>
+<section id="phase-5-polish-integration-testing">
+<h3>Phase 5: Polish &amp; Integration Testing<a class="headerlink" href="#phase-5-polish-integration-testing" title="Link to this heading"></a></h3>
+<p><strong>Goal:</strong> Full loop tested, rough edges smoothed.</p>
+<ul class="simple">
+<li><p>[x] End-to-end integration tests (Journey A, B, C from §6)</p></li>
+<li><p>[x] Home page populated with real project data</p></li>
+<li><p>[x] Error handling and edge cases (API down, validation failures, empty states)</p></li>
+<li><p>[x] Loading states and progress indicators</p></li>
+<li><p>[x] Consistent styling across all modules</p></li>
+<li><p>[ ] Internal user testing and feedback</p></li>
+<li><p>[x] Documentation updates</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="decisions-resolved">
+<h2>10. Decisions (Resolved)<a class="headerlink" href="#decisions-resolved" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p><strong>Mapping application during upload:</strong> Auto-apply column renames from the harmonization mapping with a preview confirmation step. The original source-to-canonical mapping is always retained and viewable — users can inspect the mapping for any variable at any time. The mapping artifact is a first-class object in the Data Project, never discarded.</p></li>
+<li><p><strong>Schema version pinning:</strong> Yes. Data Projects pin to the schema version at creation time. Validation results are meaningless if the schema shifts underneath them. Users can create a new Data Project to use a newer schema version, or an explicit “upgrade schema version” action can be added post-MVP.</p></li>
+<li><p><strong>Project storage:</strong> Local filesystem cache (<code class="docutils literal notranslate"><span class="pre">.cache/forge-app/</span></code>) for MVP. Migrate to Supabase after the MVP is built and validated with internal users, aligned with the C.1-Infra persistence migration track.</p></li>
+<li><p><strong>Standalone service deprecation:</strong> Keep deployable, mark as legacy. The standalone Streamlit apps (<code class="docutils literal notranslate"><span class="pre">:8501</span></code>, <code class="docutils literal notranslate"><span class="pre">:8502</span></code>, <code class="docutils literal notranslate"><span class="pre">:8503</span></code>) remain in the repo as fallbacks and for isolated service testing. READMEs updated to point to the unified app as the primary interface. No further UI investment in standalone apps once the unified app covers equivalent functionality.</p></li>
+<li><p><strong>Schema validation rules in Registry:</strong> Keep as DataForge-specific config tied to <code class="docutils literal notranslate"><span class="pre">schema_id</span></code> for now. Validation rules are operational concerns (data quality), not schema definition. If multiple Data Projects duplicate the same rules for the same schema, that’s the signal to promote rules into Registry.</p></li>
+</ol>
+</section>
+<hr class="docutils" />
+<section id="success-criteria">
+<h2>11. Success Criteria<a class="headerlink" href="#success-criteria" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Metric</p></th>
+<th class="head"><p>Target</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Internal users can complete Journey A (full loop)</p></td>
+<td><p>Yes, without switching apps</p></td>
+</tr>
+<tr class="row-odd"><td><p>Internal users can complete Journey B (quick upload)</p></td>
+<td><p>Yes, in under 5 clicks</p></td>
+</tr>
+<tr class="row-even"><td><p>Schema created in curation appears in Harmonize/Data dropdowns</p></td>
+<td><p>Immediately after publish</p></td>
+</tr>
+<tr class="row-odd"><td><p>No regression in individual service functionality</p></td>
+<td><p>All existing tests pass</p></td>
+</tr>
+<tr class="row-even"><td><p>Time to complete full loop vs. separate apps</p></td>
+<td><p>≤ 50% of current time</p></td>
+</tr>
+<tr class="row-odd"><td><p>Zero data loss during wizard flows</p></td>
+<td><p>Manifest persistence on every step transition</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="forge-production-roadmap.html" class="btn btn-neutral float-left" title="Forge Production Roadmap" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="forge-validation-rules-spec.html" class="btn btn-neutral float-right" title="Validation Rules — Interactive Rule Builder Spec" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

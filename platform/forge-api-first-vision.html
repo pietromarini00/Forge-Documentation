@@ -1,0 +1,505 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forge — API-First Platform Vision &mdash; Forge  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=a6d64eb9" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Forge" href="forge-executive-summary.html" />
+    <link rel="prev" title="Harmonization Engine - Cloud Run Deployment Guide" href="../guides/deployment.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Forge
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guides</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../guides/deployment.html">Harmonization Engine - Cloud Run Deployment Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Platform</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Forge — API-First Platform Vision</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-problem">The Problem</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-insight">The Insight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#architecture-api-core-pluggable-clients">Architecture: API Core + Pluggable Clients</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#core-apis">Core APIs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#schema-registry-api">Schema Registry API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#harmonization-api">Harmonization API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#validation-api">Validation API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#review-audit-api">Review &amp; Audit API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gold-dataset-api">Gold Dataset API</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#what-makes-this-defensible">What Makes This Defensible</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#governance-compounds-matching-doesn-t">1. Governance compounds; matching doesn’t</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#regulatory-requirements-aren-t-optional">2. Regulatory requirements aren’t optional</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-schema-registry-is-a-network-effect">3. The schema registry is a network effect</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ai-gets-better-governance-stays-necessary">4. AI gets better; governance stays necessary</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#deployment-tiers">Deployment Tiers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#near-term-roadmap">Near-Term Roadmap</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#now-managed-ui-for-initial-organizations">Now: Managed UI for initial organizations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#next-extract-and-stabilize-public-apis">Next: Extract and stabilize public APIs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#then-python-sdk-cli">Then: Python SDK + CLI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#later-ecosystem-integrations">Later: Ecosystem integrations</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#positioning">Positioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#summary">Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="forge-executive-summary.html">Forge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-identifier-scheme-spec.html">Identifier Schemes &amp; Golden IDs — Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-production-roadmap.html">Forge Production Roadmap</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-unified-app-spec.html">Forge Unified App — MVP Specification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="forge-validation-rules-spec.html">Validation Rules — Interactive Rule Builder Spec</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Specifications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../specs/api-first-decoupling.html">API-First Decoupling Spec</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/curation-workbench.html">SchemaForge: Curation Workbench</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/dataforge.html">DataForge</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/harmonization-engine.html">SchemaForge: Harmonization Engine</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/registry-service.html">SchemaForge: Registry Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../specs/roles-and-governance.html">Forge Platform — Roles, Permissions &amp; Governance</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/api-reference.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/data-models.html">Data Model Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/glossary.html">Glossary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/local-dev-setup.html">Local Development Setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/service-interactions.html">Service Interaction Sequences</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Deployment</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../local-deploy.html">Local Developer Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../gcloud-deploy.html">GCloud Deploy Workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../forge.html">Forge API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Forge</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Forge — API-First Platform Vision</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/platform/forge-api-first-vision.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="forge-api-first-platform-vision">
+<h1>Forge — API-First Platform Vision<a class="headerlink" href="#forge-api-first-platform-vision" title="Link to this heading"></a></h1>
+<p><strong>Data governance infrastructure for schema conformance and harmonization</strong></p>
+<hr class="docutils" />
+<section id="the-problem">
+<h2>The Problem<a class="headerlink" href="#the-problem" title="Link to this heading"></a></h2>
+<p>Organizations harmonizing multi-source data face three bottlenecks that don’t go away with better AI:</p>
+<ol class="arabic simple">
+<li><p><strong>Schema drift</strong> — Canonical data dictionaries degrade over time. No versioning, no change tracking, no single source of truth.</p></li>
+<li><p><strong>Untracked mapping decisions</strong> — Field mappings live in spreadsheets and tribal knowledge. No audit trail, no reuse across studies, no institutional memory.</p></li>
+<li><p><strong>No governance layer</strong> — Once data is mapped and validated, there’s no provenance trail connecting production records back to source submissions, reviewers, and decisions.</p></li>
+</ol>
+<p>AI is getting very good at <em>performing</em> harmonization. What it cannot provide: traceable, auditable, versioned decision records that satisfy institutional and regulatory requirements.</p>
+</section>
+<hr class="docutils" />
+<section id="the-insight">
+<h2>The Insight<a class="headerlink" href="#the-insight" title="Link to this heading"></a></h2>
+<p><strong>Matching is a commodity. Governance is the moat.</strong></p>
+<p>Any frontier LLM can map <code class="docutils literal notranslate"><span class="pre">patient_age</span></code> to <code class="docutils literal notranslate"><span class="pre">AGE_AT_VISIT</span></code> with high accuracy. That’s table stakes. What researchers, CROs, and institutions actually need is:</p>
+<ul class="simple">
+<li><p>A <strong>versioned schema registry</strong> that serves as the single source of truth</p></li>
+<li><p>An <strong>auditable record</strong> of every mapping decision, who approved it, and why</p></li>
+<li><p><strong>Provenance tracking</strong> from source row to production dataset</p></li>
+<li><p><strong>Repeatable workflows</strong> that pass regulatory scrutiny</p></li>
+<li><p><strong>Reusable artifacts</strong> — mappings, schemas, validation rules — that compound over time</p></li>
+</ul>
+<p>Forge provides the governance infrastructure. AI is a pluggable capability within it, not the product itself.</p>
+</section>
+<hr class="docutils" />
+<section id="architecture-api-core-pluggable-clients">
+<h2>Architecture: API Core + Pluggable Clients<a class="headerlink" href="#architecture-api-core-pluggable-clients" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                          ┌─────────────────────────────┐
+                          │        Forge APIs           │
+                          │                             │
+                          │  Schema Registry API        │
+                          │  Harmonization API          │
+                          │  Validation API             │
+                          │  Review &amp; Audit API         │
+                          │  Gold Dataset API           │
+                          │                             │
+                          └──────────┬──────────────────┘
+                                     │
+              ┌──────────────────────┼──────────────────────┐
+              │                      │                      │
+              ▼                      ▼                      ▼
+     ┌────────────────┐   ┌──────────────────┐   ┌────────────────┐
+     │   Forge App    │   │  Python SDK /    │   │  Integrations  │
+     │   (Web UI)     │   │  CLI             │   │                │
+     │                │   │                  │   │  REDCap plugin │
+     │  Managed UI    │   │  forge validate  │   │  Jupyter ext   │
+     │  for orgs that │   │  forge harmonize │   │  R package     │
+     │  want a full   │   │  forge publish   │   │  CI/CD hooks   │
+     │  workflow      │   │                  │   │                │
+     └────────────────┘   └──────────────────┘   └────────────────┘
+</pre></div>
+</div>
+<p>The <strong>APIs are the product</strong>. Everything else is a client.</p>
+</section>
+<hr class="docutils" />
+<section id="core-apis">
+<h2>Core APIs<a class="headerlink" href="#core-apis" title="Link to this heading"></a></h2>
+<section id="schema-registry-api">
+<h3>Schema Registry API<a class="headerlink" href="#schema-registry-api" title="Link to this heading"></a></h3>
+<p><em>Single source of truth for canonical schemas</em></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Capability</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Schema CRUD</p></td>
+<td><p>Create, version, and publish canonical schemas</p></td>
+</tr>
+<tr class="row-odd"><td><p>Element management</p></td>
+<td><p>Add, update, deprecate individual data elements</p></td>
+</tr>
+<tr class="row-even"><td><p>Semantic versioning</p></td>
+<td><p>Track breaking vs. non-breaking schema changes</p></td>
+</tr>
+<tr class="row-odd"><td><p>Export</p></td>
+<td><p>Download schemas as CSV, JSON, or data dictionary format</p></td>
+</tr>
+<tr class="row-even"><td><p>History</p></td>
+<td><p>Full change log with diffs between versions</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why it matters:</strong> Every other capability depends on a shared, versioned definition of “correct.” Without a registry, schemas live in spreadsheets and diverge immediately.</p>
+</section>
+<section id="harmonization-api">
+<h3>Harmonization API<a class="headerlink" href="#harmonization-api" title="Link to this heading"></a></h3>
+<p><em>Map source fields to canonical schemas with AI assistance</em></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Capability</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Match</p></td>
+<td><p>Submit source fields, receive ranked candidate mappings with confidence scores</p></td>
+</tr>
+<tr class="row-odd"><td><p>Review</p></td>
+<td><p>Accept, reject, or override AI-suggested mappings</p></td>
+</tr>
+<tr class="row-even"><td><p>Audit</p></td>
+<td><p>Every mapping decision is recorded with actor, timestamp, and rationale</p></td>
+</tr>
+<tr class="row-odd"><td><p>Reuse</p></td>
+<td><p>Export mapping sets for application to new batches or similar studies</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>AI is pluggable here.</strong> The API accepts any matching backend — the current implementation uses hybrid retrieval + LLM evaluation, but could be swapped for a single frontier model call, a fine-tuned domain model, or deterministic rules. The governance layer stays the same regardless.</p>
+</section>
+<section id="validation-api">
+<h3>Validation API<a class="headerlink" href="#validation-api" title="Link to this heading"></a></h3>
+<p><em>Enforce schema conformance on real data</em></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Capability</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Validate</p></td>
+<td><p>Submit data against a schema; receive row-level and field-level errors</p></td>
+</tr>
+<tr class="row-odd"><td><p>Rules engine</p></td>
+<td><p>Type checks, allowed values, numeric ranges, conditional rules, cross-field logic</p></td>
+</tr>
+<tr class="row-even"><td><p>Batch support</p></td>
+<td><p>Validate CSV/Excel files up to configurable size limits</p></td>
+</tr>
+<tr class="row-odd"><td><p>Schema-bound</p></td>
+<td><p>Validation is always tied to a specific schema version</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="review-audit-api">
+<h3>Review &amp; Audit API<a class="headerlink" href="#review-audit-api" title="Link to this heading"></a></h3>
+<p><em>Human QC workflow with full traceability</em></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Capability</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Submission lifecycle</p></td>
+<td><p>Upload → Validate → Review → Accept/Reject → Correct</p></td>
+</tr>
+<tr class="row-odd"><td><p>Claim/release</p></td>
+<td><p>Reviewers claim submissions to prevent conflicts</p></td>
+</tr>
+<tr class="row-even"><td><p>Audit log</p></td>
+<td><p>Append-only record of every action (who, what, when)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Corrections flow</p></td>
+<td><p>Handle updates to previously accepted data with versioning</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="gold-dataset-api">
+<h3>Gold Dataset API<a class="headerlink" href="#gold-dataset-api" title="Link to this heading"></a></h3>
+<p><em>Curated, provenance-tracked production datasets</em></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Capability</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Collection</p></td>
+<td><p>Aggregate accepted submissions into named datasets</p></td>
+</tr>
+<tr class="row-odd"><td><p>Provenance</p></td>
+<td><p>Every row traces back to submission, version, source row, reviewer, timestamp</p></td>
+</tr>
+<tr class="row-even"><td><p>Deduplication</p></td>
+<td><p>Key-column-based duplicate detection across submissions</p></td>
+</tr>
+<tr class="row-odd"><td><p>Export</p></td>
+<td><p>Download complete datasets with or without provenance columns</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<hr class="docutils" />
+<section id="what-makes-this-defensible">
+<h2>What Makes This Defensible<a class="headerlink" href="#what-makes-this-defensible" title="Link to this heading"></a></h2>
+<section id="governance-compounds-matching-doesn-t">
+<h3>1. Governance compounds; matching doesn’t<a class="headerlink" href="#governance-compounds-matching-doesn-t" title="Link to this heading"></a></h3>
+<p>Every mapping decision, schema version, and review action stored in Forge becomes institutional knowledge. Over time, the system knows: “We always map <code class="docutils literal notranslate"><span class="pre">pt_age</span></code> to <code class="docutils literal notranslate"><span class="pre">AGE_AT_VISIT</span></code>” and “Dr. Smith rejected this mapping last year because X.” An ad-hoc LLM session doesn’t accumulate this.</p>
+</section>
+<section id="regulatory-requirements-aren-t-optional">
+<h3>2. Regulatory requirements aren’t optional<a class="headerlink" href="#regulatory-requirements-aren-t-optional" title="Link to this heading"></a></h3>
+<p>FDA submissions, NIH data sharing compliance, and institutional review boards require traceable data lineage. “We asked ChatGPT” is not an acceptable provenance record. Forge provides the structured audit trail that satisfies these requirements.</p>
+</section>
+<section id="the-schema-registry-is-a-network-effect">
+<h3>3. The schema registry is a network effect<a class="headerlink" href="#the-schema-registry-is-a-network-effect" title="Link to this heading"></a></h3>
+<p>A shared registry of community-curated schemas — versioned, validated, with mapping templates — becomes more valuable as more organizations contribute. The platform with the best schema library wins.</p>
+</section>
+<section id="ai-gets-better-governance-stays-necessary">
+<h3>4. AI gets better; governance stays necessary<a class="headerlink" href="#ai-gets-better-governance-stays-necessary" title="Link to this heading"></a></h3>
+<p>As AI matching improves, the <em>accuracy</em> of harmonization approaches 100% and the <em>need for human review</em> decreases. But the need for <em>recording that a human reviewed it</em> doesn’t decrease — it may increase as regulators scrutinize AI-assisted pipelines.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="deployment-tiers">
+<h2>Deployment Tiers<a class="headerlink" href="#deployment-tiers" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Tier</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Target</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Managed</strong></p></td>
+<td><p>Hosted Forge with web UI, auth, org isolation</p></td>
+<td><p>Research organizations, CROs</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Self-hosted</strong></p></td>
+<td><p>Docker Compose deployment, full control</p></td>
+<td><p>Academic institutions with data sovereignty requirements</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>SDK/CLI</strong></p></td>
+<td><p>Python package + CLI, bring your own storage</p></td>
+<td><p>Data engineers, CI/CD pipelines, notebook users</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="near-term-roadmap">
+<h2>Near-Term Roadmap<a class="headerlink" href="#near-term-roadmap" title="Link to this heading"></a></h2>
+<section id="now-managed-ui-for-initial-organizations">
+<h3>Now: Managed UI for initial organizations<a class="headerlink" href="#now-managed-ui-for-initial-organizations" title="Link to this heading"></a></h3>
+<p>Deploy the Forge App (web UI) for 3-4 partner organizations. This validates the core workflows, builds the schema library, and generates feedback on API design.</p>
+</section>
+<section id="next-extract-and-stabilize-public-apis">
+<h3>Next: Extract and stabilize public APIs<a class="headerlink" href="#next-extract-and-stabilize-public-apis" title="Link to this heading"></a></h3>
+<p>Formalize the internal APIs that the web UI already consumes into a documented, versioned public API surface. The web UI becomes one client among many.</p>
+</section>
+<section id="then-python-sdk-cli">
+<h3>Then: Python SDK + CLI<a class="headerlink" href="#then-python-sdk-cli" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Validate a CSV against a published schema</span>
+forge<span class="w"> </span>validate<span class="w"> </span>patient-data.csv<span class="w"> </span>--schema<span class="w"> </span>cdisc-sdtm-v3.2
+
+<span class="c1"># Harmonize a source data dictionary</span>
+forge<span class="w"> </span>harmonize<span class="w"> </span>source-dict.csv<span class="w"> </span>--target<span class="w"> </span>my-registry/canonical-cdes
+
+<span class="c1"># Publish a new schema version</span>
+forge<span class="w"> </span>schema<span class="w"> </span>publish<span class="w"> </span>my-schema.yaml<span class="w"> </span>--bump<span class="w"> </span>minor
+</pre></div>
+</div>
+</section>
+<section id="later-ecosystem-integrations">
+<h3>Later: Ecosystem integrations<a class="headerlink" href="#later-ecosystem-integrations" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>REDCap</strong>: Validate exports against Forge schemas without leaving REDCap</p></li>
+<li><p><strong>Jupyter</strong>: <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">forge</span> <span class="pre">import</span> <span class="pre">Registry;</span> <span class="pre">schema</span> <span class="pre">=</span> <span class="pre">Registry().get(&quot;my-cdes&quot;)</span></code></p></li>
+<li><p><strong>R</strong>: <code class="docutils literal notranslate"><span class="pre">forge::validate(df,</span> <span class="pre">schema</span> <span class="pre">=</span> <span class="pre">&quot;cdisc-sdtm&quot;)</span></code></p></li>
+<li><p><strong>CI/CD</strong>: Schema validation as a pipeline gate (fail the build if data doesn’t conform)</p></li>
+</ul>
+</section>
+</section>
+<hr class="docutils" />
+<section id="positioning">
+<h2>Positioning<a class="headerlink" href="#positioning" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p></p></th>
+<th class="head"><p>Ad-hoc LLM</p></th>
+<th class="head"><p>Spreadsheet workflow</p></th>
+<th class="head"><p>Forge</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Speed</p></td>
+<td><p>Fast</p></td>
+<td><p>Slow</p></td>
+<td><p>Fast</p></td>
+</tr>
+<tr class="row-odd"><td><p>Accuracy</p></td>
+<td><p>High (improving)</p></td>
+<td><p>Variable</p></td>
+<td><p>High (AI-assisted)</p></td>
+</tr>
+<tr class="row-even"><td><p>Audit trail</p></td>
+<td><p>None</p></td>
+<td><p>Informal</p></td>
+<td><p>Structured, append-only</p></td>
+</tr>
+<tr class="row-odd"><td><p>Reusability</p></td>
+<td><p>None</p></td>
+<td><p>Copy-paste</p></td>
+<td><p>Versioned artifacts</p></td>
+</tr>
+<tr class="row-even"><td><p>Provenance</p></td>
+<td><p>None</p></td>
+<td><p>None</p></td>
+<td><p>Row-level traceability</p></td>
+</tr>
+<tr class="row-odd"><td><p>Regulatory compliance</p></td>
+<td><p>No</p></td>
+<td><p>Partial</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td><p>Institutional memory</p></td>
+<td><p>None</p></td>
+<td><p>Tribal knowledge</p></td>
+<td><p>Compounding asset</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<hr class="docutils" />
+<section id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Link to this heading"></a></h2>
+<p>Forge is <strong>data governance infrastructure</strong>, not an AI matching tool. The AI makes harmonization fast. The governance layer makes it <em>trustworthy, repeatable, and auditable</em>. As AI matching becomes commoditized, the governance layer becomes more — not less — valuable.</p>
+<p><strong>API-first means:</strong> the web UI is a client, not the product. Every capability is accessible programmatically. Researchers use the UI when they want a guided workflow. Data engineers use the SDK when they want to automate. CI/CD pipelines use the CLI when they want to enforce. The APIs serve all three.</p>
+<hr class="docutils" />
+<p><em>Initial focus: Biomedical research (CDEs, clinical trials, NIH compliance)</em>
+<em>Expansion: Any domain where data must conform to shared standards — “data contracts as a service”</em></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../guides/deployment.html" class="btn btn-neutral float-left" title="Harmonization Engine - Cloud Run Deployment Guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="forge-executive-summary.html" class="btn btn-neutral float-right" title="Forge" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, DataTecnica, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

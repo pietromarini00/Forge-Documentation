@@ -1,0 +1,21 @@
+GCloud Deploy Workflow
+======================
+
+Use this flow when you want to deploy Forge App via Cloud Build.
+
+1. Authenticate with Google Cloud.
+2. Submit a build using the Forge App Cloud Build config.
+3. Wait for build completion and then manually deploy, and check the service status.
+
+Commands
+--------
+
+.. code-block:: bash
+
+	gcloud auth login
+	gcloud builds submit --config cloudbuild_forge_app.yaml .
+
+Tip
+---
+
+Run these commands from the repository root so the build context includes all required files.
